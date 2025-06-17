@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FinançaPlus | Usuários do Sistema</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .avatar {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 9999px;
+            font-weight: 600;
+            color: white;
+        }
+        .permission-badge {
+            display: inline-block;
+            background-color: #EFF6FF;
+            color: #3B82F6;
+            padding: 2px 8px;
+            border-radius: 9999px;
+            font-size: 12px;
+            margin-right: 4px;
+            margin-bottom: 4px;
+        }
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 24px;
+        }
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: #10B981;
+        }
+        input:checked + .slider:before {
+            transform: translateX(20px);
+        }
+        .modal {
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+        .modal-hidden {
+            opacity: 0;
+            transform: translateY(10px);
+            pointer-events: none;
+        }
+        .toast {
+            animation: slideIn 0.3s ease, fadeOut 0.5s ease 2.5s forwards;
+        }
+        @keyframes slideIn {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        @keyframes fadeOut {
+            to { opacity: 0; }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans">
+    <!-- Header -->
+    <header class="fixed top-0 left-0 right-0 bg-white shadow-sm z-10">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <div class="w-8 h-8 bg-blue-500 rounded-md flex items-center justify-center">
+                    <span class="text-white font-bold">FP</span>
+                </div>
+                <h1 class="text-xl font-semibold text-gray-800">FinançaPlus</h1>
+            </div>
+            
+            <!-- Desktop Navigation -->
+            <nav class="hidden md:flex space-x-6">
+                <a href="../index.html" class="menu-item text-gray-700 hover:text-blue-500 transition-colors">Dashboard</a>
+                <a href="./entradas.html" class="menu-item text-gray-700 hover:text-blue-500 transition-colors">Entradas</a>
+                <a href="./saidas.html" class="menu-item text-gray-700 hover:text-blue-500 transition-colors">Saídas</a>
+                <a href="./DRE.html" class="menu-item text-gray-700 hover:text-blue-500 transition-colors">DRE</a>
+                <a href="./DFC.html" class="menu-item text-gray-700 hover:text-blue-500 transition-colors">DFC</a>
+                <a href="./cadastros.html" class="menu-item text-gray-700 hover:text-blue-500 transition-colors">Cadastros</a>
+                <a href="./con.html" class="menu-item active text-blue-600 hover:text-blue-700 transition-colors">Configurações</a>
+            </nav>
+            
+            <!-- Mobile Menu Button -->
+            <button id="mobile-menu-button" class="md:hidden text-gray-600 focus:outline-none">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                </svg>
+            </button>
+        </div>
+        
+        <!-- Mobile Navigation -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-gray-200 px-4 py-2">
+            <a href="#" class="block py-2 text-gray-700 hover:text-blue-500">Dashboard</a>
+            <a href="#" class="block py-2 text-gray-700 hover:text-blue-500">Entradas</a>
+            <a href="#" class="block py-2 text-gray-700 hover:text-blue-500">Saídas</a>
+            <a href="#" class="block py-2 text-gray-700 hover:text-blue-500">DRE</a>
+            <a href="#" class="block py-2 text-gray-700 hover:text-blue-500">DFC</a>
+            <a href="#" class="block py-2 text-gray-700 hover:text-blue-500">Cadastros</a>
+            <a href="#" class="block py-2 text-blue-500 font-medium">Configurações</a>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="mt-16 pt-6 pb-20">
+        <div class="container mx-auto px-4">
+            <!-- Page Header -->
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+                <div>
+                    <h2 class="text-2xl font-bold text-gray-800">Usuários do Sistema</h2>
+                    <p class="text-sm text-gray-600 mt-1">Gerencie os usuários e permissões de acesso</p>
+                </div>
+                <div class="mt-4 md:mt-0">
+                    <button id="add-user-button" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors flex items-center">
+                        <i class="fas fa-user-plus mr-2"></i>
+                        Adicionar Usuário
+                    </button>
+                </div>
+            </div>
+
+            <!-- Filters -->
+            <div class="bg-white rounded-lg shadow-sm p-4 border border-gray-100 mb-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div>
+                        <label class="block text-gray-600 text-sm mb-1">Buscar</label>
+                        <div class="relative">
+                            <input type="text" placeholder="Nome ou e-mail" class="w-full border border-gray-300 rounded px-3 py-2 pl-10 text-sm">
+                            <i class="fas fa-search absolute left-3 top-2.5 text-gray-400"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-gray-600 text-sm mb-1">Status</label>
+                        <select class="w-full border border-gray-300 rounded px-3 py-2 text-sm">
+                            <option>Todos</option>
+                            <option>Ativo</option>
+                            <option>Inativo</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-gray-600 text-sm mb-1">Cargo</label>
+                        <select class="w-full border border-gray-300 rounded px-3 py-2 text-sm">
+                            <option>Todos</option>
+                            <option>Administrador</option>
+                            <option>Financeiro</option>
+                            <option>Gestor</option>
+                            <option>Analista</option>
+                        </select>
+                    </div>
+                    <div class="flex items-end">
+                        <button class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors w-full">
+                            Filtrar
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Table -->
+            <div class="bg-white rounded-lg shadow-sm overflow-hidden border border-gray-100">
+                <!-- Desktop Table -->
+                <div class="hidden md:block overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Usuário</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">E-mail</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cargo</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Permissões</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <div class="avatar w-10 h-10 bg-blue-500 mr-3">
+                                            <span>AD</span>
+                                        </div>
+                                        <div>
+                                            <div class="text-sm font-medium text-gray-900">Admin User</div>
+                                            <div class="text-xs text-gray-500">Último acesso: 15/06/2023</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">admin@empresa.com</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Administrador</td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">Ativo</span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex flex-wrap">
+                                        <span class="permission-badge">Dashboard</span>
+                                        <span class="permission-badge">Entradas</span>
+                                        <span class="permission-badge">Saídas</span>
+                                        <span class="permission-badge">DRE</span>
+                                        <span class="permission-badge">DFC</span>
+                                        <span class="permission-badge">Clientes</span>
+                                        <span class="permission-badge">Fornecedores</span>
+                                        <span class="permission-badge">Configurações</span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                    <button class="text-blue-500 hover:text-blue-700 mr-3 edit-user" data-id="1">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="text-red-500 hover:text-red-700 delete-user" data-id="1">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <div class="avatar w-10 h-10 bg-green-500 mr-3">
+                                            <span>FN</span>
+                                        </div>
+                                        <div>
+                                            <div class="text-sm font-medium text-gray-900">Financeiro User</div>
+                                            <div class="text-xs text-gray-500">Último acesso: 14/06/2023</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">financeiro@empresa.com</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Financeiro</td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">Ativo</span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex flex-wrap">
+                                        <span class="permission-badge">Dashboard</span>
+                                        <span class="permission-badge">Entradas</span>
+                                        <span class="permission-badge">Saídas</span>
+                                        <span class="permission-badge">DRE</span>
+                                        <span class="permission-badge">DFC</span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                    <button class="text-blue-500 hover:text-blue-700 mr-3 edit-user" data-id="2">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="text-red-500 hover:text-red-700 delete-user" data-id="2">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <div class="avatar w-10 h-10 bg-purple-500 mr-3">
+                                            <span>GS</span>
+                                        </div>
+                                        <div>
+                                            <div class="text-sm font-medium text-gray-900">Gestor User</div>
+                                            <div class="text-xs text-gray-500">Último acesso: 10/06/2023</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">gestor@empresa.com</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Gestor</td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">Ativo</span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex flex-wrap">
+                                        <span class="permission-badge">Dashboard</span>
+                                        <span class="permission-badge">DRE</span>
+                                        <span class="permission-badge">DFC</span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                    <button class="text-blue-500 hover:text-blue-700 mr-3 edit-user" data-id="3">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="text-red-500 hover:text-red-700 delete-user" data-id="3">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <div class="avatar w-10 h-10 bg-yellow-500 mr-3">
+                                            <span>AN</span>
+                                        </div>
+                                        <div>
+                                            <div class="text-sm font-medium text-gray-900">Analista User</div>
+                                            <div class="text-xs text-gray-500">Último acesso: 12/06/2023</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">analista@empresa.com</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Analista</td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="px-2 py-1 text-xs rounded-full bg-red-100 text-red-800">Inativo</span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex flex-wrap">
+                                        <span class="permission-badge">Dashboard</span>
+                                        <span class="permission-badge">Entradas</span>
+                                        <span class="permission-badge">Saídas</span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                    <button class="text-blue-500 hover:text-blue-700 mr-3 edit-user" data-id="4">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="text-red-500 hover:text-red-700 delete-user" data-id="4">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Mobile Cards -->
+                <div class="md:hidden divide-y divide-gray-200">
+                    <div class="p-4">
+                        <div class="flex justify-between items-start">
+                            <div class="flex items-center">
+                                <div class="avatar w-10 h-10 bg-blue-500 mr-3">
+                                    <span>AD</span>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-medium text-gray-900">Admin User</p>
+                                    <p class="text-xs text-gray-500">admin@empresa.com</p>
+                                </div>
+                            </div>
+                            <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">Ativo</span>
+                        </div>
+                        <div class="mt-3">
+                            <p class="text-xs text-gray-500"><i class="fas fa-briefcase mr-1"></i> Administrador</p>
+                            <p class="text-xs text-gray-500 mt-1"><i class="fas fa-clock mr-1"></i> Último acesso: 15/06/2023</p>
+                        </div>
+                        <div class="mt-3 flex flex-wrap">
+                            <span class="permission-badge">Dashboard</span>
+                            <span class="permission-badge">Entradas</span>
+                            <span class="permission-badge">Saídas</span>
+                            <span class="permission-badge">DRE</span>
+                            <span class="permission-badge">DFC</span>
+                            <span class="permission-badge">Clientes</span>
+                            <span class="permission-badge">Fornecedores</span>
+                            <span class="permission-badge">Configurações</span>
+                        </div>
+                        <div class="mt-3 flex justify-end space-x-3">
+                            <button class="text-blue-500 hover:text-blue-700 edit-user" data-id="1">
+                                <i class="fas fa-edit"></i> Editar
+                            </button>
+                            <button class="text-red-500 hover:text-red-700 delete-user" data-id="1">
+                                <i class="fas fa-trash-alt"></i> Excluir
+                            </button>
+                        </div>
+                    </div>
+                    <!-- More mobile cards would go here -->
+                </div>
+
+                <!-- Pagination -->
+                <div class="bg-gray-50 px-6 py-3 flex items-center justify-between border-t border-gray-200">
+                    <div class="flex-1 flex justify-between sm:hidden">
+                        <a href="#" class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                            Anterior
+                        </a>
+                        <a href="#" class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                            Próxima
+                        </a>
+                    </div>
+                    <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                        <div>
+                            <p class="text-sm text-gray-700">
+                                Mostrando <span class="font-medium">1</span> a <span class="font-medium">4</span> de <span class="font-medium">12</span> usuários
+                            </p>
+                        </div>
+                        <div>
+                            <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                                <a href="#" class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                                    <span class="sr-only">Anterior</span>
+                                    <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                                    </svg>
+                                </a>
+                                <a href="#" aria-current="page" class="z-10 bg-blue-50 border-blue-500 text-blue-600 relative inline-flex items-center px-4 py-2 border text-sm font-medium">
+                                    1
+                                </a>
+                                <a href="#" class="bg-white border-gray-300 text-gray-500 hover:bg-gray-50 relative inline-flex items-center px-4 py-2 border text-sm font-medium">
+                                    2
+                                </a>
+                                <a href="#" class="bg-white border-gray-300 text-gray-500 hover:bg-gray-50 relative inline-flex items-center px-4 py-2 border text-sm font-medium">
+                                    3
+                                </a>
+                                <a href="#" class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                                    <span class="sr-only">Próxima</span>
+                                    <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                    </svg>
+                                </a>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- User Modal -->
+    <div id="user-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50 modal-hidden">
+        <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-screen overflow-y-auto">
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-xl font-semibold text-gray-800" id="modal-title">Adicionar Novo Usuário</h3>
+                    <button id="close-modal" class="text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                
+                <form id="user-form">
+                    <input type="hidden" id="user-id">
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="full-name" class="block text-sm font-medium text-gray-700 mb-1">Nome completo *</label>
+                            <input type="text" id="full-name" required class="w-full border border-gray-300 rounded px-3 py-2 focus:ring-blue-500 focus:border-blue-500">
+                            <p class="mt-1 text-xs text-red-600 hidden" id="name-error">Por favor, insira um nome válido</p>
+                        </div>
+                        
+                        <div>
+                            <label for="email" class="block text-sm font-medium text-gray-700 mb-1">E-mail *</label>
+                            <input type="email" id="email" required class="w-full border border-gray-300 rounded px-3 py-2 focus:ring-blue-500 focus:border-blue-500">
+                            <p class="mt-1 text-xs text-gray-500">Será usado para login</p>
+                            <p class="mt-1 text-xs text-red-600 hidden" id="email-error">Por favor, insira um e-mail válido</p>
+                        </div>
+                        
+                        <div>
+                            <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Senha *</label>
+                            <div class="relative">
+                                <input type="password" id="password" required minlength="8" class="w-full border border-gray-300 rounded px-3 py-2 focus:ring-blue-500 focus:border-blue-500">
+                                <button type="button" id="toggle-password" class="absolute right-3 top-2.5 text-gray-500">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                            <p class="mt-1 text-xs text-gray-500">Mínimo de 8 caracteres</p>
+                            <p class="mt-1 text-xs text-red-600 hidden" id="password-error">A senha deve ter pelo menos 8 caracteres</p>
+                        </div>
+                        
+                        <div>
+                            <label for="role" class="block text-sm font-medium text-gray-700 mb-1">Cargo/Função *</label>
+                            <select id="role" required class="w-full border border-gray-300 rounded px-3 py-2 focus:ring-blue-500 focus:border-blue-500">
+                                <option value="">Selecione</option>
+                                <option value="Administrador">Administrador</option>
+                                <option value="Financeiro">Financeiro</option>
+                                <option value="Gestor">Gestor</option>
+                                <option value="Analista">Analista</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                            <label class="switch">
+                                <input type="checkbox" id="status" checked>
+                                <span class="slider"></span>
+                            </label>
+                            <span class="ml-2 text-sm text-gray-600" id="status-label">Ativo</span>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-6">
+                        <h4 class="text-lg font-medium text-gray-800 mb-3">Permissões de Acesso</h4>
+                        <p class="text-sm text-gray-600 mb-4">Selecione os módulos que este usuário poderá acessar:</p>
+                        
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                            <div class="flex items-center">
+                                <input type="checkbox" id="permission-dashboard" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                <label for="permission-dashboard" class="ml-2 block text-sm text-gray-700">Dashboard</label>
+                            </div>
+                            <div class="flex items-center">
+                                <input type="checkbox" id="permission-entradas" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                <label for="permission-entradas" class="ml-2 block text-sm text-gray-700">Entradas</label>
+                            </div>
+                            <div class="flex items-center">
+                                <input type="checkbox" id="permission-saidas" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                <label for="permission-saidas" class="ml-2 block text-sm text-gray-700">Saídas</label>
+                            </div>
+                            <div class="flex items-center">
+                                <input type="checkbox" id="permission-dre" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                <label for="permission-dre" class="ml-2 block text-sm text-gray-700">DRE</label>
+                            </div>
+                            <div class="flex items-center">
+                                <input type="checkbox" id="permission-dfc" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                <label for="permission-dfc" class="ml-2 block text-sm text-gray-700">DFC</label>
+                            </div>
+                            <div class="flex items-center">
+                                <input type="checkbox" id="permission-contas-pagar" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                <label for="permission-contas-pagar" class="ml-2 block text-sm text-gray-700">Contas a Pagar</label>
+                            </div>
+                            <div class="flex items-center">
+                                <input type="checkbox" id="permission-contas-receber" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                <label for="permission-contas-receber" class="ml-2 block text-sm text-gray-700">Contas a Receber</label>
+                            </div>
+                            <div class="flex items-center">
+                                <input type="checkbox" id="permission-clientes" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                <label for="permission-clientes" class="ml-2 block text-sm text-gray-700">Clientes</label>
+                            </div>
+                            <div class="flex items-center">
+                                <input type="checkbox" id="permission-fornecedores" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                <label for="permission-fornecedores" class="ml-2 block text-sm text-gray-700">Fornecedores</label>
+                            </div>
+                            <div class="flex items-center">
+                                <input type="checkbox" id="permission-configuracoes" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                <label for="permission-configuracoes" class="ml-2 block text-sm text-gray-700">Configurações</label>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4 p-3 bg-gray-50 rounded">
+                            <h5 class="text-sm font-medium text-gray-700 mb-2">Resumo das Permissões:</h5>
+                            <div class="flex flex-wrap" id="permissions-summary">
+                                <span class="text-xs text-gray-500">Nenhuma permissão selecionada</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-6 flex justify-end space-x-3">
+                        <button type="button" id="cancel-button" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg transition-colors">
+                            Cancelar
+                        </button>
+                        <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors">
+                            Salvar Usuário
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="delete-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50 modal-hidden">
+        <div class="bg-white rounded-lg shadow-xl max-w-md w-full">
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-xl font-semibold text-gray-800">Confirmar Exclusão</h3>
+                    <button id="close-delete-modal" class="text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                
+                <p class="text-gray-600 mb-6">Tem certeza que deseja excluir este usuário? Esta ação não pode ser desfeita.</p>
+                
+                <div class="flex justify-end space-x-3">
+                    <button type="button" id="cancel-delete" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg transition-colors">
+                        Cancelar
+                    </button>
+                    <button type="button" id="confirm-delete" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors">
+                        Excluir Usuário
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-4 right-4 toast hidden">
+        <div class="bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg flex items-center">
+            <i class="fas fa-check-circle mr-2"></i>
+            <span id="toast-message">Usuário salvo com sucesso!</span>
+        </div>
+    </div>
+
+    <!-- Floating Action Button -->
+    <button class="fab fixed bottom-6 right-6 w-14 h-14 bg-blue-500 text-white rounded-full flex items-center justify-center focus:outline-none shadow-lg hover:bg-blue-600 transition-colors md:hidden">
+        <i class="fas fa-user-plus"></i>
+    </button>
+
+    <script>
+        // Mobile menu toggle
+        document.getElementById('mobile-menu-button').addEventListener('click', function() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+        });
+
+        // User modal functionality
+        const userModal = document.getElementById('user-modal');
+        const addUserButton = document.getElementById('add-user-button');
+        const closeModal = document.getElementById('close-modal');
+        const cancelButton = document.getElementById('cancel-button');
+        const fabButton = document.querySelector('.fab');
+        
+        function openUserModal(userId = null) {
+            if (userId) {
+                document.getElementById('modal-title').textContent = 'Editar Usuário';
+                // In a real app, you would load user data here
+                document.getElementById('user-id').value = userId;
+                // Example data for demo
+                document.getElementById('full-name').value = 'Admin User';
+                document.getElementById('email').value = 'admin@empresa.com';
+                document.getElementById('role').value = 'Administrador';
+                document.getElementById('status').checked = true;
+                document.getElementById('status-label').textContent = 'Ativo';
+                
+                // Check all permissions for admin
+                const checkboxes = document.querySelectorAll('input[type="checkbox"][id^="permission-"]');
+                checkboxes.forEach(checkbox => checkbox.checked = true);
+                updatePermissionsSummary();
+            } else {
+                document.getElementById('modal-title').textContent = 'Adicionar Novo Usuário';
+                document.getElementById('user-form').reset();
+                document.getElementById('status').checked = true;
+                document.getElementById('status-label').textContent = 'Ativo';
+                document.getElementById('permissions-summary').innerHTML = '<span class="text-xs text-gray-500">Nenhuma permissão selecionada</span>';
+            }
+            
+            userModal.classList.remove('modal-hidden');
+        }
+        
+        function closeUserModal() {
+            userModal.classList.add('modal-hidden');
+        }
+        
+        addUserButton.addEventListener('click', () => openUserModal());
+        fabButton.addEventListener('click', () => openUserModal());
+        closeModal.addEventListener('click', closeUserModal);
+        cancelButton.addEventListener('click', closeUserModal);
+        
+        // Edit user buttons
+        document.querySelectorAll('.edit-user').forEach(button => {
+            button.addEventListener('click', function() {
+                const userId = this.getAttribute('data-id');
+                openUserModal(userId);
+            });
+        });
+        
+        // Delete modal functionality
+        const deleteModal = document.getElementById('delete-modal');
+        const closeDeleteModal = document.getElementById('close-delete-modal');
+        const cancelDelete = document.getElementById('cancel-delete');
+        
+        function openDeleteModal(userId) {
+            document.getElementById('confirm-delete').setAttribute('data-id', userId);
+            deleteModal.classList.remove('modal-hidden');
+        }
+        
+        function closeDeleteModalFunc() {
+            deleteModal.classList.add('modal-hidden');
+        }
+        
+        document.querySelectorAll('.delete-user').forEach(button => {
+            button.addEventListener('click', function() {
+                const userId = this.getAttribute('data-id');
+                openDeleteModal(userId);
+            });
+        });
+        
+        closeDeleteModal.addEventListener('click', closeDeleteModalFunc);
+        cancelDelete.addEventListener('click', closeDeleteModalFunc);
+        
+        document.getElementById('confirm-delete').addEventListener('click', function() {
+            const userId = this.getAttribute('data-id');
+            // In a real app, you would delete the user here
+            showToast('Usuário excluído com sucesso!');
+            closeDeleteModalFunc();
+        });
+        
+        // Toggle password visibility
+        document.getElementById('toggle-password').addEventListener('click', function() {
+            const passwordInput = document.getElementById('password');
+            const icon = this.querySelector('i');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                icon.classList.replace('fa-eye', 'fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                icon.classList.replace('fa-eye-slash', 'fa-eye');
+            }
+        });
+        
+        // Toggle status label
+        document.getElementById('status').addEventListener('change', function() {
+            document.getElementById('status-label').textContent = this.checked ? 'Ativo' : 'Inativo';
+        });
+        
+        // Update permissions summary
+        function updatePermissionsSummary() {
+            const summaryContainer = document.getElementById('permissions-summary');
+            const checkedPermissions = document.querySelectorAll('input[type="checkbox"][id^="permission-"]:checked');
+            
+            if (checkedPermissions.length === 0) {
+                summaryContainer.innerHTML = '<span class="text-xs text-gray-500">Nenhuma permissão selecionada</span>';
+                return;
+            }
+            
+            summaryContainer.innerHTML = '';
+            checkedPermissions.forEach(checkbox => {
+                const label = document.querySelector(`label[for="${checkbox.id}"]`).textContent;
+                const badge = document.createElement('span');
+                badge.className = 'permission-badge';
+                badge.textContent = label;
+                summaryContainer.appendChild(badge);
+            });
+        }
+        
+        // Listen for permission checkbox changes
+        document.querySelectorAll('input[type="checkbox"][id^="permission-"]').forEach(checkbox => {
+            checkbox.addEventListener('change', updatePermissionsSummary);
+        });
+        
+        // Form validation and submission
+        document.getElementById('user-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Simple validation
+            let isValid = true;
+            const name = document.getElementById('full-name').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            // Validate name
+            if (name.trim() === '') {
+                document.getElementById('name-error').classList.remove('hidden');
+                isValid = false;
+            } else {
+                document.getElementById('name-error').classList.add('hidden');
+            }
+            
+            // Validate email
+            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                document.getElementById('email-error').classList.remove('hidden');
+                isValid = false;
+            } else {
+                document.getElementById('email-error').classList.add('hidden');
+            }
+            
+            // Validate password
+            if (password.length < 8) {
+                document.getElementById('password-error').classList.remove('hidden');
+                isValid = false;
+            } else {
+                document.getElementById('password-error').classList.add('hidden');
+            }
+            
+            if (isValid) {
+                // In a real app, you would save the user data here
+                const userId = document.getElementById('user-id').value;
+                const message = userId ? 'Usuário atualizado com sucesso!' : 'Usuário cadastrado com sucesso!';
+                showToast(message);
+                closeUserModal();
+            }
+        });
+        
+        // Show toast notification
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-message').textContent = message;
+            toast.classList.remove('hidden');
+            
+            setTimeout(() => {
+                toast.classList.add('hidden');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

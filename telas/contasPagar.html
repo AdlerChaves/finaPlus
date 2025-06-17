@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FinançaPlus | Contas a Pagar</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .highlight-due {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% {
+                background-color: rgba(254, 226, 226, 0.5);
+            }
+            50% {
+                background-color: rgba(254, 226, 226, 1);
+            }
+            100% {
+                background-color: rgba(254, 226, 226, 0.5);
+            }
+        }
+        
+        .overdue {
+            background-color: #FEE2E2;
+        }
+        
+        .due-soon {
+            background-color: #FEF3C7;
+        }
+        
+        .toast {
+            animation: slideIn 0.5s, fadeOut 0.5s 2.5s;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(100%); }
+            to { transform: translateX(0); }
+        }
+        
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+        
+        .modal {
+            transition: opacity 0.3s ease;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans">
+    <!-- Header -->
+    <header class="fixed top-0 left-0 right-0 bg-white shadow-sm z-10">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <div class="w-8 h-8 bg-blue-500 rounded-md flex items-center justify-center">
+                    <span class="text-white font-bold">FP</span>
+                </div>
+                <h1 class="text-xl font-semibold text-gray-800">FinançaPlus</h1>
+            </div>
+            
+            <!-- Desktop Navigation -->
+            <nav class="hidden md:flex space-x-6">
+                <a href="../index.html" class="menu-item text-gray-700 hover:text-blue-500 transition-colors">Dashboard</a>
+                <a href="./entradas.html" class="menu-item text-gray-700 hover:text-blue-500 transition-colors">Entradas</a>
+                <a href="./saidas.html" class="menu-item text-gray-700 hover:text-blue-500 transition-colors">Saídas</a>
+                <a href="./DRE.html" class="menu-item text-gray-700 hover:text-blue-500 transition-colors">DRE</a>
+                <a href="./DFC.html" class="menu-item text-gray-700 hover:text-blue-500 transition-colors">DFC</a>
+                <a href="./contas-a-pagar.html" class="menu-item active text-gray-700 hover:text-blue-500 transition-colors">Contas a Pagar</a>
+                <a href="./cadastros.html" class="menu-item text-gray-700 hover:text-blue-500 transition-colors">Cadastros</a>
+                <a href="./con.html" class="menu-item text-gray-700 hover:text-blue-500 transition-colors">Configurações</a>
+            </nav>
+            
+            <!-- Mobile Menu Button -->
+            <button id="mobile-menu-button" class="md:hidden text-gray-600 focus:outline-none">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                </svg>
+            </button>
+        </div>
+        
+        <!-- Mobile Navigation -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-gray-200 px-4 py-2">
+            <a href="#" class="block py-2 text-gray-700 hover:text-blue-500">Dashboard</a>
+            <a href="#" class="block py-2 text-gray-700 hover:text-blue-500">Entradas</a>
+            <a href="#" class="block py-2 text-gray-700 hover:text-blue-500">Saídas</a>
+            <a href="#" class="block py-2 text-gray-700 hover:text-blue-500">DRE</a>
+            <a href="#" class="block py-2 text-gray-700 hover:text-blue-500">DFC</a>
+            <a href="#" class="block py-2 text-blue-500 font-medium">Contas a Pagar</a>
+            <a href="#" class="block py-2 text-gray-700 hover:text-blue-500">Configurações</a>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="mt-16 pt-6 pb-20">
+        <div class="container mx-auto px-4">
+            <!-- Page Header -->
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-800">Contas a Pagar</h2>
+                <div class="mt-4 md:mt-0">
+                    <button id="add-bill-button" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors flex items-center">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                        </svg>
+                        Nova Conta
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Summary Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                <div class="bg-white rounded-lg shadow-sm p-4 border border-gray-100">
+                    <div class="flex items-center">
+                        <div class="p-3 rounded-full bg-blue-100 text-blue-600 mr-4">
+                            <i class="fas fa-file-invoice-dollar text-lg"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500">Total a Pagar</p>
+                            <p class="text-xl font-bold text-gray-800">R$ 12.450,00</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-lg shadow-sm p-4 border border-gray-100">
+                    <div class="flex items-center">
+                        <div class="p-3 rounded-full bg-green-100 text-green-600 mr-4">
+                            <i class="fas fa-check-circle text-lg"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500">Total Pago</p>
+                            <p class="text-xl font-bold text-gray-800">R$ 5.200,00</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-lg shadow-sm p-4 border border-gray-100">
+                    <div class="flex items-center">
+                        <div class="p-3 rounded-full bg-red-100 text-red-600 mr-4">
+                            <i class="fas fa-exclamation-circle text-lg"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500">Total Pendente</p>
+                            <p class="text-xl font-bold text-gray-800">R$ 7.250,00</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filters -->
+            <div class="bg-white rounded-lg shadow-sm p-4 border border-gray-100 mb-6">
+                <h3 class="text-gray-700 font-medium mb-4">Filtrar Contas</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div>
+                        <label class="block text-gray-600 text-sm mb-1">Período</label>
+                        <select class="w-full border border-gray-300 rounded px-3 py-2 text-sm">
+                            <option>Este mês</option>
+                            <option>Próximos 7 dias</option>
+                            <option>Próximos 30 dias</option>
+                            <option>Personalizado</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-gray-600 text-sm mb-1">Status</label>
+                        <select class="w-full border border-gray-300 rounded px-3 py-2 text-sm">
+                            <option>Todos</option>
+                            <option>Pendentes</option>
+                            <option>Pagas</option>
+                            <option>Vencidas</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-gray-600 text-sm mb-1">Categoria</label>
+                        <select class="w-full border border-gray-300 rounded px-3 py-2 text-sm">
+                            <option>Todas</option>
+                            <option>Aluguel</option>
+                            <option>Água/Luz</option>
+                            <option>Folha de Pagamento</option>
+                            <option>Fornecedores</option>
+                            <option>Impostos</option>
+                            <option>Outros</option>
+                        </select>
+                    </div>
+                    <div class="flex items-end">
+                        <button class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors w-full">
+                            Aplicar Filtros
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Table -->
+            <div class="bg-white rounded-lg shadow-sm overflow-hidden border border-gray-100">
+                <!-- Desktop Table -->
+                <div class="hidden md:block overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fornecedor</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Descrição</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vencimento</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Categoria</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Valor</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            <!-- Overdue bill -->
+                            <tr class="overdue highlight-due">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Imobiliária ABC</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Aluguel do escritório</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    <span class="text-red-600 font-medium">10/06/2023</span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Aluguel</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-red-600">R$ 3.500,00</td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                                        Vencida
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                    <button class="text-blue-500 hover:text-blue-700 mr-3" onclick="markAsPaid(1)">
+                                        <i class="fas fa-check-circle"></i>
+                                    </button>
+                                    <button class="text-blue-500 hover:text-blue-700 mr-3" onclick="editBill(1)">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="text-red-500 hover:text-red-700" onclick="confirmDelete(1)">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            
+                            <!-- Due soon bill -->
+                            <tr class="due-soon">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Energética XYZ</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Conta de energia</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    <span class="text-yellow-600 font-medium">20/06/2023</span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Água/Luz</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">R$ 450,00</td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                                        Pendente
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                    <button class="text-blue-500 hover:text-blue-700 mr-3" onclick="markAsPaid(2)">
+                                        <i class="fas fa-check-circle"></i>
+                                    </button>
+                                    <button class="text-blue-500 hover:text-blue-700 mr-3" onclick="editBill(2)">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="text-red-500 hover:text-red-700" onclick="confirmDelete(2)">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            
+                            <!-- Paid bill -->
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Fornecedor 123</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Materiais de escritório</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">05/06/2023</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Fornecedores</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">R$ 1.200,00</td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                        Pago
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                    <button class="text-blue-500 hover:text-blue-700 mr-3" onclick="editBill(3)">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="text-red-500 hover:text-red-700" onclick="confirmDelete(3)">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            
+                            <!-- Regular bill -->
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Empresa RH</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Folha de pagamento</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">30/06/2023</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Folha de Pagamento</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">R$ 8.500,00</td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
+                                        Pendente
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                    <button class="text-blue-500 hover:text-blue-700 mr-3" onclick="markAsPaid(4)">
+                                        <i class="fas fa-check-circle"></i>
+                                    </button>
+                                    <button class="text-blue-500 hover:text-blue-700 mr-3" onclick="editBill(4)">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="text-red-500 hover:text-red-700" onclick="confirmDelete(4)">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Mobile Cards -->
+                <div class="md:hidden divide-y divide-gray-200">
+                    <!-- Overdue bill -->
+                    <div class="p-4 overdue highlight-due">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-sm font-medium text-gray-900">Imobiliária ABC</p>
+                                <p class="text-xs text-gray-500 mt-1">Aluguel do escritório</p>
+                                <div class="flex items-center mt-1">
+                                    <span class="text-xs text-red-600 font-medium mr-2">10/06/2023</span>
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                                        Vencida
+                                    </span>
+                                </div>
+                                <p class="text-xs text-gray-500 mt-1">Aluguel</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-sm font-medium text-red-600">R$ 3.500,00</p>
+                                <div class="mt-2 flex justify-end space-x-2">
+                                    <button class="text-blue-500" onclick="markAsPaid(1)">
+                                        <i class="fas fa-check-circle"></i>
+                                    </button>
+                                    <button class="text-blue-500" onclick="editBill(1)">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="text-red-500" onclick="confirmDelete(1)">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Due soon bill -->
+                    <div class="p-4 due-soon">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-sm font-medium text-gray-900">Energética XYZ</p>
+                                <p class="text-xs text-gray-500 mt-1">Conta de energia</p>
+                                <div class="flex items-center mt-1">
+                                    <span class="text-xs text-yellow-600 font-medium mr-2">20/06/2023</span>
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                                        Pendente
+                                    </span>
+                                </div>
+                                <p class="text-xs text-gray-500 mt-1">Água/Luz</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-sm font-medium text-gray-900">R$ 450,00</p>
+                                <div class="mt-2 flex justify-end space-x-2">
+                                    <button class="text-blue-500" onclick="markAsPaid(2)">
+                                        <i class="fas fa-check-circle"></i>
+                                    </button>
+                                    <button class="text-blue-500" onclick="editBill(2)">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="text-red-500" onclick="confirmDelete(2)">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Paid bill -->
+                    <div class="p-4">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-sm font-medium text-gray-900">Fornecedor 123</p>
+                                <p class="text-xs text-gray-500 mt-1">Materiais de escritório</p>
+                                <div class="flex items-center mt-1">
+                                    <span class="text-xs text-gray-500 mr-2">05/06/2023</span>
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                        Pago
+                                    </span>
+                                </div>
+                                <p class="text-xs text-gray-500 mt-1">Fornecedores</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-sm font-medium text-gray-900">R$ 1.200,00</p>
+                                <div class="mt-2 flex justify-end space-x-2">
+                                    <button class="text-blue-500" onclick="editBill(3)">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="text-red-500" onclick="confirmDelete(3)">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Regular bill -->
+                    <div class="p-4">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-sm font-medium text-gray-900">Empresa RH</p>
+                                <p class="text-xs text-gray-500 mt-1">Folha de pagamento</p>
+                                <div class="flex items-center mt-1">
+                                    <span class="text-xs text-gray-500 mr-2">30/06/2023</span>
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
+                                        Pendente
+                                    </span>
+                                </div>
+                                <p class="text-xs text-gray-500 mt-1">Folha de Pagamento</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-sm font-medium text-gray-900">R$ 8.500,00</p>
+                                <div class="mt-2 flex justify-end space-x-2">
+                                    <button class="text-blue-500" onclick="markAsPaid(4)">
+                                        <i class="fas fa-check-circle"></i>
+                                    </button>
+                                    <button class="text-blue-500" onclick="editBill(4)">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="text-red-500" onclick="confirmDelete(4)">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Pagination -->
+                <div class="bg-gray-50 px-6 py-3 flex items-center justify-between border-t border-gray-200">
+                    <div class="flex-1 flex justify-between sm:hidden">
+                        <a href="#" class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                            Anterior
+                        </a>
+                        <a href="#" class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                            Próxima
+                        </a>
+                    </div>
+                    <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                        <div>
+                            <p class="text-sm text-gray-700">
+                                Mostrando <span class="font-medium">1</span> a <span class="font-medium">4</span> de <span class="font-medium">24</span> contas
+                            </p>
+                        </div>
+                        <div>
+                            <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                                <a href="#" class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                                    <span class="sr-only">Anterior</span>
+                                    <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                                    </svg>
+                                </a>
+                                <a href="#" aria-current="page" class="z-10 bg-blue-50 border-blue-500 text-blue-600 relative inline-flex items-center px-4 py-2 border text-sm font-medium">
+                                    1
+                                </a>
+                                <a href="#" class="bg-white border-gray-300 text-gray-500 hover:bg-gray-50 relative inline-flex items-center px-4 py-2 border text-sm font-medium">
+                                    2
+                                </a>
+                                <a href="#" class="bg-white border-gray-300 text-gray-500 hover:bg-gray-50 relative inline-flex items-center px-4 py-2 border text-sm font-medium">
+                                    3
+                                </a>
+                                <span class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700">
+                                    ...
+                                </span>
+                                <a href="#" class="bg-white border-gray-300 text-gray-500 hover:bg-gray-50 relative inline-flex items-center px-4 py-2 border text-sm font-medium">
+                                    6
+                                </a>
+                                <a href="#" class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                                    <span class="sr-only">Próxima</span>
+                                    <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                    </svg>
+                                </a>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Floating Action Button -->
+    <button id="fab-button" class="fab fixed bottom-6 right-6 w-14 h-14 bg-blue-500 text-white rounded-full flex items-center justify-center shadow-lg hover:bg-blue-600 transition-colors focus:outline-none">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+        </svg>
+    </button>
+    
+    <!-- Add/Edit Bill Modal -->
+    <div id="bill-modal" class="fixed inset-0 overflow-y-auto z-50 hidden modal">
+        <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+                <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+            </div>
+            
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            
+            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <div class="sm:flex sm:items-start">
+                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+                            <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4" id="modal-title">
+                                Nova Conta a Pagar
+                            </h3>
+                            <div class="mt-2">
+                                <form id="bill-form">
+                                    <div class="mb-4">
+                                        <label for="supplier" class="block text-sm font-medium text-gray-700 mb-1">Fornecedor/Beneficiário *</label>
+                                        <input type="text" id="supplier" name="supplier" required class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    </div>
+                                    
+                                    <div class="mb-4">
+                                        <label for="description" class="block text-sm font-medium text-gray-700 mb-1">Descrição</label>
+                                        <input type="text" id="description" name="description" class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    </div>
+                                    
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                        <div>
+                                            <label for="amount" class="block text-sm font-medium text-gray-700 mb-1">Valor *</label>
+                                            <input type="number" id="amount" name="amount" step="0.01" min="0" required class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                        </div>
+                                        <div>
+                                            <label for="due-date" class="block text-sm font-medium text-gray-700 mb-1">Data de Vencimento *</label>
+                                            <input type="date" id="due-date" name="due-date" required class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-4">
+                                        <label for="category" class="block text-sm font-medium text-gray-700 mb-1">Categoria *</label>
+                                        <select id="category" name="category" required class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                            <option value="">Selecione uma categoria</option>
+                                            <option value="Aluguel">Aluguel</option>
+                                            <option value="Água/Luz">Água/Luz</option>
+                                            <option value="Folha de Pagamento">Folha de Pagamento</option>
+                                            <option value="Fornecedores">Fornecedores</option>
+                                            <option value="Impostos">Impostos</option>
+                                            <option value="Outros">Outros</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="mb-4">
+                                        <label for="notes" class="block text-sm font-medium text-gray-700 mb-1">Observações</label>
+                                        <textarea id="notes" name="notes" rows="3" class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                    <button type="button" id="save-bill" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-500 text-base font-medium text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">
+                        Salvar
+                    </button>
+                    <button type="button" id="cancel-modal" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                        Cancelar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Delete Confirmation Modal -->
+    <div id="delete-modal" class="fixed inset-0 overflow-y-auto z-50 hidden modal">
+        <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+                <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+            </div>
+            
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            
+            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <div class="sm:flex sm:items-start">
+                        <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+                            <svg class="h-6 w-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                            </svg>
+                        </div>
+                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                            <h3 class="text-lg leading-6 font-medium text-gray-900">
+                                Confirmar Exclusão
+                            </h3>
+                            <div class="mt-2">
+                                <p class="text-sm text-gray-500">
+                                    Tem certeza que deseja excluir esta conta? Esta ação não pode ser desfeita.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                    <button type="button" id="confirm-delete" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-500 text-base font-medium text-white hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm">
+                        Excluir
+                    </button>
+                    <button type="button" id="cancel-delete" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                        Cancelar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Toast Notification -->
+    <div id="toast" class="hidden fixed bottom-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg toast">
+        <div class="flex items-center">
+            <i class="fas fa-check-circle mr-2"></i>
+            <span id="toast-message">Operação realizada com sucesso!</span>
+        </div>
+    </div>
+    
+    <script>
+        // Mobile menu toggle
+        document.getElementById('mobile-menu-button').addEventListener('click', function() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+        });
+        
+        // Modal handling
+        const billModal = document.getElementById('bill-modal');
+        const deleteModal = document.getElementById('delete-modal');
+        const toast = document.getElementById('toast');
+        
+        // Open add bill modal
+        document.getElementById('add-bill-button').addEventListener('click', function() {
+            document.getElementById('modal-title').textContent = 'Nova Conta a Pagar';
+            document.getElementById('bill-form').reset();
+            billModal.classList.remove('hidden');
+        });
+        
+        // Open edit bill modal (simulated)
+        function editBill(id) {
+            document.getElementById('modal-title').textContent = 'Editar Conta a Pagar';
+            // In a real app, you would load the bill data here
+            document.getElementById('supplier').value = 'Fornecedor ' + id;
+            document.getElementById('description').value = 'Descrição da conta ' + id;
+            document.getElementById('amount').value = (id * 1000).toFixed(2);
+            document.getElementById('due-date').value = '2023-06-1' + id;
+            document.getElementById('category').value = ['Aluguel', 'Água/Luz', 'Fornecedores', 'Folha de Pagamento'][id % 4];
+            document.getElementById('notes').value = 'Observações para a conta ' + id;
+            billModal.classList.remove('hidden');
+        }
+        
+        // Close modals
+        document.getElementById('cancel-modal').addEventListener('click', function() {
+            billModal.classList.add('hidden');
+        });
+        
+        document.getElementById('cancel-delete').addEventListener('click', function() {
+            deleteModal.classList.add('hidden');
+        });
+        
+        // Save bill
+        document.getElementById('save-bill').addEventListener('click', function() {
+            // Validate form
+            const form = document.getElementById('bill-form');
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+            
+            // In a real app, you would save the bill here
+            billModal.classList.add('hidden');
+            showToast('Conta salva com sucesso!');
+        });
+        
+        // Delete bill confirmation
+        let billToDelete = null;
+        
+        function confirmDelete(id) {
+            billToDelete = id;
+            deleteModal.classList.remove('hidden');
+        }
+        
+        document.getElementById('confirm-delete').addEventListener('click', function() {
+            // In a real app, you would delete the bill here
+            deleteModal.classList.add('hidden');
+            showToast('Conta excluída com sucesso!');
+        });
+        
+        // Mark as paid
+        function markAsPaid(id) {
+            // In a real app, you would update the bill status here
+            showToast('Conta marcada como paga!');
+        }
+        
+        // Show toast notification
+        function showToast(message) {
+            document.getElementById('toast-message').textContent = message;
+            toast.classList.remove('hidden');
+            setTimeout(() => {
+                toast.classList.add('hidden');
+            }, 3000);
+        }
+        
+        // FAB button
+        document.getElementById('fab-button').addEventListener('click', function() {
+            document.getElementById('modal-title').textContent = 'Nova Conta a Pagar';
+            document.getElementById('bill-form').reset();
+            billModal.classList.remove('hidden');
+        });
+    </script>
+</body>
+</html>

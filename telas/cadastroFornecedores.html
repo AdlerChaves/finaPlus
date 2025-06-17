@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FinançaPlus | Fornecedores</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3B82F6',
+                        secondary: '#6B7280',
+                        success: '#10B981',
+                        danger: '#EF4444',
+                        warning: '#F59E0B',
+                        info: '#06B6D4',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .slide-fade-enter-active, .slide-fade-leave-active {
+            transition: all 0.3s ease;
+        }
+        .slide-fade-enter-from, .slide-fade-leave-to {
+            transform: translateY(20px);
+            opacity: 0;
+        }
+        .toast-enter-active, .toast-leave-active {
+            transition: all 0.3s ease;
+        }
+        .toast-enter-from, .toast-leave-to {
+            transform: translateY(-20px);
+            opacity: 0;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans">
+    <!-- Header -->
+    <header class="fixed top-0 left-0 right-0 bg-white shadow-sm z-10">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <div class="w-8 h-8 bg-blue-500 rounded-md flex items-center justify-center">
+                    <span class="text-white font-bold">FP</span>
+                </div>
+                <h1 class="text-xl font-semibold text-gray-800">FinançaPlus</h1>
+            </div>
+            
+            <!-- Desktop Navigation -->
+            <nav class="hidden md:flex space-x-6">
+                <a href="../index.html" class="menu-item text-gray-700 hover:text-blue-500 transition-colors">Dashboard</a>
+                <a href="./entradas.html" class="menu-item text-gray-700 hover:text-blue-500 transition-colors">Entradas</a>
+                <a href="./saidas.html" class="menu-item text-gray-700 hover:text-blue-500 transition-colors">Saídas</a>
+                <a href="./DRE.html" class="menu-item text-gray-700 hover:text-blue-500 transition-colors">DRE</a>
+                <a href="./DFC.html" class="menu-item text-gray-700 hover:text-blue-500 transition-colors">DFC</a>
+                <a href="./cadastros.html" class="menu-item active text-blue-500 hover:text-blue-600 transition-colors">Cadastros</a>
+                <a href="./con.html" class="menu-item text-gray-700 hover:text-blue-500 transition-colors">Configurações</a>
+            </nav>
+            
+            <!-- Mobile Menu Button -->
+            <button id="mobile-menu-button" class="md:hidden text-gray-600 focus:outline-none">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                </svg>
+            </button>
+        </div>
+        
+        <!-- Mobile Navigation -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-gray-200 px-4 py-2">
+            <a href="#" class="block py-2 text-gray-700 hover:text-blue-500">Dashboard</a>
+            <a href="#" class="block py-2 text-gray-700 hover:text-blue-500">Entradas</a>
+            <a href="#" class="block py-2 text-gray-700 hover:text-blue-500">Saídas</a>
+            <a href="#" class="block py-2 text-gray-700 hover:text-blue-500">DRE</a>
+            <a href="#" class="block py-2 text-gray-700 hover:text-blue-500">DFC</a>
+            <a href="#" class="block py-2 text-blue-500 font-medium">Cadastros</a>
+            <a href="#" class="block py-2 text-gray-700 hover:text-blue-500">Configurações</a>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="mt-16 pt-6 pb-20">
+        <div class="container mx-auto px-4">
+            <!-- Page Header -->
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+                <div>
+                    <h2 class="text-2xl font-bold text-gray-800">Fornecedores</h2>
+                    <p class="text-sm text-gray-500">Cadastre e gerencie seus fornecedores</p>
+                </div>
+                <div class="mt-4 md:mt-0">
+                    <button id="add-supplier-btn" class="bg-primary hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors flex items-center">
+                        <i class="fas fa-plus mr-2"></i>
+                        Adicionar Fornecedor
+                    </button>
+                </div>
+            </div>
+
+            <!-- Summary Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                <div class="bg-white rounded-lg shadow-sm p-4 border border-gray-100">
+                    <div class="flex items-center">
+                        <div class="p-3 rounded-full bg-blue-100 text-blue-500 mr-4">
+                            <i class="fas fa-building"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500">Total de Fornecedores</p>
+                            <p class="text-xl font-bold text-gray-800">42</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-lg shadow-sm p-4 border border-gray-100">
+                    <div class="flex items-center">
+                        <div class="p-3 rounded-full bg-green-100 text-green-500 mr-4">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500">Ativos</p>
+                            <p class="text-xl font-bold text-gray-800">36</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-lg shadow-sm p-4 border border-gray-100">
+                    <div class="flex items-center">
+                        <div class="p-3 rounded-full bg-gray-100 text-gray-500 mr-4">
+                            <i class="fas fa-ban"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500">Inativos</p>
+                            <p class="text-xl font-bold text-gray-800">6</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filters -->
+            <div class="bg-white rounded-lg shadow-sm p-4 border border-gray-100 mb-6">
+                <h3 class="text-gray-700 font-medium mb-4">Filtrar Fornecedores</h3>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div class="md:col-span-2">
+                        <label class="block text-gray-600 text-sm mb-1">Buscar</label>
+                        <div class="relative">
+                            <input type="text" placeholder="Nome ou CNPJ" class="w-full border border-gray-300 rounded px-3 py-2 pl-10 text-sm">
+                            <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-gray-600 text-sm mb-1">Status</label>
+                        <select class="w-full border border-gray-300 rounded px-3 py-2 text-sm">
+                            <option>Todos</option>
+                            <option>Ativo</option>
+                            <option>Inativo</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-gray-600 text-sm mb-1">Categoria</label>
+                        <select class="w-full border border-gray-300 rounded px-3 py-2 text-sm">
+                            <option>Todas</option>
+                            <option>Material Elétrico</option>
+                            <option>Serviços</option>
+                            <option>Transporte</option>
+                            <option>Alimentos</option>
+                            <option>Tecnologia</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Table -->
+            <div class="bg-white rounded-lg shadow-sm overflow-hidden border border-gray-100">
+                <!-- Desktop Table -->
+                <div class="hidden md:block overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fornecedor</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">CNPJ</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Telefone</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">E-mail</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Categoria</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <div class="flex-shrink-0 h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-500 font-medium">
+                                            LE
+                                        </div>
+                                        <div class="ml-4">
+                                            <div class="text-sm font-medium text-gray-900">Lima Eletricista</div>
+                                            <div class="text-sm text-gray-500">limaeletricista@exemplo.com</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">12.345.678/0001-90</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">(11) 98765-4321</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">contato@limaeletricista.com</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Material Elétrico</td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                        Ativo
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                    <button class="text-primary hover:text-blue-700 mr-3 edit-btn" data-id="1">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="text-danger hover:text-red-700 delete-btn" data-id="1">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <div class="flex-shrink-0 h-10 w-10 rounded-full bg-purple-100 flex items-center justify-center text-purple-500 font-medium">
+                                            TT
+                                        </div>
+                                        <div class="ml-4">
+                                            <div class="text-sm font-medium text-gray-900">Tech Transportes</div>
+                                            <div class="text-sm text-gray-500">techtrans@exemplo.com</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">98.765.432/0001-10</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">(11) 91234-5678</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">contato@techtrans.com.br</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Transporte</td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                        Ativo
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                    <button class="text-primary hover:text-blue-700 mr-3 edit-btn" data-id="2">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="text-danger hover:text-red-700 delete-btn" data-id="2">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <div class="flex-shrink-0 h-10 w-10 rounded-full bg-yellow-100 flex items-center justify-center text-yellow-500 font-medium">
+                                            AS
+                                        </div>
+                                        <div class="ml-4">
+                                            <div class="text-sm font-medium text-gray-900">Alimentos S.A.</div>
+                                            <div class="text-sm text-gray-500">alimentossa@exemplo.com</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">23.456.789/0001-11</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">(11) 99876-5432</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">sac@alimentossa.com.br</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Alimentos</td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
+                                        Inativo
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                    <button class="text-primary hover:text-blue-700 mr-3 edit-btn" data-id="3">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="text-danger hover:text-red-700 delete-btn" data-id="3">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Mobile Cards -->
+                <div class="md:hidden divide-y divide-gray-200">
+                    <div class="p-4">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0 h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-500 font-medium">
+                                LE
+                            </div>
+                            <div class="ml-4 flex-1">
+                                <div class="flex justify-between">
+                                    <div>
+                                        <p class="text-sm font-medium text-gray-900">Lima Eletricista</p>
+                                        <p class="text-xs text-gray-500">12.345.678/0001-90</p>
+                                    </div>
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                        Ativo
+                                    </span>
+                                </div>
+                                <div class="mt-2">
+                                    <p class="text-xs text-gray-500"><i class="fas fa-phone mr-1"></i> (11) 98765-4321</p>
+                                    <p class="text-xs text-gray-500"><i class="fas fa-envelope mr-1"></i> contato@limaeletricista.com</p>
+                                    <p class="text-xs text-gray-500"><i class="fas fa-tag mr-1"></i> Material Elétrico</p>
+                                </div>
+                                <div class="mt-2 flex justify-end space-x-3">
+                                    <button class="text-primary hover:text-blue-700 edit-btn" data-id="1">
+                                        <i class="fas fa-edit"></i> Editar
+                                    </button>
+                                    <button class="text-danger hover:text-red-700 delete-btn" data-id="1">
+                                        <i class="fas fa-trash"></i> Excluir
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0 h-10 w-10 rounded-full bg-purple-100 flex items-center justify-center text-purple-500 font-medium">
+                                TT
+                            </div>
+                            <div class="ml-4 flex-1">
+                                <div class="flex justify-between">
+                                    <div>
+                                        <p class="text-sm font-medium text-gray-900">Tech Transportes</p>
+                                        <p class="text-xs text-gray-500">98.765.432/0001-10</p>
+                                    </div>
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                        Ativo
+                                    </span>
+                                </div>
+                                <div class="mt-2">
+                                    <p class="text-xs text-gray-500"><i class="fas fa-phone mr-1"></i> (11) 91234-5678</p>
+                                    <p class="text-xs text-gray-500"><i class="fas fa-envelope mr-1"></i> contato@techtrans.com.br</p>
+                                    <p class="text-xs text-gray-500"><i class="fas fa-tag mr-1"></i> Transporte</p>
+                                </div>
+                                <div class="mt-2 flex justify-end space-x-3">
+                                    <button class="text-primary hover:text-blue-700 edit-btn" data-id="2">
+                                        <i class="fas fa-edit"></i> Editar
+                                    </button>
+                                    <button class="text-danger hover:text-red-700 delete-btn" data-id="2">
+                                        <i class="fas fa-trash"></i> Excluir
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0 h-10 w-10 rounded-full bg-yellow-100 flex items-center justify-center text-yellow-500 font-medium">
+                                AS
+                            </div>
+                            <div class="ml-4 flex-1">
+                                <div class="flex justify-between">
+                                    <div>
+                                        <p class="text-sm font-medium text-gray-900">Alimentos S.A.</p>
+                                        <p class="text-xs text-gray-500">23.456.789/0001-11</p>
+                                    </div>
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
+                                        Inativo
+                                    </span>
+                                </div>
+                                <div class="mt-2">
+                                    <p class="text-xs text-gray-500"><i class="fas fa-phone mr-1"></i> (11) 99876-5432</p>
+                                    <p class="text-xs text-gray-500"><i class="fas fa-envelope mr-1"></i> sac@alimentossa.com.br</p>
+                                    <p class="text-xs text-gray-500"><i class="fas fa-tag mr-1"></i> Alimentos</p>
+                                </div>
+                                <div class="mt-2 flex justify-end space-x-3">
+                                    <button class="text-primary hover:text-blue-700 edit-btn" data-id="3">
+                                        <i class="fas fa-edit"></i> Editar
+                                    </button>
+                                    <button class="text-danger hover:text-red-700 delete-btn" data-id="3">
+                                        <i class="fas fa-trash"></i> Excluir
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Pagination -->
+                <div class="bg-gray-50 px-6 py-3 flex items-center justify-between border-t border-gray-200">
+                    <div class="flex-1 flex justify-between sm:hidden">
+                        <a href="#" class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                            Anterior
+                        </a>
+                        <a href="#" class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                            Próxima
+                        </a>
+                    </div>
+                    <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                        <div>
+                            <p class="text-sm text-gray-700">
+                                Mostrando <span class="font-medium">1</span> a <span class="font-medium">3</span> de <span class="font-medium">42</span> fornecedores
+                            </p>
+                        </div>
+                        <div>
+                            <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                                <a href="#" class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                                    <span class="sr-only">Anterior</span>
+                                    <i class="fas fa-chevron-left"></i>
+                                </a>
+                                <a href="#" aria-current="page" class="z-10 bg-blue-50 border-blue-500 text-blue-600 relative inline-flex items-center px-4 py-2 border text-sm font-medium">
+                                    1
+                                </a>
+                                <a href="#" class="bg-white border-gray-300 text-gray-500 hover:bg-gray-50 relative inline-flex items-center px-4 py-2 border text-sm font-medium">
+                                    2
+                                </a>
+                                <a href="#" class="bg-white border-gray-300 text-gray-500 hover:bg-gray-50 relative inline-flex items-center px-4 py-2 border text-sm font-medium">
+                                    3
+                                </a>
+                                <span class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700">
+                                    ...
+                                </span>
+                                <a href="#" class="bg-white border-gray-300 text-gray-500 hover:bg-gray-50 relative inline-flex items-center px-4 py-2 border text-sm font-medium">
+                                    8
+                                </a>
+                                <a href="#" class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                                    <span class="sr-only">Próxima</span>
+                                    <i class="fas fa-chevron-right"></i>
+                                </a>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Floating Action Button -->
+    <button id="fab-add-supplier" class="fab fixed bottom-6 right-6 w-14 h-14 bg-primary text-white rounded-full flex items-center justify-center shadow-lg hover:bg-blue-600 transition-colors focus:outline-none">
+        <i class="fas fa-plus text-xl"></i>
+    </button>
+
+    <!-- Modal -->
+    <div id="supplier-modal" class="fixed inset-0 z-50 hidden overflow-y-auto">
+        <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <!-- Background overlay -->
+            <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+                <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+            </div>
+            
+            <!-- Modal content -->
+            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <div class="flex justify-between items-start">
+                        <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">
+                            Adicionar Fornecedor
+                        </h3>
+                        <button id="close-modal" class="text-gray-400 hover:text-gray-500">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <form id="supplier-form">
+                            <div class="grid grid-cols-1 gap-4">
+                                <div>
+                                    <label for="name" class="block text-sm font-medium text-gray-700">Nome / Razão Social *</label>
+                                    <input type="text" id="name" name="name" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                                </div>
+                                
+                                <div>
+                                    <label for="cnpj" class="block text-sm font-medium text-gray-700">CNPJ *</label>
+                                    <input type="text" id="cnpj" name="cnpj" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" placeholder="00.000.000/0000-00">
+                                </div>
+                                
+                                <div>
+                                    <label for="phone" class="block text-sm font-medium text-gray-700">Telefone</label>
+                                    <input type="text" id="phone" name="phone" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" placeholder="(00) 00000-0000">
+                                </div>
+                                
+                                <div>
+                                    <label for="email" class="block text-sm font-medium text-gray-700">E-mail</label>
+                                    <input type="email" id="email" name="email" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" placeholder="exemplo@dominio.com">
+                                </div>
+                                
+                                <div>
+                                    <label for="category" class="block text-sm font-medium text-gray-700">Categoria</label>
+                                    <select id="category" name="category" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                                        <option value="">Selecione uma categoria</option>
+                                        <option value="Material Elétrico">Material Elétrico</option>
+                                        <option value="Serviços">Serviços</option>
+                                        <option value="Transporte">Transporte</option>
+                                        <option value="Alimentos">Alimentos</option>
+                                        <option value="Tecnologia">Tecnologia</option>
+                                        <option value="Outros">Outros</option>
+                                    </select>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">Status</label>
+                                    <div class="mt-2 space-y-2">
+                                        <div class="flex items-center">
+                                            <input id="status-active" name="status" type="radio" checked class="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300">
+                                            <label for="status-active" class="ml-2 block text-sm text-gray-700">Ativo</label>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <input id="status-inactive" name="status" type="radio" class="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300">
+                                            <label for="status-inactive" class="ml-2 block text-sm text-gray-700">Inativo</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div>
+                                    <label for="notes" class="block text-sm font-medium text-gray-700">Observações</label>
+                                    <textarea id="notes" name="notes" rows="3" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"></textarea>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
+                <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                    <button type="button" id="save-supplier" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-primary text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">
+                        Salvar
+                    </button>
+                    <button type="button" id="cancel-modal" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                        Cancelar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="delete-modal" class="fixed inset-0 z-50 hidden overflow-y-auto">
+        <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <!-- Background overlay -->
+            <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+                <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+            </div>
+            
+            <!-- Modal content -->
+            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <div class="sm:flex sm:items-start">
+                        <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+                            <i class="fas fa-exclamation text-red-600"></i>
+                        </div>
+                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                            <h3 class="text-lg leading-6 font-medium text-gray-900">Confirmar exclusão</h3>
+                            <div class="mt-2">
+                                <p class="text-sm text-gray-500">Tem certeza que deseja excluir este fornecedor? Esta ação não pode ser desfeita.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                    <button type="button" id="confirm-delete" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-danger text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm">
+                        Excluir
+                    </button>
+                    <button type="button" id="cancel-delete" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                        Cancelar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="hidden fixed top-4 right-4 z-50">
+        <div class="max-w-sm w-full bg-white shadow-lg rounded-lg pointer-events-auto ring-1 ring-black ring-opacity-5 overflow-hidden">
+            <div class="p-4">
+                <div class="flex items-start">
+                    <div id="toast-icon" class="flex-shrink-0">
+                        <i class="fas fa-check-circle text-green-500"></i>
+                    </div>
+                    <div class="ml-3 w-0 flex-1 pt-0.5">
+                        <p id="toast-title" class="text-sm font-medium text-gray-900">Sucesso!</p>
+                        <p id="toast-message" class="mt-1 text-sm text-gray-500">Fornecedor cadastrado com sucesso.</p>
+                    </div>
+                    <div class="ml-4 flex-shrink-0 flex">
+                        <button id="close-toast" class="bg-white rounded-md inline-flex text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                            <span class="sr-only">Fechar</span>
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Mobile menu toggle
+        document.getElementById('mobile-menu-button').addEventListener('click', function() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+        });
+
+        // Modal handling
+        const modal = document.getElementById('supplier-modal');
+        const deleteModal = document.getElementById('delete-modal');
+        const toast = document.getElementById('toast');
+        let currentSupplierId = null;
+
+        // Open modal for adding new supplier
+        document.getElementById('add-supplier-btn').addEventListener('click', openModal);
+        document.getElementById('fab-add-supplier').addEventListener('click', openModal);
+
+        // Close modal
+        document.getElementById('close-modal').addEventListener('click', closeModal);
+        document.getElementById('cancel-modal').addEventListener('click', closeModal);
+
+        // Open modal for editing
+        document.querySelectorAll('.edit-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const supplierId = this.getAttribute('data-id');
+                // In a real app, we would fetch the supplier data here
+                currentSupplierId = supplierId;
+                document.getElementById('modal-title').textContent = 'Editar Fornecedor';
+                openModal();
+            });
+        });
+
+        // Delete confirmation
+        document.querySelectorAll('.delete-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                currentSupplierId = this.getAttribute('data-id');
+                deleteModal.classList.remove('hidden');
+            });
+        });
+
+        // Confirm delete
+        document.getElementById('confirm-delete').addEventListener('click', function() {
+            // In a real app, we would delete the supplier here
+            showToast('Fornecedor excluído com sucesso!', 'success');
+            deleteModal.classList.add('hidden');
+            currentSupplierId = null;
+        });
+
+        // Cancel delete
+        document.getElementById('cancel-delete').addEventListener('click', function() {
+            deleteModal.classList.add('hidden');
+            currentSupplierId = null;
+        });
+
+        // Save supplier
+        document.getElementById('save-supplier').addEventListener('click', function() {
+            const form = document.getElementById('supplier-form');
+            if (form.checkValidity()) {
+                // In a real app, we would save the supplier here
+                const message = currentSupplierId ? 'Fornecedor atualizado com sucesso!' : 'Fornecedor cadastrado com sucesso!';
+                showToast(message, 'success');
+                closeModal();
+            } else {
+                form.reportValidity();
+            }
+        });
+
+        // Close toast
+        document.getElementById('close-toast').addEventListener('click', function() {
+            toast.classList.add('hidden');
+        });
+
+        function openModal() {
+            modal.classList.remove('hidden');
+        }
+
+        function closeModal() {
+            modal.classList.add('hidden');
+            document.getElementById('supplier-form').reset();
+            currentSupplierId = null;
+        }
+
+        function showToast(message, type) {
+            const toastTitle = document.getElementById('toast-title');
+            const toastMessage = document.getElementById('toast-message');
+            const toastIcon = document.getElementById('toast-icon');
+            
+            toastMessage.textContent = message;
+            
+            if (type === 'success') {
+                toastTitle.textContent = 'Sucesso!';
+                toastIcon.innerHTML = '<i class="fas fa-check-circle text-green-500"></i>';
+            } else if (type === 'error') {
+                toastTitle.textContent = 'Erro!';
+                toastIcon.innerHTML = '<i class="fas fa-exclamation-circle text-red-500"></i>';
+            }
+            
+            toast.classList.remove('hidden');
+            
+            // Auto hide after 5 seconds
+            setTimeout(() => {
+                toast.classList.add('hidden');
+            }, 5000);
+        }
+
+        // Input masks
+        document.getElementById('cnpj').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            
+            if (value.length > 12) {
+                value = value.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2}).*/, '$1.$2.$3/$4-$5');
+            } else if (value.length > 8) {
+                value = value.replace(/^(\d{2})(\d{3})(\d{3})(\d{4}).*/, '$1.$2.$3/$4');
+            } else if (value.length > 5) {
+                value = value.replace(/^(\d{2})(\d{3})(\d{3}).*/, '$1.$2.$3');
+            } else if (value.length > 2) {
+                value = value.replace(/^(\d{2})(\d{3}).*/, '$1.$2');
+            }
+            
+            e.target.value = value;
+        });
+
+        document.getElementById('phone').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            
+            if (value.length > 10) {
+                value = value.replace(/^(\d{2})(\d{5})(\d{4}).*/, '($1) $2-$3');
+            } else if (value.length > 6) {
+                value = value.replace(/^(\d{2})(\d{4})(\d{4}).*/, '($1) $2-$3');
+            } else if (value.length > 2) {
+                value = value.replace(/^(\d{2})(\d{4}).*/, '($1) $2');
+            } else if (value.length > 0) {
+                value = value.replace(/^(\d{2}).*/, '($1)');
+            }
+            
+            e.target.value = value;
+        });
+    </script>
+</body>
+</html>

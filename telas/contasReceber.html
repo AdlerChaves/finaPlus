@@ -813,5 +813,24 @@
             searchInput.addEventListener('input', filterReceivables);
         });
     </script>
+<script src="../componentes/topbar.js"></script>
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                // Exemplo de permissões para um usuário do financeiro
+                const userPermissions = {
+                    dashboard: true,
+                    movimentacoes: true,
+                    relatorios: true,
+                    pagamentos: true,
+                    contas: true,
+                    cadastros: true,       
+                    configuracoes: true    
+                };
+                renderTopbar('pagamentos', userPermissions);
+
+                // ...aqui entraria qualquer outro JS específico da página de entradas
+            });
+        </script>
 </body>
+
 </html>

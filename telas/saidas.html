@@ -12,50 +12,6 @@
 
 <body class="bg-gray-50 font-sans">
     <!-- Header -->
-    <header class="fixed top-0 left-0 right-0 bg-white shadow-sm z-10">
-        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
-            <div class="flex items-center space-x-2">
-                <div class="w-8 h-8 bg-blue-500 rounded-md flex items-center justify-center">
-                    <span class="text-white font-bold">FP</span>
-                </div>
-                <h1 class="text-xl font-semibold text-gray-800">FinançaPlus</h1>
-            </div>
-
-            <!-- Desktop Navigation -->
-            <nav class="hidden md:flex space-x-6">
-                <a href="../index.html"
-                    class="menu-item text-gray-700 hover:text-blue-500 transition-colors">Dashboard</a>
-                <a href="./entradas.html"
-                    class="menu-item text-gray-700 hover:text-blue-500 transition-colors">Entradas</a>
-                <a href="./saidas.html"
-                    class="menu-item active text-gray-700 hover:text-blue-500 transition-colors">Saídas</a>
-                <a href="./DRE.html" class="menu-item text-gray-700 hover:text-blue-500 transition-colors">DRE</a>
-                <a href="./DFC.html" class="menu-item text-gray-700 hover:text-blue-500 transition-colors">DFC</a>
-                <a href="./cadastros.html" class="menu-item text-gray-700 hover:text-blue-500 transition-colors">Cadastros</a>
-                <a href="./configuracoes.html"
-                    class="menu-item text-gray-700 hover:text-blue-500 transition-colors">Configurações</a>
-            </nav>
-
-            <!-- Mobile Menu Button -->
-            <button id="mobile-menu-button" class="md:hidden text-gray-600 focus:outline-none">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16">
-                    </path>
-                </svg>
-            </button>
-        </div>
-
-        <!-- Mobile Navigation -->
-        <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-gray-200 px-4 py-2">
-            <a href="#" class="block py-2 text-gray-700 hover:text-blue-500">Dashboard</a>
-            <a href="#" class="block py-2 text-blue-500 font-medium">Entradas</a>
-            <a href="#" class="block py-2 text-gray-700 hover:text-blue-500">Saídas</a>
-            <a href="#" class="block py-2 text-gray-700 hover:text-blue-500">DRE</a>
-            <a href="#" class="block py-2 text-gray-700 hover:text-blue-500">DFC</a>
-            <a href="#" class="block py-2 text-gray-700 hover:text-blue-500">Configurações</a>
-        </div>
-    </header>
 
     <!-- Main Content -->
     <main class="mt-16 pt-6 pb-20">
@@ -667,6 +623,26 @@
 
                 // Initial render
                 renderExpenses();
+            });
+        </script>
+        <script src="../componentes/topbar.js"></script>
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                // Exemplo de permissões para um usuário do financeiro
+                const userPermissions = {
+                    dashboard: true,
+                    movimentacoes: true,
+                    relatorios: true,
+                    pagamentos: true,
+                    contas: true,
+                    cadastros: true,       
+                    configuracoes: true    
+                };
+
+                // Chama a função, marcando o menu 'movimentacoes' como ativo
+                renderTopbar('movimentacoes', userPermissions);
+
+                // ...aqui entraria qualquer outro JS específico da página de entradas
             });
         </script>
 </body>

@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FinançaPlus | Gestão de Contas</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary': '#3B82F6',
+                        'primary-dark': '#2563EB',
+                        'success': '#10B981',
+                        'danger': '#EF4444',
+                        'warning': '#F59E0B',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .slide-fade-enter-active {
+            transition: all 0.3s ease-out;
+        }
+
+        .slide-fade-leave-active {
+            transition: all 0.3s cubic-bezier(1, 0.5, 0.8, 1);
+        }
+
+        .slide-fade-enter-from,
+        .slide-fade-leave-to {
+            transform: translateY(20px);
+            opacity: 0;
+        }
+
+        .toast {
+            animation: slideIn 0.5s, fadeOut 0.5s 2.5s;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+            }
+
+            to {
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+            }
+
+            to {
+                opacity: 0;
+            }
+        }
+
+        .currency-input {
+            padding-left: 20px;
+        }
+
+        .currency-input::before {
+            content: "R$";
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6B7280;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50 font-sans">
+    <!-- Header -->
+
+    <!-- Main Content -->
+    <main class="mt-16 pt-6 pb-20">
+        <div class="container mx-auto px-4">
+            <!-- Page Header -->
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+                <div>
+                    <h2 class="text-2xl font-bold text-gray-800">Gestão de Contas</h2>
+                    <p class="text-gray-600">Cadastre e gerencie suas contas bancárias e caixas.</p>
+                </div>
+                <div class="mt-4 md:mt-0 flex space-x-3">
+                    <button id="add-account-btn"
+                        class="bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-lg transition-colors flex items-center">
+                        <i class="fas fa-plus mr-2"></i>
+                        Adicionar Conta
+                    </button>
+                    <a href="cadastroCartoes.html"
+                        class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg transition-colors flex items-center">
+                        <i class="fas fa-credit-card mr-2"></i>
+                        Cartões
+                    </a>
+                </div>
+            </div>
+
+            <!-- Summary Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                <div class="bg-white rounded-lg shadow-sm p-4 border border-gray-100">
+                    <div class="flex items-center">
+                        <div class="p-3 rounded-full bg-green-100 text-green-600 mr-4">
+                            <i class="fas fa-wallet text-xl"></i>
+                        </div>
+                        <div>
+                            <p class="text-gray-500 text-sm">Saldo Total</p>
+                            <p class="text-2xl font-bold text-gray-800">R$ 24.580,00</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-lg shadow-sm p-4 border border-gray-100">
+                    <div class="flex items-center">
+                        <div class="p-3 rounded-full bg-blue-100 text-blue-600 mr-4">
+                            <i class="fas fa-check-circle text-xl"></i>
+                        </div>
+                        <div>
+                            <p class="text-gray-500 text-sm">Contas Ativas</p>
+                            <p class="text-2xl font-bold text-gray-800">4</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-lg shadow-sm p-4 border border-gray-100">
+                    <div class="flex items-center">
+                        <div class="p-3 rounded-full bg-red-100 text-red-600 mr-4">
+                            <i class="fas fa-times-circle text-xl"></i>
+                        </div>
+                        <div>
+                            <p class="text-gray-500 text-sm">Contas Inativas</p>
+                            <p class="text-2xl font-bold text-gray-800">1</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Table -->
+            <div class="bg-white rounded-lg shadow-sm overflow-hidden border border-gray-100">
+                <!-- Desktop Table -->
+                <div class="hidden md:block overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Nome da Conta</th>
+                                <th
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Tipo</th>
+                                <th
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Saldo Inicial</th>
+                                <th
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Status</th>
+                                <th
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200" id="accounts-table-body">
+                            <!-- Accounts will be inserted here by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Mobile Cards -->
+                <div class="md:hidden divide-y divide-gray-200" id="mobile-accounts-list">
+                    <!-- Mobile account cards will be inserted here by JavaScript -->
+                </div>
+
+                <!-- Pagination -->
+                <div class="bg-gray-50 px-6 py-3 flex items-center justify-between border-t border-gray-200">
+                    <div class="flex-1 flex justify-between sm:hidden">
+                        <a href="#"
+                            class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                            Anterior
+                        </a>
+                        <a href="#"
+                            class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                            Próxima
+                        </a>
+                    </div>
+                    <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                        <div>
+                            <p class="text-sm text-gray-700">
+                                Mostrando <span class="font-medium">1</span> a <span class="font-medium">5</span> de
+                                <span class="font-medium">5</span> contas
+                            </p>
+                        </div>
+                        <div>
+                            <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px"
+                                aria-label="Pagination">
+                                <a href="#"
+                                    class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                                    <span class="sr-only">Anterior</span>
+                                    <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                        stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M15 19l-7-7 7-7" />
+                                    </svg>
+                                </a>
+                                <a href="#" aria-current="page"
+                                    class="z-10 bg-blue-50 border-blue-500 text-blue-600 relative inline-flex items-center px-4 py-2 border text-sm font-medium">
+                                    1
+                                </a>
+                                <span
+                                    class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700">
+                                    ...
+                                </span>
+                                <a href="#"
+                                    class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                                    <span class="sr-only">Próxima</span>
+                                    <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                        stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M9 5l7 7-7 7" />
+                                    </svg>
+                                </a>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Account Modal -->
+    <div id="account-modal" class="fixed inset-0 overflow-y-auto z-50 hidden" aria-labelledby="modal-title"
+        role="dialog" aria-modal="true">
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+
+            <div
+                class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <div class="sm:flex sm:items-start">
+                        <div
+                            class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-blue-100 sm:mx-0 sm:h-10 sm:w-10">
+                            <i id="modal-icon" class="fas fa-plus text-blue-600"></i>
+                        </div>
+                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                            <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">
+                                Adicionar Nova Conta
+                            </h3>
+                            <div class="mt-2">
+                                <form id="account-form" class="space-y-4">
+                                    <input type="hidden" id="account-id">
+                                    <div>
+                                        <label for="account-name" class="block text-sm font-medium text-gray-700">Nome
+                                            da Conta *</label>
+                                        <input type="text" id="account-name"
+                                            class="mt-1 focus:ring-primary focus:border-primary block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+                                            required>
+                                        <p id="name-error" class="mt-1 text-sm text-danger hidden">Por favor, insira um
+                                            nome para a conta.</p>
+                                    </div>
+
+                                    <div>
+                                        <label for="account-type" class="block text-sm font-medium text-gray-700">Tipo
+                                            de Conta *</label>
+                                        <select id="account-type"
+                                            class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm rounded-md"
+                                            required>
+                                            <option value="">Selecione um tipo</option>
+                                            <option value="Conta Corrente">Conta Corrente</option>
+                                            <option value="Conta Poupança">Conta Poupança</option>
+                                            <option value="Caixa">Caixa</option>
+                                            <option value="Investimento">Investimento</option>
+                                            <option value="Outro">Outro</option>
+                                        </select>
+                                        <p id="type-error" class="mt-1 text-sm text-danger hidden">Por favor, selecione
+                                            um tipo de conta.</p>
+                                    </div>
+
+                                    <div class="relative">
+                                        <label for="account-balance"
+                                            class="block text-sm font-medium text-gray-700">Saldo Inicial *</label>
+                                        <input type="text" id="account-balance"
+                                            class="currency-input mt-1 focus:ring-primary focus:border-primary block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+                                            required>
+                                        <p id="balance-error" class="mt-1 text-sm text-danger hidden">Por favor, insira
+                                            um saldo válido.</p>
+                                    </div>
+
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">Status *</label>
+                                        <div class="mt-2 flex items-center space-x-6">
+                                            <div class="flex items-center">
+                                                <input id="status-active" name="account-status" type="radio"
+                                                    value="Ativa" checked
+                                                    class="focus:ring-primary h-4 w-4 text-primary border-gray-300">
+                                                <label for="status-active"
+                                                    class="ml-2 block text-sm text-gray-700">Ativa</label>
+                                            </div>
+                                            <div class="flex items-center">
+                                                <input id="status-inactive" name="account-status" type="radio"
+                                                    value="Inativa"
+                                                    class="focus:ring-primary h-4 w-4 text-primary border-gray-300">
+                                                <label for="status-inactive"
+                                                    class="ml-2 block text-sm text-gray-700">Inativa</label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <label for="account-notes"
+                                            class="block text-sm font-medium text-gray-700">Observações</label>
+                                        <textarea id="account-notes" rows="3"
+                                            class="mt-1 focus:ring-primary focus:border-primary block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"></textarea>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                    <button type="button" id="save-account-btn"
+                        class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-primary text-base font-medium text-white hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary sm:ml-3 sm:w-auto sm:text-sm">
+                        Salvar
+                    </button>
+                    <button type="button" id="cancel-modal-btn"
+                        class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                        Cancelar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="delete-modal" class="fixed inset-0 overflow-y-auto z-50 hidden" aria-labelledby="modal-title" role="dialog"
+        aria-modal="true">
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+
+            <div
+                class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <div class="sm:flex sm:items-start">
+                        <div
+                            class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+                            <i class="fas fa-exclamation-triangle text-red-600"></i>
+                        </div>
+                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                            <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">
+                                Confirmar Exclusão
+                            </h3>
+                            <div class="mt-2">
+                                <p class="text-sm text-gray-500">Tem certeza que deseja excluir esta conta? Esta ação
+                                    não pode ser desfeita.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                    <button type="button" id="confirm-delete-btn"
+                        class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-danger text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm">
+                        Excluir
+                    </button>
+                    <button type="button" id="cancel-delete-btn"
+                        class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                        Cancelar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="hidden fixed bottom-4 right-4 bg-green-500 text-white px-4 py-2 rounded-md shadow-lg toast">
+        <div class="flex items-center">
+            <i class="fas fa-check-circle mr-2"></i>
+            <span id="toast-message">Conta salva com sucesso!</span>
+        </div>
+    </div>
+
+
+    <script>
+        // Sample data for accounts
+        const accounts = [
+            { id: 1, name: "Banco XPTO - CC", type: "Conta Corrente", balance: 12500.00, status: "Ativa", notes: "Conta principal da empresa" },
+            { id: 2, name: "Caixa Principal", type: "Caixa", balance: 3500.00, status: "Ativa", notes: "Caixa físico no escritório" },
+            { id: 3, name: "Banco ABC - Poupança", type: "Conta Poupança", balance: 7000.00, status: "Ativa", notes: "Reserva de emergência" },
+            { id: 4, name: "Investimentos", type: "Investimento", balance: 1580.00, status: "Ativa", notes: "Aplicações financeiras" },
+            { id: 5, name: "Conta Antiga", type: "Conta Corrente", balance: 0.00, status: "Inativa", notes: "Conta desativada em 2022" }
+        ];
+
+        // DOM Elements
+        const accountModal = document.getElementById('account-modal');
+        const deleteModal = document.getElementById('delete-modal');
+        const accountForm = document.getElementById('account-form');
+        const addAccountBtn = document.getElementById('add-account-btn');
+        const saveAccountBtn = document.getElementById('save-account-btn');
+        const cancelModalBtn = document.getElementById('cancel-modal-btn');
+        const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
+        const cancelDeleteBtn = document.getElementById('cancel-delete-btn');
+        const toast = document.getElementById('toast');
+        const toastMessage = document.getElementById('toast-message');
+        const accountsTableBody = document.getElementById('accounts-table-body');
+        const mobileAccountsList = document.getElementById('mobile-accounts-list');
+
+        // Current account being edited/deleted
+        let currentAccountId = null;
+
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', function () {
+            renderAccounts();
+
+            // Event listeners
+            addAccountBtn.addEventListener('click', openAddAccountModal);
+            saveAccountBtn.addEventListener('click', saveAccount);
+            cancelModalBtn.addEventListener('click', closeAccountModal);
+            confirmDeleteBtn.addEventListener('click', deleteAccount);
+            cancelDeleteBtn.addEventListener('click', closeDeleteModal);
+
+            // Mobile menu toggle
+            document.getElementById('mobile-menu-button').addEventListener('click', function () {
+                document.getElementById('mobile-menu').classList.toggle('hidden');
+            });
+
+            // Currency input formatting
+            document.getElementById('account-balance').addEventListener('input', formatCurrency);
+        });
+
+        // Render accounts in table and mobile list
+        function renderAccounts() {
+            // Clear existing content
+            accountsTableBody.innerHTML = '';
+            mobileAccountsList.innerHTML = '';
+
+            // Calculate total balance
+            let totalBalance = 0;
+            let activeAccounts = 0;
+            let inactiveAccounts = 0;
+
+            accounts.forEach(account => {
+                if (account.status === "Ativa") {
+                    totalBalance += account.balance;
+                    activeAccounts++;
+                } else {
+                    inactiveAccounts++;
+                }
+
+                // Desktop table row
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${account.name}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${account.type}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${formatMoney(account.balance)}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${account.status === 'Ativa' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
+                            ${account.status}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <button onclick="editAccount(${account.id})" class="text-primary hover:text-primary-dark mr-3">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button onclick="confirmDelete(${account.id})" class="text-danger hover:text-red-700">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </td>
+                `;
+                accountsTableBody.appendChild(row);
+
+                // Mobile card
+                const card = document.createElement('div');
+                card.className = 'p-4';
+                card.innerHTML = `
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-sm font-medium text-gray-900">${account.name}</p>
+                            <p class="text-xs text-gray-500 mt-1">${account.type} • ${formatMoney(account.balance)}</p>
+                            <span class="mt-1 px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${account.status === 'Ativa' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
+                                ${account.status}
+                            </span>
+                        </div>
+                        <div class="text-right">
+                            <div class="flex space-x-2">
+                                <button onclick="editAccount(${account.id})" class="text-primary hover:text-primary-dark">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button onclick="confirmDelete(${account.id})" class="text-danger hover:text-red-700">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                mobileAccountsList.appendChild(card);
+            });
+
+            // Update summary cards
+            document.querySelector('div.bg-white:nth-child(1) p.text-2xl').textContent = formatMoney(totalBalance);
+            document.querySelector('div.bg-white:nth-child(2) p.text-2xl').textContent = activeAccounts;
+            document.querySelector('div.bg-white:nth-child(3) p.text-2xl').textContent = inactiveAccounts;
+        }
+
+        // Open modal to add new account
+        function openAddAccountModal() {
+            document.getElementById('modal-title').textContent = 'Adicionar Nova Conta';
+            document.getElementById('modal-icon').className = 'fas fa-plus text-blue-600';
+            document.getElementById('account-id').value = '';
+            document.getElementById('account-name').value = '';
+            document.getElementById('account-type').value = '';
+            document.getElementById('account-balance').value = '';
+            document.getElementById('status-active').checked = true;
+            document.getElementById('account-notes').value = '';
+
+            // Clear error messages
+            document.querySelectorAll('[id$="-error"]').forEach(el => el.classList.add('hidden'));
+
+            accountModal.classList.remove('hidden');
+        }
+
+        // Open modal to edit existing account
+        function editAccount(id) {
+            const account = accounts.find(acc => acc.id === id);
+            if (!account) return;
+
+            currentAccountId = id;
+
+            document.getElementById('modal-title').textContent = 'Editar Conta';
+            document.getElementById('modal-icon').className = 'fas fa-edit text-blue-600';
+            document.getElementById('account-id').value = account.id;
+            document.getElementById('account-name').value = account.name;
+            document.getElementById('account-type').value = account.type;
+            document.getElementById('account-balance').value = account.balance.toFixed(2);
+            document.getElementById(`status-${account.status === 'Ativa' ? 'active' : 'inactive'}`).checked = true;
+            document.getElementById('account-notes').value = account.notes || '';
+
+            // Clear error messages
+            document.querySelectorAll('[id$="-error"]').forEach(el => el.classList.add('hidden'));
+
+            accountModal.classList.remove('hidden');
+        }
+
+        // Save account (add new or update existing)
+        function saveAccount() {
+            // Validate form
+            const name = document.getElementById('account-name').value.trim();
+            const type = document.getElementById('account-type').value;
+            const balance = document.getElementById('account-balance').value;
+            const status = document.querySelector('input[name="account-status"]:checked').value;
+            const notes = document.getElementById('account-notes').value.trim();
+
+            let isValid = true;
+
+            // Validate name
+            if (!name) {
+                document.getElementById('name-error').classList.remove('hidden');
+                isValid = false;
+            } else {
+                document.getElementById('name-error').classList.add('hidden');
+            }
+
+            // Validate type
+            if (!type) {
+                document.getElementById('type-error').classList.remove('hidden');
+                isValid = false;
+            } else {
+                document.getElementById('type-error').classList.add('hidden');
+            }
+
+            // Validate balance
+            const balanceValue = parseFloat(balance.replace(/[^\d,-]/g, '').replace(',', '.'));
+            if (isNaN(balanceValue)) {
+                document.getElementById('balance-error').classList.remove('hidden');
+                isValid = false;
+            } else {
+                document.getElementById('balance-error').classList.add('hidden');
+            }
+
+            if (!isValid) return;
+
+            // Create or update account
+            const accountId = document.getElementById('account-id').value;
+            const accountData = {
+                id: accountId ? parseInt(accountId) : accounts.length > 0 ? Math.max(...accounts.map(a => a.id)) + 1 : 1,
+                name,
+                type,
+                balance: balanceValue,
+                status,
+                notes
+            };
+
+            if (accountId) {
+                // Update existing account
+                const index = accounts.findIndex(a => a.id === parseInt(accountId));
+                if (index !== -1) {
+                    accounts[index] = accountData;
+                    showToast('Conta atualizada com sucesso!');
+                }
+            } else {
+                // Add new account
+                accounts.push(accountData);
+                showToast('Conta adicionada com sucesso!');
+            }
+
+            // Update UI
+            renderAccounts();
+            closeAccountModal();
+        }
+
+        // Confirm delete account
+        function confirmDelete(id) {
+            currentAccountId = id;
+            deleteModal.classList.remove('hidden');
+        }
+
+
+        // Delete account
+        function deleteAccount() {
+            const index = accounts.findIndex(a => a.id === currentAccountId);
+            if (index !== -1) {
+                accounts.splice(index, 1);
+                showToast('Conta excluída com sucesso!');
+                renderAccounts();
+            }
+            closeDeleteModal();
+        }
+
+        // Close account modal
+        function closeAccountModal() {
+            accountModal.classList.add('hidden');
+        }
+
+        // Close delete modal
+        function closeDeleteModal() {
+            deleteModal.classList.add('hidden');
+            currentAccountId = null;
+        }
+
+        // Show toast notification
+        function showToast(message) {
+            toastMessage.textContent = message;
+            toast.className = 'fixed bottom-4 right-4 bg-green-500 text-white px-4 py-2 rounded-md shadow-lg toast';
+
+            setTimeout(() => {
+                toast.className = 'hidden fixed bottom-4 right-4 bg-green-500 text-white px-4 py-2 rounded-md shadow-lg toast';
+            }, 3000);
+        }
+
+        // Format currency input
+        function formatCurrency(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            value = (value / 100).toFixed(2) + '';
+            value = value.replace('.', ',');
+            value = value.replace(/(\d)(\d{3})(\d{3}),/g, '$1.$2.$3,');
+            value = value.replace(/(\d)(\d{3}),/g, '$1.$2,');
+
+            e.target.value = value;
+        }
+
+        // Format money for display
+        function formatMoney(value) {
+            return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
+        }
+
+        // Make functions available globally for inline event handlers
+        window.editAccount = editAccount;
+        window.confirmDelete = confirmDelete;
+
+        // Adicione este código dentro do seu DOMContentLoaded, junto com os outros 'DOM Elements'
+
+    </script>
+
+<script src="../componentes/topbar.js"></script>
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                // Exemplo de permissões para um usuário do financeiro
+                const userPermissions = {
+                    dashboard: true,
+                    movimentacoes: true,
+                    relatorios: true,
+                    pagamentos: true,
+                    contas: true,
+                    cadastros: true,       
+                    configuracoes: true    
+                };
+                renderTopbar('contas', userPermissions);
+
+                // ...aqui entraria qualquer outro JS específico da página de entradas
+            });
+        </script>
+</body>
+
+</html>

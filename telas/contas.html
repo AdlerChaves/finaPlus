@@ -94,7 +94,7 @@
                         <i class="fas fa-plus mr-2"></i>
                         Adicionar Conta
                     </button>
-                    <a href="cadastroCartoes.html"
+                    <a id="cards-button" href="cadastroCartoes.html"
                         class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg transition-colors flex items-center">
                         <i class="fas fa-credit-card mr-2"></i>
                         Cartões
@@ -111,7 +111,7 @@
                         </div>
                         <div>
                             <p class="text-gray-500 text-sm">Saldo Total</p>
-                            <p class="text-2xl font-bold text-gray-800">R$ 24.580,00</p>
+                            <p id="total-balance-summary" class="text-2xl font-bold text-gray-800">R$ 0,00</p>
                         </div>
                     </div>
                 </div>
@@ -122,7 +122,7 @@
                         </div>
                         <div>
                             <p class="text-gray-500 text-sm">Contas Ativas</p>
-                            <p class="text-2xl font-bold text-gray-800">4</p>
+                            <p id="active-accounts-summary" class="text-2xl font-bold text-gray-800">0</p>
                         </div>
                     </div>
                 </div>
@@ -133,7 +133,7 @@
                         </div>
                         <div>
                             <p class="text-gray-500 text-sm">Contas Inativas</p>
-                            <p class="text-2xl font-bold text-gray-800">1</p>
+                            <p id="inactive-accounts-summary" class="text-2xl font-bold text-gray-800">0</p>
                         </div>
                     </div>
                 </div>
@@ -386,313 +386,302 @@
 
 
     <script>
-        // Sample data for accounts
-        const accounts = [
-            { id: 1, name: "Banco XPTO - CC", type: "Conta Corrente", balance: 12500.00, status: "Ativa", notes: "Conta principal da empresa" },
-            { id: 2, name: "Caixa Principal", type: "Caixa", balance: 3500.00, status: "Ativa", notes: "Caixa físico no escritório" },
-            { id: 3, name: "Banco ABC - Poupança", type: "Conta Poupança", balance: 7000.00, status: "Ativa", notes: "Reserva de emergência" },
-            { id: 4, name: "Investimentos", type: "Investimento", balance: 1580.00, status: "Ativa", notes: "Aplicações financeiras" },
-            { id: 5, name: "Conta Antiga", type: "Conta Corrente", balance: 0.00, status: "Inativa", notes: "Conta desativada em 2022" }
-        ];
+        // URL base da sua API Django
+        const API_URL = 'http://127.0.0.1:8000';
 
-        // DOM Elements
+        // --- DOM ELEMENTS ---
         const accountModal = document.getElementById('account-modal');
         const deleteModal = document.getElementById('delete-modal');
-        const accountForm = document.getElementById('account-form');
         const addAccountBtn = document.getElementById('add-account-btn');
         const saveAccountBtn = document.getElementById('save-account-btn');
         const cancelModalBtn = document.getElementById('cancel-modal-btn');
         const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
         const cancelDeleteBtn = document.getElementById('cancel-delete-btn');
-        const toast = document.getElementById('toast');
-        const toastMessage = document.getElementById('toast-message');
         const accountsTableBody = document.getElementById('accounts-table-body');
         const mobileAccountsList = document.getElementById('mobile-accounts-list');
+        const accountForm = document.getElementById('account-form');
+        const toast = document.getElementById('toast');
+        const toastMessage = document.getElementById('toast-message');
 
-        // Current account being edited/deleted
-        let currentAccountId = null;
+        // Variável para guardar o ID da conta a ser deletada
+        let accountIdToDelete = null;
 
-        // Initialize the page
-        document.addEventListener('DOMContentLoaded', function () {
-            renderAccounts();
+        // --- FUNÇÕES DE RENDERIZAÇÃO ---
 
-            // Event listeners
-            addAccountBtn.addEventListener('click', openAddAccountModal);
-            saveAccountBtn.addEventListener('click', saveAccount);
-            cancelModalBtn.addEventListener('click', closeAccountModal);
-            confirmDeleteBtn.addEventListener('click', deleteAccount);
-            cancelDeleteBtn.addEventListener('click', closeDeleteModal);
-
-            // Mobile menu toggle
-            document.getElementById('mobile-menu-button').addEventListener('click', function () {
-                document.getElementById('mobile-menu').classList.toggle('hidden');
-            });
-
-            // Currency input formatting
-            document.getElementById('account-balance').addEventListener('input', formatCurrency);
-        });
-
-        // Render accounts in table and mobile list
-        function renderAccounts() {
-            // Clear existing content
-            accountsTableBody.innerHTML = '';
-            mobileAccountsList.innerHTML = '';
-
-            // Calculate total balance
-            let totalBalance = 0;
-            let activeAccounts = 0;
-            let inactiveAccounts = 0;
-
-            accounts.forEach(account => {
-                if (account.status === "Ativa") {
-                    totalBalance += account.balance;
-                    activeAccounts++;
-                } else {
-                    inactiveAccounts++;
-                }
-
-                // Desktop table row
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${account.name}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${account.type}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${formatMoney(account.balance)}</td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${account.status === 'Ativa' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
-                            ${account.status}
-                        </span>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <button onclick="editAccount(${account.id})" class="text-primary hover:text-primary-dark mr-3">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button onclick="confirmDelete(${account.id})" class="text-danger hover:text-red-700">
-                            <i class="fas fa-trash-alt"></i>
-                        </button>
-                    </td>
-                `;
-                accountsTableBody.appendChild(row);
-
-                // Mobile card
-                const card = document.createElement('div');
-                card.className = 'p-4';
-                card.innerHTML = `
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <p class="text-sm font-medium text-gray-900">${account.name}</p>
-                            <p class="text-xs text-gray-500 mt-1">${account.type} • ${formatMoney(account.balance)}</p>
-                            <span class="mt-1 px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${account.status === 'Ativa' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
-                                ${account.status}
-                            </span>
-                        </div>
-                        <div class="text-right">
-                            <div class="flex space-x-2">
-                                <button onclick="editAccount(${account.id})" class="text-primary hover:text-primary-dark">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                                <button onclick="confirmDelete(${account.id})" class="text-danger hover:text-red-700">
-                                    <i class="fas fa-trash-alt"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                mobileAccountsList.appendChild(card);
-            });
-
-            // Update summary cards
-            document.querySelector('div.bg-white:nth-child(1) p.text-2xl').textContent = formatMoney(totalBalance);
-            document.querySelector('div.bg-white:nth-child(2) p.text-2xl').textContent = activeAccounts;
-            document.querySelector('div.bg-white:nth-child(3) p.text-2xl').textContent = inactiveAccounts;
+        // Formata um número para o padrão de moeda BRL
+        function formatMoney(value) {
+            // Converte a string para número, caso venha do backend como texto
+            const numberValue = parseFloat(value);
+            if (isNaN(numberValue)) {
+                return "R$ 0,00";
+            }
+            return numberValue.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
         }
 
-        // Open modal to add new account
-        function openAddAccountModal() {
+        // Função principal que busca e renderiza as contas
+        // Dentro da tag <script> do seu contas.html
+
+        async function renderAccounts() {
+    const token = localStorage.getItem('accessToken');
+    if (!token) {
+        window.location.href = './login.html';
+        return;
+    }
+
+    const cardsButton = document.getElementById('cards-button');
+    let cardsButtonListener = null; 
+
+    try {
+        const response = await fetch(`${API_URL}/api/finance/bank-accounts/`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        if (!response.ok) {
+            throw new Error('Falha ao buscar contas. Faça login novamente.');
+        }
+
+        const accounts = await response.json();
+
+        // Limpa a tabela e a lista móvel
+        accountsTableBody.innerHTML = '';
+        mobileAccountsList.innerHTML = '';
+
+        // --- LÓGICA DO BOTÃO "CARTÕES" ---
+        if (accounts.length === 0) {
+            accountsTableBody.innerHTML = `<tr><td colspan="5" class="text-center py-4 text-gray-500">Nenhuma conta cadastrada.</td></tr>`;
+            
+            // Desabilita o botão "Cartões"
+            cardsButton.classList.add('opacity-50', 'cursor-not-allowed');
+            cardsButton.href = '#';
+            cardsButtonListener = (e) => {
+                e.preventDefault();
+                alert("Você precisa cadastrar ao menos uma conta bancária para cadastrar cartões.");
+            };
+            cardsButton.addEventListener('click', cardsButtonListener);
+
+            // Zera os resumos
+            document.getElementById('total-balance-summary').textContent = formatMoney(0);
+            document.getElementById('active-accounts-summary').textContent = 0;
+            document.getElementById('inactive-accounts-summary').textContent = 0;
+            return; // Encerra a função aqui se não houver contas
+
+        } else {
+            // Garante que o botão esteja ativo se houver contas
+            cardsButton.classList.remove('opacity-50', 'cursor-not-allowed');
+            cardsButton.href = 'cadastroCartoes.html';
+            if (cardsButtonListener) {
+                cardsButton.removeEventListener('click', cardsButtonListener);
+            }
+        }
+        
+        // --- CÓDIGO DE RENDERIZAÇÃO E CÁLCULO (RESTAURADO) ---
+        let totalBalance = 0;
+        let activeAccounts = 0;
+        let inactiveAccounts = 0;
+
+        accounts.forEach(account => {
+            if (account.is_active) {
+                totalBalance += parseFloat(account.initial_balance);
+                activeAccounts++;
+            } else {
+                inactiveAccounts++;
+            }
+
+            // Cria e adiciona a linha da tabela para Desktop
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${account.name}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${account.type}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${formatMoney(account.initial_balance)}</td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${account.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
+                        ${account.is_active ? 'Ativa' : 'Inativa'}
+                    </span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                    <button onclick="openEditModal(${account.id})" class="text-primary hover:text-primary-dark mr-3"><i class="fas fa-edit"></i></button>
+                    <button onclick="openDeleteModal(${account.id})" class="text-danger hover:text-red-700"><i class="fas fa-trash-alt"></i></button>
+                </td>
+            `;
+            accountsTableBody.appendChild(row);
+
+            // Cria e adiciona o card para Mobile
+            const card = document.createElement('div');
+            card.className = 'p-4 border-b';
+            card.innerHTML = `
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-sm font-medium text-gray-900">${account.name}</p>
+                        <p class="text-xs text-gray-500 mt-1">${account.type} • ${formatMoney(account.initial_balance)}</p>
+                    </div>
+                    <div class="text-right">
+                         <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${account.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
+                            ${account.is_active ? 'Ativa' : 'Inativa'}
+                        </span>
+                    </div>
+                </div>
+                 <div class="mt-2 text-right">
+                    <button onclick="openEditModal(${account.id})" class="text-primary hover:text-primary-dark mr-3"><i class="fas fa-edit"></i> Editar</button>
+                    <button onclick="openDeleteModal(${account.id})" class="text-danger hover:text-red-700"><i class="fas fa-trash-alt"></i> Excluir</button>
+                </div>
+            `;
+            mobileAccountsList.appendChild(card);
+        });
+
+        // Atualiza os cards de resumo
+        document.getElementById('total-balance-summary').textContent = formatMoney(totalBalance);
+        document.getElementById('active-accounts-summary').textContent = activeAccounts;
+        document.getElementById('inactive-accounts-summary').textContent = inactiveAccounts;
+
+    } catch (error) {
+        console.error('Erro:', error);
+        showToast(error.message, 'error');
+    }
+}
+
+        // --- LÓGICA DO MODAL E CRUD ---
+
+        function openAddModal() {
+            accountForm.reset();
             document.getElementById('modal-title').textContent = 'Adicionar Nova Conta';
-            document.getElementById('modal-icon').className = 'fas fa-plus text-blue-600';
             document.getElementById('account-id').value = '';
-            document.getElementById('account-name').value = '';
-            document.getElementById('account-type').value = '';
-            document.getElementById('account-balance').value = '';
             document.getElementById('status-active').checked = true;
-            document.getElementById('account-notes').value = '';
-
-            // Clear error messages
-            document.querySelectorAll('[id$="-error"]').forEach(el => el.classList.add('hidden'));
-
             accountModal.classList.remove('hidden');
         }
 
-        // Open modal to edit existing account
-        function editAccount(id) {
-            const account = accounts.find(acc => acc.id === id);
-            if (!account) return;
-
-            currentAccountId = id;
+        async function openEditModal(id) {
+            const token = localStorage.getItem('accessToken');
+            const response = await fetch(`${API_URL}/api/finance/bank-accounts/${id}/`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const account = await response.json();
 
             document.getElementById('modal-title').textContent = 'Editar Conta';
-            document.getElementById('modal-icon').className = 'fas fa-edit text-blue-600';
             document.getElementById('account-id').value = account.id;
             document.getElementById('account-name').value = account.name;
             document.getElementById('account-type').value = account.type;
-            document.getElementById('account-balance').value = account.balance.toFixed(2);
-            document.getElementById(`status-${account.status === 'Ativa' ? 'active' : 'inactive'}`).checked = true;
-            document.getElementById('account-notes').value = account.notes || '';
-
-            // Clear error messages
-            document.querySelectorAll('[id$="-error"]').forEach(el => el.classList.add('hidden'));
-
+            document.getElementById('account-balance').value = account.initial_balance;
+            document.getElementById(account.is_active ? 'status-active' : 'status-inactive').checked = true;
+            document.getElementById('account-notes').value = account.notes;
             accountModal.classList.remove('hidden');
         }
 
-        // Save account (add new or update existing)
-        function saveAccount() {
-            // Validate form
-            const name = document.getElementById('account-name').value.trim();
-            const type = document.getElementById('account-type').value;
-            const balance = document.getElementById('account-balance').value;
-            const status = document.querySelector('input[name="account-status"]:checked').value;
-            const notes = document.getElementById('account-notes').value.trim();
-
-            let isValid = true;
-
-            // Validate name
-            if (!name) {
-                document.getElementById('name-error').classList.remove('hidden');
-                isValid = false;
-            } else {
-                document.getElementById('name-error').classList.add('hidden');
-            }
-
-            // Validate type
-            if (!type) {
-                document.getElementById('type-error').classList.remove('hidden');
-                isValid = false;
-            } else {
-                document.getElementById('type-error').classList.add('hidden');
-            }
-
-            // Validate balance
-            const balanceValue = parseFloat(balance.replace(/[^\d,-]/g, '').replace(',', '.'));
-            if (isNaN(balanceValue)) {
-                document.getElementById('balance-error').classList.remove('hidden');
-                isValid = false;
-            } else {
-                document.getElementById('balance-error').classList.add('hidden');
-            }
-
-            if (!isValid) return;
-
-            // Create or update account
-            const accountId = document.getElementById('account-id').value;
-            const accountData = {
-                id: accountId ? parseInt(accountId) : accounts.length > 0 ? Math.max(...accounts.map(a => a.id)) + 1 : 1,
-                name,
-                type,
-                balance: balanceValue,
-                status,
-                notes
-            };
-
-            if (accountId) {
-                // Update existing account
-                const index = accounts.findIndex(a => a.id === parseInt(accountId));
-                if (index !== -1) {
-                    accounts[index] = accountData;
-                    showToast('Conta atualizada com sucesso!');
-                }
-            } else {
-                // Add new account
-                accounts.push(accountData);
-                showToast('Conta adicionada com sucesso!');
-            }
-
-            // Update UI
-            renderAccounts();
-            closeAccountModal();
-        }
-
-        // Confirm delete account
-        function confirmDelete(id) {
-            currentAccountId = id;
-            deleteModal.classList.remove('hidden');
-        }
-
-
-        // Delete account
-        function deleteAccount() {
-            const index = accounts.findIndex(a => a.id === currentAccountId);
-            if (index !== -1) {
-                accounts.splice(index, 1);
-                showToast('Conta excluída com sucesso!');
-                renderAccounts();
-            }
-            closeDeleteModal();
-        }
-
-        // Close account modal
-        function closeAccountModal() {
+        function closeModal() {
             accountModal.classList.add('hidden');
         }
 
-        // Close delete modal
+        async function saveAccount() {
+            const token = localStorage.getItem('accessToken');
+            const id = document.getElementById('account-id').value;
+            const name = document.getElementById('account-name').value;
+            const type = document.getElementById('account-type').value;
+            const initial_balance = document.getElementById('account-balance').value;
+            const is_active = document.getElementById('status-active').checked;
+            const notes = document.getElementById('account-notes').value;
+
+            const url = id ? `${API_URL}/api/finance/bank-accounts/${id}/` : `${API_URL}/api/finance/bank-accounts/`;
+            const method = id ? 'PUT' : 'POST';
+
+            const response = await fetch(url, {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ name, type, initial_balance, is_active, notes })
+            });
+
+            if (response.ok) {
+                showToast(id ? 'Conta atualizada com sucesso!' : 'Conta criada com sucesso!', 'success');
+                closeModal();
+                renderAccounts();
+            } else {
+                const errorData = await response.json();
+                console.error("Erro ao salvar:", errorData);
+                showToast('Ocorreu um erro ao salvar a conta.', 'error');
+            }
+        }
+
+        function openDeleteModal(id) {
+            accountIdToDelete = id;
+            deleteModal.classList.remove('hidden');
+        }
+
         function closeDeleteModal() {
+            accountIdToDelete = null;
             deleteModal.classList.add('hidden');
-            currentAccountId = null;
         }
 
-        // Show toast notification
-        function showToast(message) {
+        async function deleteAccount() {
+    if (!accountIdToDelete) return; // Segurança extra
+    
+    const token = localStorage.getItem('accessToken');
+    
+    try {
+        const response = await fetch(`${API_URL}/api/finance/bank-accounts/${accountIdToDelete}/`, {
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        // Se a resposta NÃO for 204 (sucesso na exclusão)...
+        if (response.status !== 204) {
+            // ...lê o corpo da resposta para pegar a mensagem de erro específica.
+            const errorData = await response.json();
+            // Lança um erro com a mensagem do backend (ex: "Esta conta não pode ser excluída...")
+            throw new Error(errorData.detail || 'Ocorreu um erro desconhecido.');
+        }
+
+        // Se a exclusão foi bem-sucedida (status 204)
+        showToast('Conta excluída com sucesso!', 'success');
+        closeDeleteModal();
+        renderAccounts(); // Atualiza a lista na tela
+
+    } catch (error) {
+        // Agora o toast de erro exibirá a mensagem correta vinda da API
+        showToast(error.message, 'error');
+        // Também é bom fechar o modal de confirmação em caso de erro
+        closeDeleteModal();
+    }
+}
+
+        // --- FUNÇÕES DE FEEDBACK E EVENT LISTENERS ---
+
+        function showToast(message, type = 'success') {
             toastMessage.textContent = message;
-            toast.className = 'fixed bottom-4 right-4 bg-green-500 text-white px-4 py-2 rounded-md shadow-lg toast';
-
-            setTimeout(() => {
-                toast.className = 'hidden fixed bottom-4 right-4 bg-green-500 text-white px-4 py-2 rounded-md shadow-lg toast';
-            }, 3000);
+            toast.className = `fixed bottom-4 right-4 text-white px-4 py-2 rounded-md shadow-lg toast ${type === 'success' ? 'bg-green-500' : 'bg-red-500'}`;
+            setTimeout(() => { toast.className = 'hidden'; }, 3000);
         }
 
-        // Format currency input
-        function formatCurrency(e) {
-            let value = e.target.value.replace(/\D/g, '');
-            value = (value / 100).toFixed(2) + '';
-            value = value.replace('.', ',');
-            value = value.replace(/(\d)(\d{3})(\d{3}),/g, '$1.$2.$3,');
-            value = value.replace(/(\d)(\d{3}),/g, '$1.$2,');
+        // Carrega as contas quando a página é aberta
+        document.addEventListener('DOMContentLoaded', renderAccounts);
 
-            e.target.value = value;
-        }
-
-        // Format money for display
-        function formatMoney(value) {
-            return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
-        }
-
-        // Make functions available globally for inline event handlers
-        window.editAccount = editAccount;
-        window.confirmDelete = confirmDelete;
-
-        // Adicione este código dentro do seu DOMContentLoaded, junto com os outros 'DOM Elements'
+        // Event listeners para os botões
+        addAccountBtn.addEventListener('click', openAddModal);
+        saveAccountBtn.addEventListener('click', saveAccount);
+        cancelModalBtn.addEventListener('click', closeModal);
+        confirmDeleteBtn.addEventListener('click', deleteAccount);
+        cancelDeleteBtn.addEventListener('click', closeDeleteModal);
 
     </script>
 
-<script src="../componentes/topbar.js"></script>
-        <script>
-            document.addEventListener('DOMContentLoaded', () => {
-                // Exemplo de permissões para um usuário do financeiro
-                const userPermissions = {
-                    dashboard: true,
-                    movimentacoes: true,
-                    relatorios: true,
-                    pagamentos: true,
-                    contas: true,
-                    cadastros: true,       
-                    configuracoes: true    
-                };
-                renderTopbar('contas', userPermissions);
+    <script src="../componentes/topbar.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Exemplo de permissões para um usuário do financeiro
+            const userPermissions = {
+                dashboard: true,
+                movimentacoes: true,
+                relatorios: true,
+                pagamentos: true,
+                contas: true,
+                cadastros: true,
+                configuracoes: true
+            };
+            renderTopbar('contas', userPermissions);
 
-                // ...aqui entraria qualquer outro JS específico da página de entradas
-            });
-        </script>
+            // ...aqui entraria qualquer outro JS específico da página de entradas
+        });
+    </script>
 </body>
 
 </html>

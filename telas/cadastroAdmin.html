@@ -347,22 +347,10 @@
     </div>
 
     <script>
-        // Firebase Configuration
-        const firebaseConfig = {
-            apiKey: "YOUR_API_KEY",
-            authDomain: "YOUR_AUTH_DOMAIN",
-            projectId: "YOUR_PROJECT_ID",
-            storageBucket: "YOUR_STORAGE_BUCKET",
-            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-            appId: "YOUR_APP_ID"
-        };
+        // URL base da sua API Django
+        const API_URL = 'http://127.0.0.1:8000';
 
-        // Initialize Firebase
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const db = firebase.firestore();
-
-        // DOM Elements
+        // --- DOM ELEMENTS ---
         const registrationForm = document.getElementById('registration-form');
         const companySection = document.getElementById('company-section');
         const adminSection = document.getElementById('admin-section');
@@ -373,8 +361,6 @@
         const buttonLoading = document.getElementById('button-loading');
         const errorMessage = document.getElementById('error-message');
         const errorText = document.getElementById('error-text');
-        const successMessage = document.getElementById('success-message');
-        const successText = document.getElementById('success-text');
         const successModal = document.getElementById('success-modal');
         const countdownElement = document.getElementById('countdown');
         const passwordInput = document.getElementById('password');
@@ -383,19 +369,16 @@
         const toggleConfirmPassword = document.getElementById('toggle-confirm-password');
         const passwordMatch = document.getElementById('password-match');
         const passwordMismatch = document.getElementById('password-mismatch');
-        const passwordStrength = document.getElementById('password-strength');
-        const passwordStrengthText = document.getElementById('password-strength-text');
         const cnpjInput = document.getElementById('cnpj');
+        const passwordStrengthBar = document.getElementById('password-strength');
+        const passwordStrengthText = document.getElementById('password-strength-text');
 
-        // Initialize Input Mask for CNPJ with iMask
+        // --- LÓGICA DA INTERFACE ---
+
         if (cnpjInput) {
-            const maskOptions = {
-                mask: '00.000.000/0000-00'
-            };
-            const mask = IMask(cnpjInput, maskOptions);
+            IMask(cnpjInput, { mask: '00.000.000/0000-00' });
         }
 
-        // Toggle Password Visibility
         function setupPasswordToggle(inputElement, toggleButton) {
             toggleButton.addEventListener('click', function () {
                 const type = inputElement.getAttribute('type') === 'password' ? 'text' : 'password';
@@ -403,52 +386,9 @@
                 this.querySelector('svg').classList.toggle('text-gray-700');
             });
         }
-
         setupPasswordToggle(passwordInput, togglePassword);
         setupPasswordToggle(confirmPasswordInput, toggleConfirmPassword);
 
-        // Password Strength Checker
-        passwordInput.addEventListener('input', function () {
-            const password = this.value;
-            let strength = 0;
-
-            // Length check
-            if (password.length >= 8) strength += 1;
-            if (password.length >= 12) strength += 1;
-
-            // Contains numbers
-            if (/\d/.test(password)) strength += 1;
-
-            // Contains letters
-            if (/[a-zA-Z]/.test(password)) strength += 1;
-
-            // Contains special characters
-            if (/[^a-zA-Z0-9]/.test(password)) strength += 1;
-
-            // Update strength indicator
-            if (password.length === 0) {
-                passwordStrength.className = 'password-strength weak rounded-full';
-                passwordStrengthText.textContent = '';
-            } else if (strength <= 2) {
-                passwordStrength.className = 'password-strength weak rounded-full';
-                passwordStrengthText.textContent = 'Senha fraca';
-                passwordStrengthText.className = 'text-xs text-red-500';
-            } else if (strength === 3) {
-                passwordStrength.className = 'password-strength fair rounded-full';
-                passwordStrengthText.textContent = 'Senha média';
-                passwordStrengthText.className = 'text-xs text-yellow-500';
-            } else if (strength === 4) {
-                passwordStrength.className = 'password-strength good rounded-full';
-                passwordStrengthText.textContent = 'Senha boa';
-                passwordStrengthText.className = 'text-xs text-blue-500';
-            } else {
-                passwordStrength.className = 'password-strength strong rounded-full';
-                passwordStrengthText.textContent = 'Senha forte';
-                passwordStrengthText.className = 'text-xs text-green-500';
-            }
-        });
-
-        // Password Match Checker
         function checkPasswordMatch() {
             if (passwordInput.value && confirmPasswordInput.value) {
                 if (passwordInput.value === confirmPasswordInput.value) {
@@ -464,26 +404,64 @@
             return false;
         }
 
-        passwordInput.addEventListener('input', checkPasswordMatch);
+        function checkAndUpdatePasswordStrength() {
+            const value = passwordInput.value;
+            let score = 0;
+            if (value.length >= 8) score++;
+            if (value.length >= 12) score++;
+            if (/[A-Z]/.test(value)) score++;
+            if (/[a-z]/.test(value)) score++;
+            if (/[0-9]/.test(value)) score++;
+            if (/[^A-Za-z0-9]/.test(value)) score++;
+
+            passwordStrengthBar.classList.remove('weak', 'fair', 'good', 'strong');
+            passwordStrengthText.classList.remove('text-red-500', 'text-yellow-500', 'text-blue-500', 'text-green-500');
+
+            if (value.length === 0) {
+                passwordStrengthText.textContent = '';
+                return;
+            }
+
+            switch (score) {
+                case 0: case 1: case 2:
+                    passwordStrengthBar.classList.add('weak');
+                    passwordStrengthText.textContent = 'Senha fraca';
+                    passwordStrengthText.classList.add('text-red-500');
+                    break;
+                case 3:
+                    passwordStrengthBar.classList.add('fair');
+                    passwordStrengthText.textContent = 'Senha média';
+                    passwordStrengthText.classList.add('text-yellow-500');
+                    break;
+                case 4: case 5:
+                    passwordStrengthBar.classList.add('good');
+                    passwordStrengthText.textContent = 'Senha boa';
+                    passwordStrengthText.classList.add('text-blue-500');
+                    break;
+                case 6:
+                    passwordStrengthBar.classList.add('strong');
+                    passwordStrengthText.textContent = 'Senha forte';
+                    passwordStrengthText.classList.add('text-green-500');
+                    break;
+            }
+        }
+
+        passwordInput.addEventListener('input', () => {
+            checkPasswordMatch();
+            checkAndUpdatePasswordStrength();
+        });
         confirmPasswordInput.addEventListener('input', checkPasswordMatch);
 
-        // Form Navigation
+        // --- NAVEGAÇÃO DO FORMULÁRIO ---
         nextToAdminBtn.addEventListener('click', function (e) {
             e.preventDefault();
-
-            // Validate company fields
             const companyName = document.getElementById('company-name').value.trim();
-
             if (!companyName) {
                 showError('Por favor, informe o nome da empresa.');
                 return;
             }
-
-            // If validation passes, show admin section
             companySection.classList.add('hidden');
             adminSection.classList.remove('hidden');
-
-            // Update progress steps
             updateProgressSteps(2);
         });
 
@@ -491,207 +469,97 @@
             e.preventDefault();
             adminSection.classList.add('hidden');
             companySection.classList.remove('hidden');
-
-            // Update progress steps
             updateProgressSteps(1);
         });
 
-        function updateProgressSteps(step) {
-            const steps = document.querySelectorAll('.flex.items-center.text-gray-500.relative');
+        function updateProgressSteps(step) { /* ...código existente... */ }
 
-            steps.forEach((stepElement, index) => {
-                if (index < step) {
-                    stepElement.classList.remove('text-gray-500');
-                    stepElement.classList.add('text-blue-600');
-                    stepElement.querySelector('div').classList.remove('border-gray-300');
-                    stepElement.querySelector('div').classList.add('border-blue-600');
-                } else {
-                    stepElement.classList.remove('text-blue-600');
-                    stepElement.classList.add('text-gray-500');
-                    stepElement.querySelector('div').classList.remove('border-blue-600');
-                    stepElement.querySelector('div').classList.add('border-gray-300');
-                }
-            });
-
-            const connectors = document.querySelectorAll('.flex-auto.border-t-2');
-            connectors.forEach((connector, index) => {
-                if (index < step - 1) {
-                    connector.classList.remove('border-gray-300');
-                    connector.classList.add('border-blue-600');
-                } else {
-                    connector.classList.remove('border-blue-600');
-                    connector.classList.add('border-gray-300');
-                }
-            });
-        }
-
-        // Show Error
+        // --- FUNÇÕES DE FEEDBACK ---
         function showError(message) {
             errorText.textContent = message;
             errorMessage.classList.remove('hidden');
-            successMessage.classList.add('hidden');
-
             setTimeout(() => {
                 errorMessage.classList.add('hidden');
             }, 5000);
         }
 
-        // Show Success
-        function showSuccess(message) {
-            successText.textContent = message;
-            successMessage.classList.remove('hidden');
-            errorMessage.classList.add('hidden');
-
-            setTimeout(() => {
-                successMessage.classList.add('hidden');
-            }, 5000);
+        // Nova função helper para "desempacotar" os erros
+        function parseErrors(errorData) {
+            let errorMessage = "";
+            for (const field in errorData) {
+                const value = errorData[field];
+                if (typeof value === 'object' && !Array.isArray(value)) {
+                    // É um erro aninhado, como em 'company'. Vamos olhar dentro dele.
+                    for (const nestedField in value) {
+                        errorMessage += `${nestedField}: ${value[nestedField].join(', ')} `;
+                    }
+                } else {
+                    // É um erro de nível superior, como 'email' ou 'password'.
+                    errorMessage += `${field}: ${value.join(', ')} `;
+                }
+            }
+            return errorMessage;
         }
 
-        // Form Submission
-        registrationForm.addEventListener('submit', function (e) {
+        registrationForm.addEventListener('submit', async function (e) {
             e.preventDefault();
-
-            // Get all form values
-            const companyName = document.getElementById('company-name').value.trim();
-            const cnpj = document.getElementById('cnpj').value.trim();
-            const businessArea = document.getElementById('business-area').value;
-            const fullName = document.getElementById('full-name').value.trim();
-            const email = document.getElementById('email').value.trim();
-            const password = document.getElementById('password').value;
-            const confirmPassword = document.getElementById('confirm-password').value;
-            const termsAccepted = document.getElementById('terms').checked;
-
-            // Validate all fields
-            if (!companyName) {
-                showError('Por favor, informe o nome da empresa.');
-                return;
-            }
-
-            if (!fullName) {
-                showError('Por favor, informe seu nome completo.');
-                return;
-            }
-
-            if (!email || !email.includes('@')) {
-                showError('Por favor, informe um e-mail válido.');
-                return;
-            }
-
-            if (!password || password.length < 8) {
-                showError('A senha deve ter pelo menos 8 caracteres.');
-                return;
-            }
-
-            if (password !== confirmPassword) {
+            if (!checkPasswordMatch()) {
                 showError('As senhas não coincidem.');
                 return;
             }
 
-            if (!termsAccepted) {
-                showError('Você deve aceitar os termos de uso para continuar.');
-                return;
-            }
+            const companyName = document.getElementById('company-name').value.trim();
+            const cnpj = document.getElementById('cnpj').value.trim();
+            const businessArea = document.getElementById('business-area').value;
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
 
-            // Show loading state
+            const payload = {
+                email: email,
+                password: password,
+                company: { name: companyName, cnpj: cnpj, business_area: businessArea }
+            };
+
             buttonText.classList.add('hidden');
             buttonLoading.classList.remove('hidden');
             registerButton.disabled = true;
 
-            // Create user with Firebase Auth
-            auth.createUserWithEmailAndPassword(email, password)
-                .then((userCredential) => {
-                    // User created successfully
-                    const user = userCredential.user;
-
-                    // Create company document in Firestore
-                    return db.collection('companies').doc(user.uid).set({
-                        companyName: companyName,
-                        cnpj: cnpj,
-                        businessArea: businessArea,
-                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                        adminEmail: email
-                    }).then(() => {
-                        // Update user profile with display name
-                        return user.updateProfile({
-                            displayName: fullName
-                        });
-                    }).then(() => {
-                        // Create user document in Firestore
-                        return db.collection('users').doc(user.uid).set({
-                            uid: user.uid,
-                            email: email,
-                            fullName: fullName,
-                            role: 'admin',
-                            companyId: user.uid,
-                            createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                        });
-                    });
-                })
-                .then(() => {
-                    // Show success modal
-                    successModal.classList.remove('hidden');
-
-                    // Start countdown for redirect
-                    let countdown = 5;
-                    const countdownInterval = setInterval(() => {
-                        countdown--;
-                        countdownElement.textContent = countdown;
-
-                        if (countdown <= 0) {
-                            clearInterval(countdownInterval);
-                            window.location.href = 'login.html';
-                        }
-                    }, 1000);
-                })
-                .catch((error) => {
-                    // Handle errors
-                    let errorMessage = 'Ocorreu um erro ao criar sua conta.';
-
-                    switch (error.code) {
-                        case 'auth/email-already-in-use':
-                            errorMessage = 'Este e-mail já está em uso.';
-                            break;
-                        case 'auth/invalid-email':
-                            errorMessage = 'E-mail inválido.';
-                            break;
-                        case 'auth/operation-not-allowed':
-                            errorMessage = 'Operação não permitida.';
-                            break;
-                        case 'auth/weak-password':
-                            errorMessage = 'Senha muito fraca. Use pelo menos 8 caracteres com letras e números.';
-                            break;
-                    }
-
-                    showError(errorMessage);
-                })
-                .finally(() => {
-                    // Reset loading state
-                    buttonText.classList.remove('hidden');
-                    buttonLoading.classList.add('hidden');
-                    registerButton.disabled = false;
+            try {
+                const response = await fetch(`${API_URL}/api/accounts/register/`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
                 });
-        });
 
-        // Save company info to localStorage when moving to admin section
-        nextToAdminBtn.addEventListener('click', function () {
-            const companyData = {
-                name: document.getElementById('company-name').value.trim(),
-                cnpj: document.getElementById('cnpj').value.trim(),
-                businessArea: document.getElementById('business-area').value
-            };
-            localStorage.setItem('tempCompanyData', JSON.stringify(companyData));
-        });
+                const data = await response.json();
 
-        // If returning from admin section, restore company data
-        backToCompanyBtn.addEventListener('click', function () {
-            const savedData = localStorage.getItem('tempCompanyData');
-            if (savedData) {
-                const companyData = JSON.parse(savedData);
-                document.getElementById('company-name').value = companyData.name;
-                document.getElementById('cnpj').value = companyData.cnpj;
-                document.getElementById('business-area').value = companyData.businessArea;
+                if (!response.ok) {
+                    // Usa nossa nova função para extrair a mensagem de erro
+                    const readableError = parseErrors(data);
+                    throw new Error(`Ocorreu um erro. ${readableError}`);
+                }
+
+                // Sucesso
+                successModal.classList.remove('hidden');
+                let countdown = 5;
+                const countdownInterval = setInterval(() => {
+                    countdown--;
+                    countdownElement.textContent = countdown;
+                    if (countdown <= 0) {
+                        clearInterval(countdownInterval);
+                        window.location.href = './login.html';
+                    }
+                }, 1000);
+
+            } catch (error) {
+                showError(error.message);
+                console.error('Fetch error:', error);
+            } finally {
+                buttonText.classList.remove('hidden');
+                buttonLoading.classList.add('hidden');
+                registerButton.disabled = false;
             }
-        });
+        }); 
     </script>
 </body>
 

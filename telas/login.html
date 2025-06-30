@@ -100,9 +100,8 @@
                         <input id="remember-me" name="remember-me" type="checkbox" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
                         <label for="remember-me" class="ml-2 block text-sm text-gray-700">Lembrar-me</label>
                     </div>
-                    <a href="#" id="forgot-password" class="text-sm text-blue-600 hover:text-blue-500">Esqueci minha senha</a>
-                </div>
-                
+               <a href="#" id="forgot-password-link" class="text-sm text-blue-600 hover:text-blue-500">Esqueci minha senha</a> </div>
+
                 <!-- Submit Button -->
                 <button 
                     type="submit" 
@@ -176,180 +175,150 @@
         </div>
     </div>
 
-    <script>
-        // Firebase Configuration
-        const firebaseConfig = {
-            apiKey: "YOUR_API_KEY",
-            authDomain: "YOUR_AUTH_DOMAIN",
-            projectId: "YOUR_PROJECT_ID",
-            storageBucket: "YOUR_STORAGE_BUCKET",
-            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-            appId: "YOUR_APP_ID"
-        };
+   <script>
+    // URL base da sua API Django
+    const API_URL = 'http://127.0.0.1:8000';
 
-        // Initialize Firebase
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
+    // --- DOM ELEMENTS ---
+    const loginForm = document.getElementById('login-form');
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+    const togglePassword = document.getElementById('toggle-password');
+    const loginButton = document.getElementById('login-button');
+    const buttonText = document.getElementById('button-text');
+    const buttonLoading = document.getElementById('button-loading');
+    const errorMessage = document.getElementById('error-message');
+    const errorText = document.getElementById('error-text');
+    const signupLink = document.getElementById('signup-link');
 
-        // DOM Elements
-        const loginForm = document.getElementById('login-form');
-        const emailInput = document.getElementById('email');
-        const passwordInput = document.getElementById('password');
-        const togglePassword = document.getElementById('toggle-password');
-        const loginButton = document.getElementById('login-button');
-        const buttonText = document.getElementById('button-text');
-        const buttonLoading = document.getElementById('button-loading');
-        const errorMessage = document.getElementById('error-message');
-        const errorText = document.getElementById('error-text');
-        const forgotPasswordLink = document.getElementById('forgot-password');
-        const forgotPasswordModal = document.getElementById('forgot-password-modal');
-        const closeModal = document.getElementById('close-modal');
-        const cancelReset = document.getElementById('cancel-reset');
-        const resetPasswordForm = document.getElementById('reset-password-form');
-        const resetEmailInput = document.getElementById('reset-email');
-        const successToast = document.getElementById('success-toast');
-        const successMessage = document.getElementById('success-message');
-        const signupLink = document.getElementById('signup-link');
+    // Elementos do Modal "Esqueci minha senha"
+    const forgotPasswordLink = document.getElementById('forgot-password-link'); // ID CORRIGIDO
+    const forgotPasswordModal = document.getElementById('forgot-password-modal');
+    const resetPasswordForm = document.getElementById('reset-password-form');
+    const resetEmailInput = document.getElementById('reset-email');
+    const closeModal = document.getElementById('close-modal');
+    const cancelReset = document.getElementById('cancel-reset');
 
-        // Toggle Password Visibility
-        togglePassword.addEventListener('click', function() {
-            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-            passwordInput.setAttribute('type', type);
-            this.querySelector('svg').classList.toggle('text-gray-700');
-        });
+    // --- FUNÇÕES DE FEEDBACK ---
+    function showError(message) {
+        errorText.textContent = message;
+        errorMessage.classList.remove('hidden');
+        setTimeout(() => {
+            errorMessage.classList.add('hidden');
+        }, 5000);
+    }
 
-        // Forgot Password Modal
-        forgotPasswordLink.addEventListener('click', function(e) {
-            e.preventDefault();
-            forgotPasswordModal.classList.remove('hidden');
-        });
+    function showSuccessToast(message) {
+        const toast = document.createElement('div');
+        toast.className = 'fixed top-5 right-5 bg-green-500 text-white py-2 px-4 rounded-lg shadow-lg';
+        toast.style.transition = 'opacity 0.5s, transform 0.5s';
+        toast.style.transform = 'translateX(100%)';
+        toast.style.opacity = '0';
+        toast.textContent = message;
+        document.body.appendChild(toast);
+        setTimeout(() => {
+            toast.style.transform = 'translateX(0)';
+            toast.style.opacity = '1';
+        }, 100);
+        setTimeout(() => {
+            toast.remove();
+        }, 4000);
+    }
 
-        // Close Modal
-        function closeForgotPasswordModal() {
-            forgotPasswordModal.classList.add('hidden');
+    // --- LÓGICA DE UI ---
+    togglePassword.addEventListener('click', function() {
+        const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+        passwordInput.setAttribute('type', type);
+        this.querySelector('svg').classList.toggle('text-gray-700');
+    });
+
+    // --- LÓGICA DE LOGIN ---
+    loginForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const email = emailInput.value.trim();
+        const password = passwordInput.value;
+        if (!email || !password) {
+            showError('Por favor, preencha o e-mail e a senha.');
+            return;
         }
+        buttonText.classList.add('hidden');
+        buttonLoading.classList.remove('hidden');
+        loginButton.disabled = true;
+        const payload = { username: email, password: password };
 
-        closeModal.addEventListener('click', closeForgotPasswordModal);
-        cancelReset.addEventListener('click', closeForgotPasswordModal);
-
-        // Reset Password
-        resetPasswordForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            const email = resetEmailInput.value.trim();
-            
-            auth.sendPasswordResetEmail(email)
-                .then(() => {
-                    closeForgotPasswordModal();
-                    showSuccessToast('E-mail de redefinição enviado! Verifique sua caixa de entrada.');
-                })
-                .catch(error => {
-                    showError(error.message);
-                });
+        fetch(`${API_URL}/api/token/`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        })
+        .then(async response => {
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.detail || 'Credenciais inválidas.');
+            return data;
+        })
+        .then(data => {
+            localStorage.setItem('accessToken', data.access);
+            localStorage.setItem('refreshToken', data.refresh);
+            window.location.href = '../index.html';
+        })
+        .catch(error => { showError(error.message); })
+        .finally(() => {
+            buttonText.classList.remove('hidden');
+            buttonLoading.classList.add('hidden');
+            loginButton.disabled = false;
         });
+    });
 
-        // Show Success Toast
-        function showSuccessToast(message) {
-            successMessage.textContent = message;
-            successToast.classList.remove('hidden');
-            
-            setTimeout(() => {
-                successToast.classList.add('hidden');
-            }, 5000);
+    // --- LÓGICA DO MODAL ESQUECI MINHA SENHA ---
+    function closeForgotPasswordModal() {
+        forgotPasswordModal.classList.add('hidden');
+    }
+
+    forgotPasswordLink.addEventListener('click', function(e) {
+        e.preventDefault();
+        forgotPasswordModal.classList.remove('hidden');
+    });
+    
+    closeModal.addEventListener('click', closeForgotPasswordModal);
+    cancelReset.addEventListener('click', closeForgotPasswordModal);
+
+    resetPasswordForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const email = resetEmailInput.value.trim();
+        const forgotPasswordButton = this.querySelector('button[type="submit"]');
+        if (!email) {
+            alert('Por favor, digite seu e-mail.');
+            return;
         }
-
-        // Show Error
-        function showError(message) {
-            errorText.textContent = message;
-            errorMessage.classList.remove('hidden');
-            
-            setTimeout(() => {
-                errorMessage.classList.add('hidden');
-            }, 5000);
-        }
-
-        // Login Form Submission
-        loginForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const email = emailInput.value.trim();
-            const password = passwordInput.value;
-            const rememberMe = document.getElementById('remember-me').checked;
-            
-            // Validate email
-            if (!email || !email.includes('@')) {
-                showError('Por favor, insira um e-mail válido.');
-                return;
-            }
-            
-            // Validate password
-            if (!password || password.length < 6) {
-                showError('A senha deve ter pelo menos 6 caracteres.');
-                return;
-            }
-            
-            // Show loading state
-            buttonText.classList.add('hidden');
-            buttonLoading.classList.remove('hidden');
-            loginButton.disabled = true;
-            
-            // Sign in with Firebase
-            auth.setPersistence(rememberMe ? 
-                firebase.auth.Auth.Persistence.LOCAL : 
-                firebase.auth.Auth.Persistence.SESSION)
-                .then(() => {
-                    return auth.signInWithEmailAndPassword(email, password);
-                })
-                .then(() => {
-                    // Redirect to dashboard
-                    window.location.href = 'index.html';
-                })
-                .catch(error => {
-                    // Handle errors
-                    let errorMessage = 'Ocorreu um erro ao fazer login.';
-                    
-                    switch (error.code) {
-                        case 'auth/user-not-found':
-                            errorMessage = 'Nenhum usuário encontrado com este e-mail.';
-                            break;
-                        case 'auth/wrong-password':
-                            errorMessage = 'Senha incorreta. Tente novamente.';
-                            break;
-                        case 'auth/invalid-email':
-                            errorMessage = 'E-mail inválido.';
-                            break;
-                        case 'auth/user-disabled':
-                            errorMessage = 'Esta conta foi desativada.';
-                            break;
-                    }
-                    
-                    showError(errorMessage);
-                })
-                .finally(() => {
-                    // Reset loading state
-                    buttonText.classList.remove('hidden');
-                    buttonLoading.classList.add('hidden');
-                    loginButton.disabled = false;
-                });
+        forgotPasswordButton.disabled = true;
+        forgotPasswordButton.textContent = 'Enviando...';
+        fetch(`${API_URL}/api/accounts/password_reset/`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: email })
+        })
+        .then(async response => {
+            if (!response.ok) throw new Error('Não foi possível encontrar um usuário com este e-mail.');
+            return response.json();
+        })
+        .then(data => {
+            closeForgotPasswordModal();
+            showSuccessToast('E-mail de redefinição enviado! Verifique o console do Django.');
+        })
+        .catch(error => { alert(error.message); })
+        .finally(() => {
+            forgotPasswordButton.disabled = false;
+            forgotPasswordButton.textContent = 'Enviar';
         });
+    });
 
-        // Sign Up Link
-        signupLink.addEventListener('click', function(e) {
-            e.preventDefault();
-            // In a real app, you would redirect to the signup page
-            // For this example, we'll just show a message
-            showSuccessToast('Redirecionando para a página de cadastro...');
-            setTimeout(() => {
-                 window.location.href = 'telas/cadastroAdmin.html';
-            }, 1500);
-        });
-
-        // Check if user is already logged in
-        auth.onAuthStateChanged(user => {
-            if (user) {
-                // User is signed in, redirect to dashboard
-                window.location.href = 'index.html';
-            }
-        });
-    </script>
+    // --- NAVEGAÇÃO EXTRA ---
+    signupLink.addEventListener('click', function(e) {
+        e.preventDefault();
+        window.location.href = 'telas/cadastroAdmin.html';
+    });
+</script>
 </body>
 </html>
+
+

@@ -228,6 +228,12 @@
                 document.getElementById('cancelBtn').addEventListener('click', closeModal);
                 document.getElementById('creditCardForm').addEventListener('submit', saveCard);
 
+
+                document.getElementById('confirm-delete-btn').addEventListener('click', deleteCard);
+                document.getElementById('cancel-delete-btn').addEventListener('click', closeDeleteModal);
+
+
+
                 // Futuramente, adicionaremos os listeners do modal de exclusão aqui também
                 // document.getElementById('confirm-delete-btn').addEventListener('click', deleteCard);
                 // document.getElementById('cancel-delete-btn').addEventListener('click', closeDeleteModal);
@@ -243,17 +249,21 @@
             if (form) {
                 form.reset();
                 document.getElementById('modalTitle').textContent = 'Cadastrar Cartão';
-                // document.getElementById('cardId').value = ''; // Esta linha estava causando erro, vamos garantir que ela exista ou remover.
 
-                // --- LINHA ADICIONADA AQUI ---
-                // Pega o token e popula o dropdown de contas
+                // --- LINHA CRUCIAL ADICIONADA/CORRIGIDA ---
+                // Limpa a variável para garantir que estamos no modo de CRIAÇÃO
+                cardIdToModify = null;
+
+                // Garante que o campo de ID oculto esteja vazio
+                const cardIdInput = document.getElementById('cardId');
+                if (cardIdInput) cardIdInput.value = '';
+
                 const token = localStorage.getItem('accessToken');
                 populateAccountsDropdown(token);
 
                 document.getElementById('creditCardModal').classList.remove('hidden');
             }
         }
-
         async function openEditModal(id) {
             // Guarda o ID do cartão que estamos editando
             cardIdToModify = id;
@@ -297,6 +307,37 @@
         function closeModal() {
             const modal = document.getElementById('creditCardModal');
             if (modal) modal.classList.add('hidden');
+        }
+
+        function openDeleteModal(id) {
+            cardIdToModify = id; // Guarda o ID do cartão a ser deletado
+            document.getElementById('delete-modal').classList.remove('hidden');
+        }
+
+        function closeDeleteModal() {
+            cardIdToModify = null; // Limpa o ID
+            document.getElementById('delete-modal').classList.add('hidden');
+        }
+
+        async function deleteCard() {
+            if (!cardIdToModify) return;
+            const token = localStorage.getItem('accessToken');
+            try {
+                const response = await fetch(`${API_URL}/api/finance/credit-cards/${cardIdToModify}/`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (response.status !== 204) { // 204 No Content é a resposta de sucesso para DELETE
+                    throw new Error('Erro ao excluir o cartão.');
+                }
+
+                alert('Cartão excluído com sucesso!');
+                closeDeleteModal();
+                renderCreditCards(); // Atualiza a lista na tela
+            } catch (error) {
+                alert(error.message);
+            }
         }
 
         function openDeleteModal(id) {
@@ -378,50 +419,57 @@
 
         // Função para salvar (ainda vazia, será o Passo 2)
         async function saveCard(event) {
-            event.preventDefault();
-            const token = localStorage.getItem('accessToken');
+    event.preventDefault(); 
+    
+    const token = localStorage.getItem('accessToken');
+    const id = cardIdToModify; // Pega o ID (pode ser nulo ou um número)
 
-            // Pega o ID guardado. Se tiver um ID, é uma edição. Se for nulo, é uma criação.
-            const id = cardIdToModify;
+    const payload = {
+        name: document.getElementById('cardName').value,
+        brand: document.getElementById('cardBrand').value,
+        last_digits: document.getElementById('lastDigits').value,
+        credit_limit: document.getElementById('creditLimit').value.replace(/\./g, '').replace(',', '.'),
+        closing_day: document.getElementById('closingDay').value,
+        due_day: document.getElementById('dueDay').value,
+        associated_account: document.getElementById('associatedAccount').value,
+        is_active: document.getElementById('cardStatus').checked
+    };
 
-            const payload = {
-                name: document.getElementById('cardName').value,
-                brand: document.getElementById('cardBrand').value,
-                last_digits: document.getElementById('lastDigits').value,
-                credit_limit: document.getElementById('creditLimit').value.replace(/\./g, '').replace(',', '.'),
-                closing_day: document.getElementById('closingDay').value,
-                due_day: document.getElementById('dueDay').value,
-                associated_account: document.getElementById('associatedAccount').value,
-                is_active: document.getElementById('cardStatus').checked
-            };
+    const url = id ? `${API_URL}/api/finance/credit-cards/${id}/` : `${API_URL}/api/finance/credit-cards/`;
+    const method = id ? 'PUT' : 'POST';
 
-            const url = id ? `${API_URL}/api/finance/credit-cards/${id}/` : `${API_URL}/api/finance/credit-cards/`;
-            const method = id ? 'PUT' : 'POST'; // Define o método correto
+    const saveButton = document.querySelector('button[type="submit"][form="creditCardForm"]');
+    saveButton.disabled = true;
+    saveButton.textContent = 'Salvando...';
 
-            const saveButton = document.querySelector('button[type="submit"][form="creditCardForm"]');
-            saveButton.disabled = true;
-            saveButton.textContent = 'Salvando...';
+    try {
+        const response = await fetch(url, {
+            method: method,
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+            body: JSON.stringify(payload)
+        });
 
-            try {
-                const response = await fetch(url, {
-                    method: method,
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                    body: JSON.stringify(payload)
-                });
-
-                if (!response.ok) { throw new Error('Erro ao salvar o cartão.'); }
-
-                alert(id ? 'Cartão atualizado com sucesso!' : 'Cartão criado com sucesso!');
-                closeModal();
-                renderCreditCards();
-
-            } catch (error) {
-                alert(error.message);
-            } finally {
-                saveButton.disabled = false;
-                saveButton.textContent = 'Salvar';
+        if (!response.ok) {
+            const errorData = await response.json();
+            let errorMsg = "Erro ao salvar: ";
+            for (const field in errorData) { 
+                const message = Array.isArray(errorData[field]) ? errorData[field].join(', ') : errorData[field];
+                errorMsg += `${field}: ${message} `; 
             }
+            throw new Error(errorMsg);
         }
+
+        alert(id ? 'Cartão atualizado com sucesso!' : 'Cartão criado com sucesso!');
+        closeModal();
+        renderCreditCards();
+
+    } catch (error) {
+        alert(error.message);
+    } finally {
+        saveButton.disabled = false;
+        saveButton.textContent = 'Salvar';
+    }
+}
 
 
         // Função para renderizar os cartões na tabela

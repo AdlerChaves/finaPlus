@@ -8,7 +8,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="../style.css">
-</head>
+</head> "bill-modal"
 
 <body class="bg-gray-50 font-sans">
     <main class="mt-16 pt-6 pb-20">
@@ -22,9 +22,9 @@
                         Nova Conta Boleto
                     </button>
                     <button id="add-card-expense-btn"
-                        class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors flex items-center">
+                        class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition-colors flex items-center">
                         <i class="fas fa-credit-card mr-2"></i>
-                        Nova Despesa no Cartão
+                        Lançar Despesa no Cartão
                     </button>
                 </div>
             </div>
@@ -35,7 +35,7 @@
                         <div class="p-3 rounded-full bg-blue-100 text-blue-600 mr-4"><i
                                 class="fas fa-file-invoice-dollar text-lg"></i></div>
                         <div>
-                            <p class="text-sm text-gray-500">Total Aberto</p>
+                            <p class="text-sm text-gray-500">Total Aberto (Mês)</p>
                             <p id="summary-total-open" class="text-xl font-bold text-gray-800">R$ 0,00</p>
                         </div>
                     </div>
@@ -45,7 +45,7 @@
                         <div class="p-3 rounded-full bg-green-100 text-green-600 mr-4"><i
                                 class="fas fa-check-circle text-lg"></i></div>
                         <div>
-                            <p class="text-sm text-gray-500">Total Pago (mês)</p>
+                            <p class="text-sm text-gray-500">Total Pago (Mês)</p>
                             <p id="summary-total-paid" class="text-xl font-bold text-gray-800">R$ 0,00</p>
                         </div>
                     </div>
@@ -62,8 +62,21 @@
                 </div>
             </div>
 
-            <div class="bg-white rounded-lg shadow-sm p-4 border border-gray-100 mb-6">
+            <div
+                class="bg-white rounded-lg shadow-sm p-4 border border-gray-100 mb-6 flex items-center justify-between">
+                <h3 class="text-lg font-medium text-gray-800">Filtros</h3>
+                <div class="flex items-center space-x-4">
+                    <button id="prev-month-btn" class="p-2 rounded-full hover:bg-gray-100 transition-colors">
+                        <i class="fas fa-chevron-left text-gray-600"></i>
+                    </button>
+                    <span id="current-month-display" class="text-center font-semibold text-gray-700 w-32">Julho /
+                        2025</span>
+                    <button id="next-month-btn" class="p-2 rounded-full hover:bg-gray-100 transition-colors">
+                        <i class="fas fa-chevron-right text-gray-600"></i>
+                    </button>
+                </div>
             </div>
+
 
             <div class="bg-white rounded-lg shadow-sm overflow-hidden border border-gray-100">
                 <div class="overflow-x-auto">
@@ -106,6 +119,7 @@
                 <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                     <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">Nova Conta a Pagar</h3>
                     <form id="bill-form" class="mt-4 space-y-4">
+                        <input type="hidden" id="bill-status">
                         <input type="hidden" id="bill-id">
                         <div>
                             <label for="bill-description" class="block text-sm font-medium text-gray-700">Descrição
@@ -178,27 +192,43 @@
         // --- INÍCIO DO SCRIPT UNIFICADO PARA CONTAS A PAGAR ---
 
         const API_URL = 'http://127.0.0.1:8000';
-        let billIdToModify = null; // Guarda o ID para editar ou excluir
+        let billIdToModify = null;
 
-        // --- FUNÇÃO PRINCIPAL DE INICIALIZAÇÃO ---
+        let currentMonth = new Date();
+
+        const prevMonthBtn = document.getElementById('prev-month-btn');
+        const nextMonthBtn = document.getElementById('next-month-btn');
+        const currentMonthDisplay = document.getElementById('current-month-display');
+
+        function updateMonthDisplay() {
+            const monthName = currentMonth.toLocaleString('pt-BR', { month: 'long' });
+            const year = currentMonth.getFullYear();
+            currentMonthDisplay.textContent = `${monthName.charAt(0).toUpperCase() + monthName.slice(1)} / ${year}`;
+        }
+
+        prevMonthBtn.addEventListener('click', () => {
+            currentMonth.setMonth(currentMonth.getMonth() - 1);
+            renderMonthlyBills();
+        });
+
+        nextMonthBtn.addEventListener('click', () => {
+            currentMonth.setMonth(currentMonth.getMonth() + 1);
+            renderMonthlyBills();
+        });
+
         document.addEventListener('DOMContentLoaded', () => {
-            // 1. Renderiza o Topbar primeiro
             const userPermissions = {
                 dashboard: true, movimentacoes: true, relatorios: true,
                 pagamentos: true, contas: true, cadastros: true, configuracoes: true
             };
             renderTopbar('pagamentos', userPermissions);
-
-            // 2. Carrega os modais e configura TODOS os botões da página
             setupPage();
-
-            // 3. Busca os dados iniciais da API e renderiza a tabela
-            renderPayables();
+            renderMonthlyBills();
         });
 
         function markAsPaid(id) {
             const row = document.querySelector(`button[onclick="markAsPaid(${id})"]`).closest('tr');
-            const amountText = row.cells[3].textContent; // Pega o texto do valor (ex: "R$ 150,00")
+            const amountText = row.cells[3].textContent;
             const amountValue = amountText.replace('R$', '').replace(/\./g, '').replace(',', '.').trim();
             openMarkAsPaidModal(id, amountValue);
         }
@@ -208,7 +238,6 @@
             const modal = document.getElementById('mark-as-paid-modal');
             const accountSelect = document.getElementById('payment-account');
 
-            // Popula o dropdown de contas
             try {
                 const response = await fetch(`${API_URL}/api/finance/bank-accounts/?is_active=true`, { headers: { 'Authorization': `Bearer ${token}` } });
                 const accounts = await response.json();
@@ -218,7 +247,6 @@
                 });
             } catch (error) { console.error(error); }
 
-            // Preenche os campos do modal
             document.getElementById('payable-id-input').value = billId;
             document.getElementById('payment-amount').value = parseFloat(billAmount).toFixed(2);
             document.getElementById('payment-date').valueAsDate = new Date();
@@ -253,31 +281,22 @@
 
                 showToast(data.success);
                 document.getElementById('mark-as-paid-modal').classList.add('hidden');
-                renderPayables();
+                renderMonthlyBills();
             } catch (error) {
                 showToast(error.message, 'error');
             }
         }
 
         function setupEventListeners() {
-            // Botão para adicionar nova conta manual
             document.getElementById('add-bill-button').addEventListener('click', openAddModal);
-
-            // Botões do Modal de conta manual
             document.getElementById('cancel-modal').addEventListener('click', closeModal);
             document.getElementById('bill-form').addEventListener('submit', savePayable);
-
-            // Botões do Modal de exclusão
             document.getElementById('confirm-delete-btn').addEventListener('click', deletePayable);
             document.getElementById('cancel-delete-btn').addEventListener('click', closeDeleteModal);
-
-            // --- LÓGICA CORRIGIDA AQUI ---
-            // Botão para abrir o modal de despesa no cartão
             document.getElementById('add-card-expense-btn').addEventListener('click', openCardExpenseModal);
         }
         async function loadDynamicModals() {
             try {
-                // Carrega os dois modais dinâmicos
                 const [cardRes, paidRes] = await Promise.all([
                     fetch('../componentes/modalGastoCartao.html'),
                     fetch('../componentes/modalMarcarPago.html')
@@ -288,12 +307,9 @@
                 document.getElementById('card-expense-modal-container').innerHTML = cardHtml;
                 document.body.insertAdjacentHTML('beforeend', paidHtml);
 
-                // Configura eventos do modal de gasto no cartão
                 document.getElementById('add-card-expense-btn').addEventListener('click', openCardExpenseModal);
                 document.getElementById('cancelCardExpenseBtn').addEventListener('click', closeCardExpenseModal);
                 document.getElementById('cardExpenseForm').addEventListener('submit', saveCardExpense);
-
-                // Configura eventos do NOVO modal de marcar como pago
                 document.getElementById('mark-as-paid-form').addEventListener('submit', confirmPayment);
                 document.getElementById('cancel-payment-btn').addEventListener('click', () => document.getElementById('mark-as-paid-modal').classList.add('hidden'));
 
@@ -305,91 +321,172 @@
             loadDynamicModals();
         }
 
-        // --- FUNÇÕES DE UTILIDADE E FEEDBACK ---
         const formatMoney = (value) => parseFloat(value).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
         const formatDate = (dateString) => { const [y, m, d] = dateString.split('-'); return `${d}/${m}/${y}`; };
         function showToast(message, type = 'success') {
-            // --- CORREÇÃO AQUI ---
-            // Agora procura pelo ID correto: 'toast-notification'
             const toast = document.getElementById('toast-notification');
             const toastMessage = document.getElementById('toast-message');
 
-            // Se, por algum motivo, o elemento não for encontrado, a função para e evita mais erros.
             if (!toast || !toastMessage) {
                 console.error("Elementos do Toast não encontrados no DOM.");
                 return;
             }
 
             toastMessage.textContent = message;
-
-            // Define a cor baseada no tipo (sucesso ou erro)
             const bgColor = type === 'success' ? 'bg-green-500' : 'bg-red-500';
             toast.className = `fixed bottom-4 right-4 text-white px-4 py-2 rounded-lg shadow-lg toast ${bgColor}`;
 
-            // Esconde o toast após 3 segundos
             setTimeout(() => {
                 toast.className = 'hidden';
             }, 3000);
         }
 
-        // --- FUNÇÕES DA API E RENDERIZAÇÃO ---
-        async function renderPayables() {
+        // --- FUNÇÃO PARA RENDERIZAR A TABELA UNIFICADA ---
+        function renderUnifiedTable(items) {
+            const payablesTableBody = document.getElementById('payables-table-body');
+            payablesTableBody.innerHTML = '';
+
+            if (items.length === 0) {
+                payablesTableBody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-gray-500">Nenhuma conta para este mês.</td></tr>`;
+                return;
+            }
+
+            items.forEach(item => {
+                const row = document.createElement('tr');
+                let statusClass = '';
+                let statusText = '';
+
+                // --- LÓGICA DE STATUS UNIFICADA ---
+                switch (item.status) {
+                    case 'pago':
+                        statusClass = 'bg-green-100 text-green-800';
+                        statusText = 'Pago';
+                        row.classList.add('bg-green-50'); // Fundo verde claro para a linha
+                        break;
+                    case 'vencido':
+                        statusClass = 'bg-red-100 text-red-800';
+                        statusText = 'Vencido';
+                        row.classList.add('bg-red-50'); // Fundo vermelho claro para a linha
+                        break;
+                    default: // 'pendente'
+                        statusClass = 'bg-yellow-100 text-yellow-800';
+                        statusText = 'Pendente';
+                        break;
+                }
+
+                if (item.type === 'card') {
+                    const dueDate = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), item.due_day);
+                    row.innerHTML = `
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                            <i class="fas fa-credit-card text-indigo-500 mr-2"></i>
+                            Fatura ${item.card_name}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Fatura de Cartão</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold">${formatDate(dueDate.toISOString().split('T')[0])}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-indigo-600">${formatMoney(item.total_amount)}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                             <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${statusClass}">${statusText}</span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                            <button onclick="viewCardStatement(${item.card_id})" class="text-indigo-600 hover:text-indigo-900 transition-colors" title="Ver Detalhes da Fatura">
+                                <i class="fas fa-eye"></i> Ver Detalhes
+                            </button>
+                        </td>
+                    `;
+                } else { // é 'manual'
+                    row.innerHTML = `
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${item.description}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${item.category_name || 'N/A'}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm ${item.status === 'vencido' ? 'text-red-600 font-bold' : 'text-gray-500'}">${formatDate(item.due_date)}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold">${formatMoney(item.amount)}</td>
+                        <td class="px-6 py-4 whitespace-nowrap"><span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${statusClass}">${statusText}</span></td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                            ${item.status !== 'pago' ? `<button onclick="markAsPaid(${item.id})" class="text-green-600 hover:text-green-800 mr-3" title="Marcar como Pago"><i class="fas fa-check-circle"></i></button>` : ''}
+                            <button onclick="openEditModal(${item.id})" class="text-blue-600 hover:text-blue-800 mr-3" title="Editar"><i class="fas fa-edit"></i></button>
+                            <button onclick="openDeleteModal(${item.id})" class="text-red-500 hover:text-red-700" title="Excluir"><i class="fas fa-trash-alt"></i></button>
+                        </td>
+                    `;
+                }
+                payablesTableBody.appendChild(row);
+            });
+        }
+
+
+        // --- NOVA FUNÇÃO PARA EXIBIR A FATURA (SIMULADO) ---
+        function viewCardStatement(cardId) {
+            const year = currentMonth.getFullYear();
+            const month = currentMonth.getMonth() + 1;
+
+            // Redireciona para a tela de detalhes da fatura, passando os dados via URL
+            window.location.href = `detalheFatura.html?card_id=${cardId}&month=${month}&year=${year}`;
+        }
+
+        async function renderMonthlyBills() {
+            updateMonthDisplay();
             const token = localStorage.getItem('accessToken');
             if (!token) { window.location.href = '../login.html'; return; }
 
+            const year = currentMonth.getFullYear();
+            const month = currentMonth.getMonth() + 1;
+            const url = `${API_URL}/api/finance/monthly-bills/?month=${month}&year=${year}`;
+
             try {
-                const response = await fetch(`${API_URL}/api/finance/payables/`, { headers: { 'Authorization': `Bearer ${token}` } });
-                if (!response.ok) throw new Error('Falha ao buscar contas a pagar.');
+                const response = await fetch(url, { headers: { 'Authorization': `Bearer ${token}` } });
+                if (!response.ok) throw new Error('Falha ao buscar as contas do mês.');
+                const data = await response.json();
 
-                const payables = await response.json();
-                const payablesTableBody = document.getElementById('payables-table-body'); // ID adicionado ao seu tbody
-                payablesTableBody.innerHTML = '';
+                // Mapeia e adiciona um tipo a cada item para facilitar a renderização
+                const manualItems = data.manual_bills.map(bill => ({ ...bill, type: 'manual' }));
+                const cardItems = data.card_bills.map(bill => ({ ...bill, type: 'card' }));
 
-                let totalOpen = 0, totalPaid = 0, totalOverdue = 0;
+                // Unifica os dois tipos de contas em uma única lista
+                let allItems = [...manualItems, ...cardItems];
 
-                if (payables.length === 0) {
-                    payablesTableBody.innerHTML = `<tr><td colspan="7" class="text-center py-4 text-gray-500">Nenhuma conta a pagar encontrada.</td></tr>`;
-                } else {
-                    payables.forEach(bill => {
-                        // Lógica de cálculo dos resumos...
-                        if (bill.status === 'pago') totalPaid += parseFloat(bill.amount);
-                        if (bill.status === 'vencido') totalOverdue += parseFloat(bill.amount);
-                        if (bill.status === 'pendente' || bill.status === 'vencido') totalOpen += parseFloat(bill.amount);
+                // Ordena a lista unificada por data de vencimento
+                allItems.sort((a, b) => {
+                    const dateA = a.type === 'card' ? new Date(year, month - 1, a.due_day) : new Date(a.due_date);
+                    const dateB = b.type === 'card' ? new Date(year, month - 1, b.due_day) : new Date(b.due_date);
+                    return dateA - dateB;
+                });
 
-                        const row = document.createElement('tr');
-                        // Adiciona classes de estilo para contas vencidas ou próximas do vencimento
-                        if (bill.status === 'vencido') row.classList.add('overdue', 'highlight-due');
+                renderUnifiedTable(allItems);
+                updateSummaryCards(allItems);
 
-                        row.innerHTML = `
-    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${bill.description}</td>
-    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${bill.category_name || 'N/A'}</td>
-    <td class="px-6 py-4 whitespace-nowrap text-sm ${bill.status === 'vencido' ? 'text-red-600 font-bold' : 'text-gray-500'}">${formatDate(bill.due_date)}</td>
-    <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold">${formatMoney(bill.amount)}</td>
-    <td class="px-6 py-4 whitespace-nowrap"><span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${bill.status === 'pago' ? 'bg-green-100 text-green-800' : bill.status === 'vencido' ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800'}">${bill.status.charAt(0).toUpperCase() + bill.status.slice(1)}</span></td>
-    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-        ${bill.status !== 'pago' ? `<button onclick="markAsPaid(${bill.id})" class="text-green-600 hover:text-green-800 mr-3" title="Marcar como Pago"><i class="fas fa-check-circle"></i></button>` : ''}
-        <button onclick="openEditModal(${bill.id})" class="text-blue-600 hover:text-blue-800 mr-3" title="Editar"><i class="fas fa-edit"></i></button>
-        <button onclick="openDeleteModal(${bill.id})" class="text-red-500 hover:text-red-700" title="Excluir"><i class="fas fa-trash-alt"></i></button>
-    </td>
-`;
-                        payablesTableBody.appendChild(row);
-                    });
-                }
-                // Atualiza os cards de resumo
-                document.getElementById('summary-total-open').textContent = formatMoney(totalOpen);
-                document.getElementById('summary-total-paid').textContent = formatMoney(totalPaid);
-                document.getElementById('summary-total-overdue').textContent = formatMoney(totalOverdue);
-            } catch (error) { showToast(error.message, 'error'); }
+            } catch (error) {
+                showToast(error.message, 'error');
+            }
         }
 
-        // --- FUNÇÕES DE CRUD E MODAL ---
+        function updateSummaryCards(items) {
+            let totalOpen = 0, totalPaid = 0, totalOverdue = 0;
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            items.forEach(item => {
+                const amount = parseFloat(item.amount || item.total_amount);
+
+                if (item.status === 'pago') {
+                    totalPaid += amount;
+                } else { // Se não está pago, está aberto
+                    totalOpen += amount;
+                    // Se estiver aberto E vencido, soma também no total vencido
+                    if (item.status === 'vencido') {
+                        totalOverdue += amount;
+                    }
+                }
+            });
+
+            document.getElementById('summary-total-open').textContent = formatMoney(totalOpen);
+            document.getElementById('summary-total-paid').textContent = formatMoney(totalPaid);
+            document.getElementById('summary-total-overdue').textContent = formatMoney(totalOverdue);
+        }
+
         async function populateCategoriesDropdown(token) {
             const categorySelect = document.getElementById('bill-category');
             try {
                 const response = await fetch(`${API_URL}/api/finance/categories/?type=saida`, { headers: { 'Authorization': `Bearer ${token}` } });
                 if (!response.ok) throw new Error('Falha ao carregar categorias.');
                 const categories = await response.json();
-
                 categorySelect.innerHTML = '<option value="">Selecione uma Categoria</option>';
                 categories.forEach(cat => {
                     categorySelect.innerHTML += `<option value="${cat.id}">${cat.name}</option>`;
@@ -405,10 +502,8 @@
             billForm.reset();
             document.getElementById('modal-title').textContent = 'Nova Conta a Pagar';
             document.getElementById('bill-id').value = '';
-
             const token = localStorage.getItem('accessToken');
-            await populateCategoriesDropdown(token); // Popula o dropdown
-
+            await populateCategoriesDropdown(token);
             document.getElementById('bill-modal').classList.remove('hidden');
         }
 
@@ -419,20 +514,18 @@
         async function savePayable(event) {
             event.preventDefault();
             const token = localStorage.getItem('accessToken');
+            const id = document.getElementById('bill-id').value;
 
-            // A variável billIdToModify será usada para a edição
-            const id = billIdToModify;
-
+            // --- LÓGICA DO PAYLOAD CORRIGIDA ---
             const payload = {
                 description: document.getElementById('bill-description').value,
                 amount: document.getElementById('bill-amount').value,
                 due_date: document.getElementById('bill-due-date').value,
                 category: document.getElementById('bill-category').value || null,
-                // Ao criar manualmente, o status é sempre pendente
-                status: 'pendente'
+                // Agora, ele pega o status do campo oculto, ou usa 'pendente' se for uma conta nova
+                status: document.getElementById('bill-status').value || 'pendente'
             };
 
-            // Validação simples
             if (!payload.description || !payload.amount || !payload.due_date) {
                 showToast('Descrição, Valor e Data de Vencimento são obrigatórios.', 'error');
                 return;
@@ -451,15 +544,13 @@
                     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                     body: JSON.stringify(payload)
                 });
-
                 if (!response.ok) {
                     const errorData = await response.json();
                     throw new Error(`Erro ao salvar: ${JSON.stringify(errorData)}`);
                 }
-
                 showToast(id ? 'Conta atualizada com sucesso!' : 'Conta criada com sucesso!');
                 closeModal();
-                renderPayables(); // Atualiza a tabela
+                renderMonthlyBills();
             } catch (error) {
                 showToast(error.message, 'error');
             } finally {
@@ -469,22 +560,23 @@
         }
 
         async function openEditModal(id) {
-            billIdToModify = id; // Guarda o ID para a função de salvar
+            document.getElementById('bill-id').value = id;
             const token = localStorage.getItem('accessToken');
-            await populateCategoriesDropdown(token); // Garante que as categorias estejam carregadas
+            await populateCategoriesDropdown(token);
 
             try {
                 const response = await fetch(`${API_URL}/api/finance/payables/${id}/`, { headers: { 'Authorization': `Bearer ${token}` } });
                 if (!response.ok) throw new Error('Falha ao buscar dados da conta.');
                 const bill = await response.json();
-
-                // Preenche o formulário com os dados da conta
                 document.getElementById('modal-title').textContent = 'Editar Conta a Pagar';
-                document.getElementById('bill-id').value = bill.id;
                 document.getElementById('bill-description').value = bill.description;
                 document.getElementById('bill-amount').value = bill.amount;
                 document.getElementById('bill-due-date').value = bill.due_date;
                 document.getElementById('bill-category').value = bill.category || '';
+
+                // --- LINHA NOVA ADICIONADA AQUI ---
+                // Guarda o status atual da conta no campo oculto
+                document.getElementById('bill-status').value = bill.status;
 
                 document.getElementById('bill-modal').classList.remove('hidden');
             } catch (error) {
@@ -493,12 +585,12 @@
         }
 
         function openDeleteModal(id) {
-            billIdToModify = id; // Guarda o ID da conta a ser excluída
+            billIdToModify = id;
             document.getElementById('delete-modal').classList.remove('hidden');
         }
 
         function closeDeleteModal() {
-            billIdToModify = null; // Limpa o ID
+            billIdToModify = null;
             document.getElementById('delete-modal').classList.add('hidden');
         }
 
@@ -510,44 +602,33 @@
                     method: 'DELETE',
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
-
                 if (response.status !== 204) {
                     throw new Error('Erro ao excluir a conta.');
                 }
-
                 showToast('Conta excluída com sucesso!');
                 closeDeleteModal();
-                renderPayables(); // Atualiza a tabela
+                renderMonthlyBills();
             } catch (error) {
                 showToast(error.message, 'error');
             }
         }
 
-
-
-        // Abre o modal de gasto no cartão e popula os dropdowns
         async function openCardExpenseModal() {
             const token = localStorage.getItem('accessToken');
             const cardSelect = document.getElementById('card-expense-card');
             const categorySelect = document.getElementById('card-expense-category');
-
             try {
-                // Busca cartões ativos e categorias de saída
                 const [cardsRes, catRes] = await Promise.all([
                     fetch(`${API_URL}/api/finance/credit-cards/?is_active=true`, { headers: { 'Authorization': `Bearer ${token}` } }),
                     fetch(`${API_URL}/api/finance/categories/?type=saida`, { headers: { 'Authorization': `Bearer ${token}` } })
                 ]);
                 const cards = await cardsRes.json();
                 const categories = await catRes.json();
-
                 cardSelect.innerHTML = '<option value="">Selecione um cartão</option>';
                 cards.forEach(c => { cardSelect.innerHTML += `<option value="${c.id}">${c.name} (final ${c.last_digits})</option>`; });
-
                 categorySelect.innerHTML = '<option value="">Selecione uma categoria</option>';
                 categories.forEach(c => { categorySelect.innerHTML += `<option value="${c.id}">${c.name}</option>`; });
-
                 document.getElementById('cardExpenseModal').classList.remove('hidden');
-
             } catch (error) {
                 console.error(error);
                 showToast('Erro ao carregar dados para o formulário.', 'error');
@@ -558,20 +639,14 @@
             document.getElementById('cardExpenseModal').classList.add('hidden');
         }
 
-        // Função que será chamada para salvar a despesa do cartão
         async function saveCardExpense(event) {
-            event.preventDefault(); // Impede o formulário de recarregar
-
+            event.preventDefault();
             const token = localStorage.getItem('accessToken');
             if (!token) {
                 showToast('Você não está autenticado. Faça login novamente.', 'error');
                 return;
             }
-
-            // --- CORREÇÃO AQUI ---
-            // Agora encontramos o botão pelo seu ID único, o que sempre funciona
             const saveButton = document.getElementById('saveCardExpenseBtn');
-
             const payload = {
                 description: document.getElementById('card-expense-description').value,
                 amount: document.getElementById('card-expense-amount').value,
@@ -585,8 +660,6 @@
                 showToast("Por favor, preencha todos os campos obrigatórios.", "error");
                 return;
             }
-
-            // Desabilita o botão para evitar cliques duplos
             saveButton.disabled = true;
             saveButton.textContent = 'Criando...';
 
@@ -596,20 +669,18 @@
                     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                     body: JSON.stringify(payload)
                 });
-
                 const data = await response.json();
                 if (!response.ok) {
                     throw new Error(data.error || 'Ocorreu um erro ao registrar a despesa.');
                 }
-
                 showToast(data.success || 'Despesa registrada com sucesso!');
-                closeCardExpenseModal();
-                renderPayables(); // Atualiza a lista de contas a pagar
+                document.getElementById('cardExpenseForm').reset(); // Limpa os campos do formulário
 
+                closeCardExpenseModal();
+                renderMonthlyBills();
             } catch (error) {
                 showToast(error.message, 'error');
             } finally {
-                // Garante que o botão seja reativado
                 saveButton.disabled = false;
                 saveButton.textContent = 'Criar Parcelas';
             }
@@ -618,4 +689,3 @@
 </body>
 
 </html>
-

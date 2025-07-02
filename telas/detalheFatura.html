@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FinançaPlus | Detalhes da Fatura</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body class="bg-gray-50 font-sans">
+    <main class="mt-16 pt-6 pb-20">
+        <div class="container mx-auto px-4">
+            <div class="flex items-center mb-6">
+                <button onclick="window.history.back()" class="mr-4 text-gray-600 hover:text-gray-800">
+                    <i class="fas fa-arrow-left text-xl"></i>
+                </button>
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-800">Detalhes da Fatura</h1>
+                    <div class="flex items-center mt-2">
+                        <div class="bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full text-sm font-medium">
+                            <i class="fas fa-credit-card mr-2"></i>
+                            <span id="card-name">Carregando...</span>
+                        </div>
+                        <div class="ml-4 bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm font-medium">
+                            <i class="far fa-calendar-alt mr-2"></i>
+                            <span id="bill-period">Carregando...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                <div class="bg-white rounded-lg shadow-sm p-4 border border-gray-100">
+                    <div class="flex items-center">
+                        <div class="p-3 rounded-full bg-blue-100 text-blue-600 mr-4">
+                            <i class="fas fa-file-invoice-dollar text-lg"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500">Total da Fatura</p>
+                            <p id="bill-total" class="text-xl font-bold text-gray-800">R$ 0,00</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-lg shadow-sm p-4 border border-gray-100">
+                    <div class="flex items-center">
+                        <div class="p-3 rounded-full bg-green-100 text-green-600 mr-4">
+                            <i class="fas fa-check-circle text-lg"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500">Pago</p>
+                            <p id="bill-paid" class="text-xl font-bold text-gray-800">R$ 0,00</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-lg shadow-sm p-4 border border-gray-100">
+                    <div class="flex items-center">
+                        <div class="p-3 rounded-full bg-red-100 text-red-600 mr-4">
+                            <i class="fas fa-exclamation-circle text-lg"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500">Vencimento</p>
+                            <p id="bill-due-date" class="text-xl font-bold text-gray-800">--/--/----</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="payment-action-container" class="bg-white rounded-lg shadow-sm p-4 border border-gray-100 mb-6 flex flex-col md:flex-row justify-between items-start md:items-center">
+                <div class="mb-4 md:mb-0">
+                    <h3 class="text-lg font-medium text-gray-800">Status da Fatura</h3>
+                    <p id="bill-status" class="text-sm text-gray-600 mt-1">
+                        </p>
+                </div>
+                <button id="mark-as-paid-btn"
+                    class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition-colors flex items-center">
+                    <i class="fas fa-check-circle mr-2"></i>
+                    Pagar Fatura
+                </button>
+            </div>
+
+
+            <div class="bg-white rounded-lg shadow-sm overflow-hidden border border-gray-100 mb-6">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h3 class="text-lg font-medium text-gray-800">Transações do Mês</h3>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data da Compra</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Descrição</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Categoria</th>
+                                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Valor da Parcela</th>
+                            </tr>
+                        </thead>
+                        <tbody id="transactions-list" class="bg-white divide-y divide-gray-200">
+                             <tr><td colspan="4" class="text-center py-4 text-gray-500">Carregando transações...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <div id="mark-as-paid-modal" class="fixed inset-0 overflow-y-auto z-50 hidden">
+        <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            <div
+                class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <h3 class="text-lg leading-6 font-medium text-gray-900">Pagar Fatura do Cartão</h3>
+                    <form id="payment-form" class="mt-4 space-y-4">
+                        <div>
+                            <label for="payment-account" class="block text-sm font-medium text-gray-700">Conta de Origem *</label>
+                            <select id="payment-account" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3">
+                                <option value="">Carregando contas...</option>
+                            </select>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label for="payment-amount" class="block text-sm font-medium text-gray-700">Valor a Pagar *</label>
+                                <input type="number" id="payment-amount" step="0.01" required
+                                    class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3">
+                            </div>
+                            <div>
+                                <label for="payment-date" class="block text-sm font-medium text-gray-700">Data do Pagamento *</label>
+                                <input type="date" id="payment-date" required
+                                    class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                    <button type="submit" form="payment-form" id="confirm-payment-btn"
+                        class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-green-600 text-base font-medium text-white hover:bg-green-700 sm:ml-3 sm:w-auto sm:text-sm">
+                        Confirmar Pagamento
+                    </button>
+                    <button type="button" id="cancel-payment-btn"
+                        class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 sm:mt-0 sm:w-auto sm:text-sm">
+                        Cancelar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        const API_URL = 'http://127.0.0.1:8000';
+
+        // --- Funções Helper (sem alterações) ---
+        function getQueryParams() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return {
+                card_id: urlParams.get('card_id'),
+                month: urlParams.get('month'),
+                year: urlParams.get('year')
+            };
+        }
+        const formatMoney = (value) => parseFloat(value).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        const formatDate = (dateString) => {
+            if (!dateString) return '--/--/----';
+            if (dateString.includes('/')) return dateString;
+            const [y, m, d] = dateString.split('-');
+            return `${d}/${m}/${y}`;
+        };
+
+        // --- Função para Carregar Detalhes (sem alterações) ---
+        async function loadBillDetails() {
+            const params = getQueryParams();
+            const token = localStorage.getItem('accessToken');
+            if (!params.card_id || !params.month || !params.year) {
+                document.getElementById('card-name').textContent = "Parâmetros inválidos na URL.";
+                return;
+            }
+            if (!token) {
+                window.location.href = '../login.html';
+                return;
+            }
+            const url = `${API_URL}/api/finance/card-bill-detail/?card_id=${params.card_id}&month=${params.month}&year=${params.year}`;
+            try {
+                const response = await fetch(url, { headers: { 'Authorization': `Bearer ${token}` } });
+                if (!response.ok) throw new Error('Falha ao buscar os detalhes da fatura.');
+                const data = await response.json();
+                renderBillData(data);
+            } catch (error) {
+                console.error("Erro:", error);
+                document.getElementById('card-name').textContent = "Erro ao carregar os dados.";
+            }
+        }
+
+        // --- Função para Renderizar Dados (ATUALIZADA) ---
+        function renderBillData(data) {
+            document.getElementById('card-name').textContent = data.card_name;
+            document.getElementById('bill-period').textContent = data.bill_period;
+            document.getElementById('bill-total').textContent = formatMoney(data.total_amount);
+            document.getElementById('bill-paid').textContent = formatMoney(data.paid_amount);
+            document.getElementById('bill-due-date').textContent = formatDate(data.due_date);
+
+            // Atualiza status e visibilidade do botão de pagar
+            const statusElement = document.getElementById('bill-status');
+            const payButton = document.getElementById('mark-as-paid-btn');
+            const totalToPay = data.total_amount - data.paid_amount;
+
+            if (totalToPay <= 0) {
+                statusElement.innerHTML = '<span class="px-2 py-1 rounded-full bg-green-100 text-green-800">Fatura Paga</span>';
+                payButton.classList.add('hidden');
+            } else {
+                statusElement.innerHTML = `<span class="px-2 py-1 rounded-full bg-yellow-100 text-yellow-800">Pendente (${formatMoney(totalToPay)} em aberto)</span>`;
+                payButton.classList.remove('hidden');
+            }
+
+            // Popula a lista de transações
+            const transactionsList = document.getElementById('transactions-list');
+            transactionsList.innerHTML = '';
+            if (data.transactions && data.transactions.length > 0) {
+                data.transactions.forEach(t => {
+                    transactionsList.innerHTML += `
+                        <tr class="${t.status === 'pago' ? 'bg-green-50' : ''}">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${formatDate(t.transaction_date)}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${t.description}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${t.category_name || 'N/A'}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-right font-semibold">${formatMoney(t.amount)}</td>
+                        </tr>
+                    `;
+                });
+            } else {
+                transactionsList.innerHTML = `<tr><td colspan="4" class="text-center py-4 text-gray-500">Nenhuma transação para esta fatura.</td></tr>`;
+            }
+        }
+
+        // --- LÓGICA DO MODAL DE PAGAMENTO (NOVA) ---
+        const payModal = document.getElementById('mark-as-paid-modal');
+
+        async function openPayModal() {
+            const token = localStorage.getItem('accessToken');
+            const accountSelect = document.getElementById('payment-account');
+            
+            // Popula o valor a ser pago e a data
+            const totalBill = parseFloat(document.getElementById('bill-total').textContent.replace('R$', '').replace('.', '').replace(',', '.'));
+            const totalPaid = parseFloat(document.getElementById('bill-paid').textContent.replace('R$', '').replace('.', '').replace(',', '.'));
+            document.getElementById('payment-amount').value = (totalBill - totalPaid).toFixed(2);
+            document.getElementById('payment-date').valueAsDate = new Date();
+
+            // Busca as contas bancárias
+            accountSelect.innerHTML = '<option value="">Carregando...</option>';
+            try {
+                const response = await fetch(`${API_URL}/api/finance/bank-accounts/?is_active=true`, { headers: { 'Authorization': `Bearer ${token}` } });
+                const accounts = await response.json();
+                accountSelect.innerHTML = '<option value="">Selecione a conta</option>';
+                accounts.forEach(acc => {
+                    accountSelect.innerHTML += `<option value="${acc.id}">${acc.name} (${formatMoney(acc.initial_balance)})</option>`;
+                });
+            } catch (error) {
+                console.error('Erro ao buscar contas:', error);
+                accountSelect.innerHTML = '<option value="">Erro ao carregar contas</option>';
+            }
+            
+            payModal.classList.remove('hidden');
+        }
+
+        function closePayModal() {
+            payModal.classList.add('hidden');
+        }
+
+        async function confirmPayment(event) {
+            event.preventDefault();
+            const token = localStorage.getItem('accessToken');
+            const params = getQueryParams();
+
+            const payload = {
+                card_id: params.card_id,
+                month: params.month,
+                year: params.year,
+                bank_account_id: document.getElementById('payment-account').value,
+                amount: document.getElementById('payment-amount').value,
+                payment_date: document.getElementById('payment-date').value
+            };
+
+            if (!payload.bank_account_id) {
+                alert("Por favor, selecione a conta de origem.");
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_URL}/api/finance/pay-card-bill/`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify(payload)
+                });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error || 'Erro ao processar pagamento.');
+                
+                alert('Fatura paga com sucesso!');
+                closePayModal();
+                loadBillDetails(); // Recarrega os dados da página
+            } catch (error) {
+                alert(`Erro: ${error.message}`);
+            }
+        }
+
+
+        // --- Event Listeners ---
+        document.addEventListener('DOMContentLoaded', () => {
+            loadBillDetails();
+            document.getElementById('mark-as-paid-btn').addEventListener('click', openPayModal);
+            document.getElementById('cancel-payment-btn').addEventListener('click', closePayModal);
+            document.getElementById('payment-form').addEventListener('submit', confirmPayment);
+        });
+    </script>
+</body>
+
+</html>

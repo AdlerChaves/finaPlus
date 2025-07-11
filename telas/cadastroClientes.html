@@ -3,681 +3,368 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FinançaPlus | Clientes</title>
+    <title>Cadastro de Clientes</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
                         primary: '#3B82F6',
+                        secondary: '#6B7280',
                         success: '#10B981',
                         danger: '#EF4444',
-                        warning: '#F59E0B',
                     }
                 }
             }
         }
     </script>
-    <style>
-        .fade-enter-active, .fade-leave-active {
-            transition: opacity 0.3s ease;
-        }
-        .fade-enter-from, .fade-leave-to {
-            opacity: 0;
-        }
-        .slide-enter-active, .slide-leave-active {
-            transition: all 0.3s ease-out;
-        }
-        .slide-enter-from {
-            opacity: 0;
-            transform: translateY(-20px);
-        }
-        .slide-leave-to {
-            opacity: 0;
-            transform: translateY(20px);
-        }
-        .toast-enter-active, .toast-leave-active {
-            transition: all 0.3s ease;
-        }
-        .toast-enter-from, .toast-leave-to {
-            opacity: 0;
-            transform: translateY(30px);
-        }
-    </style>
 </head>
-<body class="bg-gray-50 font-sans">
-    <!-- Header -->
-
-    <!-- Main Content -->
-    <main class="mt-16 pt-6 pb-20">
-        <div class="container mx-auto px-4">
-            <!-- Page Header -->
-            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
-                <div>
-                    <h2 class="text-2xl font-bold text-gray-800">Clientes</h2>
-                    <p class="text-sm text-gray-500">Gerencie os clientes da sua empresa</p>
-                </div>
-                <div class="mt-4 md:mt-0">
-                    <button onclick="openCustomerModal()" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors flex items-center">
-                        <i class="fas fa-plus mr-2"></i>
-                        Adicionar Cliente
-                    </button>
-                </div>
+<body class="bg-gray-100 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+            <div>
+                <h1 id="page-title" class="text-2xl md:text-3xl font-bold text-gray-800">Cadastro de Clientes</h1>
+                <p id="page-subtitle" class="text-gray-600 mt-1">Preencha os dados do cliente abaixo</p>
             </div>
-
-            <!-- Summary Cards -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                <div class="bg-white rounded-lg shadow-sm p-4 border border-gray-100">
-                    <div class="flex items-center">
-                        <div class="p-3 rounded-full bg-blue-100 text-blue-500 mr-4">
-                            <i class="fas fa-users"></i>
-                        </div>
-                        <div>
-                            <p class="text-sm text-gray-500">Total de Clientes</p>
-                            <p class="text-xl font-bold">142</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="bg-white rounded-lg shadow-sm p-4 border border-gray-100">
-                    <div class="flex items-center">
-                        <div class="p-3 rounded-full bg-green-100 text-green-500 mr-4">
-                            <i class="fas fa-check-circle"></i>
-                        </div>
-                        <div>
-                            <p class="text-sm text-gray-500">Clientes Ativos</p>
-                            <p class="text-xl font-bold">128</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="bg-white rounded-lg shadow-sm p-4 border border-gray-100">
-                    <div class="flex items-center">
-                        <div class="p-3 rounded-full bg-gray-100 text-gray-500 mr-4">
-                            <i class="fas fa-times-circle"></i>
-                        </div>
-                        <div>
-                            <p class="text-sm text-gray-500">Clientes Inativos</p>
-                            <p class="text-xl font-bold">14</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Filters -->
-            <div class="bg-white rounded-lg shadow-sm p-4 border border-gray-100 mb-6">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div>
-                        <label class="block text-gray-600 text-sm mb-1">Buscar cliente</label>
-                        <div class="relative">
-                            <input type="text" placeholder="Nome, CPF ou CNPJ" class="w-full border border-gray-300 rounded px-3 py-2 pl-10 text-sm">
-                            <i class="fas fa-search absolute left-3 top-2.5 text-gray-400"></i>
-                        </div>
-                    </div>
-                    <div>
-                        <label class="block text-gray-600 text-sm mb-1">Status</label>
-                        <select class="w-full border border-gray-300 rounded px-3 py-2 text-sm">
-                            <option>Todos</option>
-                            <option>Ativo</option>
-                            <option>Inativo</option>
-                        </select>
-                    </div>
-                    <div class="flex items-end">
-                        <button class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors mr-2">
-                            <i class="fas fa-filter mr-1"></i> Filtrar
-                        </button>
-                        <button class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg transition-colors">
-                            <i class="fas fa-redo mr-1"></i> Limpar
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Export Button -->
-            <div class="flex justify-end mb-4">
-                <button class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg transition-colors flex items-center">
-                    <i class="fas fa-file-export mr-2"></i> Exportar
+            <div class="flex gap-2 w-full md:w-auto">
+                <button onclick="window.location.href='clientes.html'" class="flex items-center justify-center gap-2 px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition w-full md:w-auto">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>Voltar para Lista</span>
                 </button>
             </div>
+        </div>
 
-            <!-- Table -->
-            <div class="bg-white rounded-lg shadow-sm overflow-hidden border border-gray-100">
-                <!-- Desktop Table -->
-                <div class="hidden md:block overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cliente</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">CPF/CNPJ</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Telefone</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">E-mail</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody class="bg-white divide-y divide-gray-200">
-                            <tr>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="flex items-center">
-                                        <div class="flex-shrink-0 h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-500 font-semibold">
-                                            JS
-                                        </div>
-                                        <div class="ml-4">
-                                            <div class="text-sm font-medium text-gray-900">João Silva</div>
-                                            <div class="text-sm text-gray-500">Pessoa Física</div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">123.456.789-09</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">(11) 98765-4321</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">joao@exemplo.com</td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                                        Ativo
-                                    </span>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                    <button onclick="openCustomerModal(true)" class="text-blue-500 hover:text-blue-700 mr-3">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                    <button onclick="confirmDeleteCustomer()" class="text-red-500 hover:text-red-700">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="flex items-center">
-                                        <div class="flex-shrink-0 h-10 w-10 rounded-full bg-purple-100 flex items-center justify-center text-purple-500 font-semibold">
-                                            ET
-                                        </div>
-                                        <div class="ml-4">
-                                            <div class="text-sm font-medium text-gray-900">Empresa Teste Ltda</div>
-                                            <div class="text-sm text-gray-500">Pessoa Jurídica</div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">12.345.678/0001-99</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">(11) 2222-3333</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">contato@empresateste.com</td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                                        Ativo
-                                    </span>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                    <button onclick="openCustomerModal(true)" class="text-blue-500 hover:text-blue-700 mr-3">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                    <button onclick="confirmDeleteCustomer()" class="text-red-500 hover:text-red-700">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="flex items-center">
-                                        <div class="flex-shrink-0 h-10 w-10 rounded-full bg-yellow-100 flex items-center justify-center text-yellow-500 font-semibold">
-                                            MA
-                                        </div>
-                                        <div class="ml-4">
-                                            <div class="text-sm font-medium text-gray-900">Maria Aparecida</div>
-                                            <div class="text-sm text-gray-500">Pessoa Física</div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">987.654.321-00</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">(11) 91234-5678</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">maria@exemplo.com</td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
-                                        Inativo
-                                    </span>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                    <button onclick="openCustomerModal(true)" class="text-blue-500 hover:text-blue-700 mr-3">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                    <button onclick="confirmDeleteCustomer()" class="text-red-500 hover:text-red-700">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+        <div class="bg-white rounded-lg shadow-md overflow-hidden">
+            <div class="border-b border-gray-200">
+                <nav class="flex -mb-px">
+                    <button type="button" id="infoTab" class="tab-button active py-4 px-6 text-center border-b-2 font-medium text-sm border-primary text-primary">
+                        <i class="fas fa-user mr-2"></i>Informações Básicas
+                    </button>
+                    <button type="button" id="addressTab" class="tab-button py-4 px-6 text-center border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300">
+                        <i class="fas fa-map-marker-alt mr-2"></i>Endereço (Opcional)
+                    </button>
+                </nav>
+            </div>
+
+            <form id="customerForm" class="p-6">
+                <input type="hidden" id="customerId">
                 
-                <!-- Mobile Cards -->
-                <div class="md:hidden divide-y divide-gray-200">
-                    <div class="p-4">
-                        <div class="flex items-start">
-                            <div class="flex-shrink-0 h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-500 font-semibold mr-3">
-                                JS
-                            </div>
-                            <div class="flex-1">
-                                <div class="flex justify-between">
-                                    <div>
-                                        <p class="text-sm font-medium text-gray-900">João Silva</p>
-                                        <p class="text-xs text-gray-500">123.456.789-09</p>
-                                    </div>
-                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                                        Ativo
-                                    </span>
-                                </div>
-                                <div class="mt-2">
-                                    <p class="text-xs text-gray-500"><i class="fas fa-phone mr-1"></i> (11) 98765-4321</p>
-                                    <p class="text-xs text-gray-500"><i class="fas fa-envelope mr-1"></i> joao@exemplo.com</p>
-                                </div>
-                                <div class="mt-2 flex justify-end space-x-2">
-                                    <button onclick="openCustomerModal(true)" class="text-blue-500 text-sm">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                    <button onclick="confirmDeleteCustomer()" class="text-red-500 text-sm">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="p-4">
-                        <div class="flex items-start">
-                            <div class="flex-shrink-0 h-10 w-10 rounded-full bg-purple-100 flex items-center justify-center text-purple-500 font-semibold mr-3">
-                                ET
-                            </div>
-                            <div class="flex-1">
-                                <div class="flex justify-between">
-                                    <div>
-                                        <p class="text-sm font-medium text-gray-900">Empresa Teste Ltda</p>
-                                        <p class="text-xs text-gray-500">12.345.678/0001-99</p>
-                                    </div>
-                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                                        Ativo
-                                    </span>
-                                </div>
-                                <div class="mt-2">
-                                    <p class="text-xs text-gray-500"><i class="fas fa-phone mr-1"></i> (11) 2222-3333</p>
-                                    <p class="text-xs text-gray-500"><i class="fas fa-envelope mr-1"></i> contato@empresateste.com</p>
-                                </div>
-                                <div class="mt-2 flex justify-end space-x-2">
-                                    <button onclick="openCustomerModal(true)" class="text-blue-500 text-sm">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                    <button onclick="confirmDeleteCustomer()" class="text-red-500 text-sm">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="p-4">
-                        <div class="flex items-start">
-                            <div class="flex-shrink-0 h-10 w-10 rounded-full bg-yellow-100 flex items-center justify-center text-yellow-500 font-semibold mr-3">
-                                MA
-                            </div>
-                            <div class="flex-1">
-                                <div class="flex justify-between">
-                                    <div>
-                                        <p class="text-sm font-medium text-gray-900">Maria Aparecida</p>
-                                        <p class="text-xs text-gray-500">987.654.321-00</p>
-                                    </div>
-                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
-                                        Inativo
-                                    </span>
-                                </div>
-                                <div class="mt-2">
-                                    <p class="text-xs text-gray-500"><i class="fas fa-phone mr-1"></i> (11) 91234-5678</p>
-                                    <p class="text-xs text-gray-500"><i class="fas fa-envelope mr-1"></i> maria@exemplo.com</p>
-                                </div>
-                                <div class="mt-2 flex justify-end space-x-2">
-                                    <button onclick="openCustomerModal(true)" class="text-blue-500 text-sm">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                    <button onclick="confirmDeleteCustomer()" class="text-red-500 text-sm">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Pagination -->
-                <div class="bg-gray-50 px-6 py-3 flex items-center justify-between border-t border-gray-200">
-                    <div class="flex-1 flex justify-between sm:hidden">
-                        <a href="#" class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
-                            Anterior
-                        </a>
-                        <a href="#" class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
-                            Próxima
-                        </a>
-                    </div>
-                    <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                <div id="infoContent" class="tab-content">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <p class="text-sm text-gray-700">
-                                Mostrando <span class="font-medium">1</span> a <span class="font-medium">3</span> de <span class="font-medium">142</span> clientes
-                            </p>
+                            <label for="customerName" class="block text-sm font-medium text-gray-700 mb-1">Nome/Razão Social*</label>
+                            <input type="text" id="customerName" required class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary">
                         </div>
                         <div>
-                            <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
-                                <a href="#" class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
-                                    <span class="sr-only">Anterior</span>
-                                    <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-                                    </svg>
-                                </a>
-                                <a href="#" aria-current="page" class="z-10 bg-blue-50 border-blue-500 text-blue-600 relative inline-flex items-center px-4 py-2 border text-sm font-medium">
-                                    1
-                                </a>
-                                <a href="#" class="bg-white border-gray-300 text-gray-500 hover:bg-gray-50 relative inline-flex items-center px-4 py-2 border text-sm font-medium">
-                                    2
-                                </a>
-                                <a href="#" class="bg-white border-gray-300 text-gray-500 hover:bg-gray-50 relative inline-flex items-center px-4 py-2 border text-sm font-medium">
-                                    3
-                                </a>
-                                <span class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700">
-                                    ...
-                                </span>
-                                <a href="#" class="bg-white border-gray-300 text-gray-500 hover:bg-gray-50 relative inline-flex items-center px-4 py-2 border text-sm font-medium">
-                                    15
-                                </a>
-                                <a href="#" class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
-                                    <span class="sr-only">Próxima</span>
-                                    <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                                    </svg>
-                                </a>
-                            </nav>
+                            <label for="customerType" class="block text-sm font-medium text-gray-700 mb-1">Tipo*</label>
+                            <select id="customerType" required class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary">
+                                <option value="PF">Pessoa Física</option>
+                                <option value="PJ">Pessoa Jurídica</option>
+                            </select>
+                        </div>
+                        <div id="documentField">
+                            <label id="documentLabel" for="customerDocument" class="block text-sm font-medium text-gray-700 mb-1">CPF*</label>
+                            <input type="text" id="customerDocument" required class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary">
+                        </div>
+                        <div>
+                            <label for="customerPhone" class="block text-sm font-medium text-gray-700 mb-1">Telefone*</label>
+                            <input type="tel" id="customerPhone" required class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary">
+                        </div>
+                        <div>
+                            <label for="customerEmail" class="block text-sm font-medium text-gray-700 mb-1">E-mail*</label>
+                            <input type="email" id="customerEmail" required class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary" placeholder="exemplo@dominio.com">
+                        </div>
+                        <div id="birthDateField">
+                            <label for="customerBirthDate" class="block text-sm font-medium text-gray-700 mb-1">Data de Nascimento</label>
+                            <input type="date" id="customerBirthDate" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary">
+                        </div>
+                        <div>
+                            <label for="customerStatus" class="block text-sm font-medium text-gray-700 mb-1">Status*</label>
+                            <select id="customerStatus" required class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary">
+                                <option value="active">Ativo</option>
+                                <option value="inactive">Inativo</option>
+                            </select>
+                        </div>
+                        <div class="col-span-2">
+                            <label for="customerNotes" class="block text-sm font-medium text-gray-700 mb-1">Observações</label>
+                            <textarea id="customerNotes" rows="3" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary"></textarea>
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
-    </main>
 
-    <!-- Customer Modal -->
-    <div id="customerModal" class="fixed inset-0 z-50 hidden overflow-y-auto">
-        <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <!-- Background overlay -->
-            <div class="fixed inset-0 transition-opacity" aria-hidden="true">
-                <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
-            </div>
-            
-            <!-- Modal panel -->
-            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                    <div class="sm:flex sm:items-start">
-                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
-                            <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4" id="modalTitle">
-                                Adicionar Novo Cliente
-                            </h3>
-                            <div class="mt-2">
-                                <form id="customerForm">
-                                    <div class="grid grid-cols-1 gap-4">
-                                        <div>
-                                            <label for="customerName" class="block text-sm font-medium text-gray-700">Nome/Razão Social*</label>
-                                            <input type="text" id="customerName" name="customerName" required class="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
-                                        </div>
-                                        
-                                        <div>
-                                            <label for="customerType" class="block text-sm font-medium text-gray-700">Tipo</label>
-                                            <select id="customerType" name="customerType" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md">
-                                                <option value="PF">Pessoa Física</option>
-                                                <option value="PJ">Pessoa Jurídica</option>
-                                            </select>
-                                        </div>
-                                        
-                                        <div id="cpfField">
-                                            <label for="customerCPF" class="block text-sm font-medium text-gray-700">CPF*</label>
-                                            <input type="text" id="customerCPF" name="customerCPF" required class="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" placeholder="000.000.000-00">
-                                        </div>
-                                        
-                                        <div id="cnpjField" class="hidden">
-                                            <label for="customerCNPJ" class="block text-sm font-medium text-gray-700">CNPJ*</label>
-                                            <input type="text" id="customerCNPJ" name="customerCNPJ" class="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" placeholder="00.000.000/0000-00">
-                                        </div>
-                                        
-                                        <div>
-                                            <label for="customerPhone" class="block text-sm font-medium text-gray-700">Telefone*</label>
-                                            <input type="tel" id="customerPhone" name="customerPhone" required class="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" placeholder="(00) 00000-0000">
-                                        </div>
-                                        
-                                        <div>
-                                            <label for="customerEmail" class="block text-sm font-medium text-gray-700">E-mail*</label>
-                                            <input type="email" id="customerEmail" name="customerEmail" required class="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" placeholder="exemplo@dominio.com">
-                                        </div>
-                                        
-                                        <div>
-                                            <label for="customerStatus" class="block text-sm font-medium text-gray-700">Status</label>
-                                            <select id="customerStatus" name="customerStatus" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md">
-                                                <option value="active">Ativo</option>
-                                                <option value="inactive">Inativo</option>
-                                            </select>
-                                        </div>
-                                        
-                                        <div>
-                                            <label for="customerNotes" class="block text-sm font-medium text-gray-700">Observações</label>
-                                            <textarea id="customerNotes" name="customerNotes" rows="3" class="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"></textarea>
-                                        </div>
-                                    </div>
-                                </form>
-                            </div>
+                <div id="addressContent" class="tab-content hidden">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="customerCEP" class="block text-sm font-medium text-gray-700 mb-1">CEP</label>
+                            <input type="text" id="customerCEP" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary">
+                            <button type="button" id="searchCEP" class="mt-2 text-xs text-primary hover:underline">Buscar endereço</button>
+                        </div>
+                        <div class="col-span-2 md:col-span-1">
+                            <label for="customerStreet" class="block text-sm font-medium text-gray-700 mb-1">Logradouro</label>
+                            <input type="text" id="customerStreet" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary">
+                        </div>
+                        <div>
+                            <label for="customerNumber" class="block text-sm font-medium text-gray-700 mb-1">Número</label>
+                            <input type="text" id="customerNumber" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary">
+                        </div>
+                        <div>
+                            <label for="customerComplement" class="block text-sm font-medium text-gray-700 mb-1">Complemento</label>
+                            <input type="text" id="customerComplement" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary">
+                        </div>
+                        <div>
+                            <label for="customerNeighborhood" class="block text-sm font-medium text-gray-700 mb-1">Bairro</label>
+                            <input type="text" id="customerNeighborhood" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary">
+                        </div>
+                        <div>
+                            <label for="customerCity" class="block text-sm font-medium text-gray-700 mb-1">Cidade</label>
+                            <input type="text" id="customerCity" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary">
+                        </div>
+                        <div>
+                            <label for="customerState" class="block text-sm font-medium text-gray-700 mb-1">Estado</label>
+                            <select id="customerState" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary">
+                                <option value="">Selecione</option>
+                                <option value="AC">Acre</option>
+                                <option value="AL">Alagoas</option>
+                                <option value="SP">São Paulo</option>
+                                <option value="SE">Sergipe</option>
+                                <option value="TO">Tocantins</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="customerCountry" class="block text-sm font-medium text-gray-700 mb-1">País</label>
+                            <input type="text" id="customerCountry" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary" value="Brasil">
                         </div>
                     </div>
                 </div>
-                <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                    <button type="button" onclick="saveCustomer()" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-500 text-base font-medium text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">
-                        Salvar
+
+                <div class="mt-8 flex flex-col sm:flex-row justify-end gap-3 border-t border-gray-200 pt-6">
+                    <button type="button" id="previousTab" class="hidden px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition">
+                        <i class="fas fa-arrow-left mr-2"></i>Anterior
                     </button>
-                    <button type="button" onclick="closeCustomerModal()" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
-                        Cancelar
+                    <button type="button" id="nextTab" class="px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-600 transition">
+                        Próximo<i class="fas fa-arrow-right ml-2"></i>
+                    </button>
+                    <button type="submit" id="saveButton" class="px-4 py-2 bg-success text-white rounded-md hover:bg-green-600 transition">
+                        <i class="fas fa-save mr-2"></i>Salvar Cliente
                     </button>
                 </div>
-            </div>
+            </form>
         </div>
     </div>
 
-    <!-- Delete Confirmation Modal -->
-    <div id="deleteModal" class="fixed inset-0 z-50 hidden overflow-y-auto">
-        <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <!-- Background overlay -->
-            <div class="fixed inset-0 transition-opacity" aria-hidden="true">
-                <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
-            </div>
-            
-            <!-- Modal panel -->
-            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                    <div class="sm:flex sm:items-start">
-                        <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
-                            <i class="fas fa-exclamation text-red-500"></i>
-                        </div>
-                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-                            <h3 class="text-lg leading-6 font-medium text-gray-900">
-                                Confirmar Exclusão
-                            </h3>
-                            <div class="mt-2">
-                                <p class="text-sm text-gray-500">
-                                    Tem certeza que deseja excluir este cliente? Esta ação não pode ser desfeita.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                    <button type="button" onclick="deleteCustomer()" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-500 text-base font-medium text-white hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm">
-                        Excluir
-                    </button>
-                    <button type="button" onclick="closeDeleteModal()" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
-                        Cancelar
-                    </button>
-                </div>
-            </div>
-        </div>
+    <div id="toast" class="hidden fixed bottom-5 right-5 px-5 py-3 rounded-lg shadow-lg text-white">
+        <span id="toast-message"></span>
     </div>
 
-    <!-- Toast Notification -->
-    <div id="toast" class="fixed bottom-4 right-4 hidden">
-        <div class="bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg flex items-center">
-            <i class="fas fa-check-circle mr-2"></i>
-            <span id="toastMessage">Cliente salvo com sucesso!</span>
-        </div>
-    </div>
-
-    <!-- Mobile Menu Script -->
     <script>
-        document.getElementById('mobile-menu-button').addEventListener('click', function() {
-            const menu = document.getElementById('mobile-menu');
-            menu.classList.toggle('hidden');
-        });
-    </script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const API_URL = 'http://127.0.0.1:8000'; // Ajuste se necessário
+            const token = localStorage.getItem('accessToken');
+            const customerId = new URLSearchParams(window.location.search).get('id');
+            const form = document.getElementById('customerForm');
 
-    <!-- Customer Modal Script -->
-    <script>
-        // Toggle between CPF and CNPJ fields
-        document.getElementById('customerType').addEventListener('change', function() {
-            const isPJ = this.value === 'PJ';
-            document.getElementById('cpfField').classList.toggle('hidden', isPJ);
-            document.getElementById('cnpjField').classList.toggle('hidden', !isPJ);
-            
-            if (isPJ) {
-                document.getElementById('customerCNPJ').required = true;
-                document.getElementById('customerCPF').required = false;
-            } else {
-                document.getElementById('customerCPF').required = true;
-                document.getElementById('customerCNPJ').required = false;
-            }
-        });
-        
-        // Open customer modal
-        function openCustomerModal(isEdit = false) {
-            const modal = document.getElementById('customerModal');
-            const title = document.getElementById('modalTitle');
-            
-            if (isEdit) {
-                title.textContent = 'Editar Cliente';
-                // Here you would populate the form with the customer data
-                // For demo purposes, we're just setting some values
-                document.getElementById('customerName').value = 'João Silva';
-                document.getElementById('customerType').value = 'PF';
-                document.getElementById('customerCPF').value = '123.456.789-09';
-                document.getElementById('customerPhone').value = '(11) 98765-4321';
-                document.getElementById('customerEmail').value = 'joao@exemplo.com';
-                document.getElementById('customerStatus').value = 'active';
-                document.getElementById('customerNotes').value = 'Cliente preferencial';
-            } else {
-                title.textContent = 'Adicionar Novo Cliente';
-                document.getElementById('customerForm').reset();
+            // --- LÓGICA DE INICIALIZAÇÃO (CRIAR vs EDITAR) ---
+            const initialize = () => {
+                setupEventListeners();
+                if (customerId) {
+                    prepareEditMode(customerId);
+                } else {
+                    prepareCreateMode();
+                }
+            };
+
+            const prepareCreateMode = () => {
+                document.getElementById('page-title').textContent = 'Cadastro de Clientes';
+                document.getElementById('page-subtitle').textContent = 'Preencha os dados do novo cliente';
+            };
+
+            const prepareEditMode = async (id) => {
+                document.getElementById('page-title').textContent = 'Editar Cliente';
+                document.getElementById('page-subtitle').textContent = 'Altere os dados do cliente abaixo';
+                document.getElementById('saveButton').innerHTML = '<i class="fas fa-save mr-2"></i>Salvar Alterações';
+
+                try {
+                    const response = await fetch(`${API_URL}/api/cadastros/customers/${id}/`, {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    if (!response.ok) throw new Error('Não foi possível carregar os dados do cliente.');
+                    const customer = await response.json();
+                    populateForm(customer);
+                } catch (error) {
+                    showToast(error.message, 'error');
+                    setTimeout(() => window.location.href = 'clientes.html', 2000);
+                }
+            };
+
+            const populateForm = (customer) => {
+                document.getElementById('customerId').value = customer.id;
+                document.getElementById('customerName').value = customer.name;
+                document.getElementById('customerType').value = customer.customer_type;
+                document.getElementById('customerDocument').value = customer.document;
+                document.getElementById('customerPhone').value = customer.phone;
+                document.getElementById('customerEmail').value = customer.email;
+                document.getElementById('customerStatus').value = customer.status;
+                document.getElementById('customerBirthDate').value = customer.birth_date || '';
+                document.getElementById('customerNotes').value = customer.notes || '';
+                
+                if (customer.address) {
+                    document.getElementById('customerCEP').value = customer.address.cep || '';
+                    document.getElementById('customerStreet').value = customer.address.street || '';
+                    document.getElementById('customerNumber').value = customer.address.number || '';
+                    document.getElementById('customerComplement').value = customer.address.complement || '';
+                    document.getElementById('customerNeighborhood').value = customer.address.neighborhood || '';
+                    document.getElementById('customerCity').value = customer.address.city || '';
+                    document.getElementById('customerState').value = customer.address.state || '';
+                    document.getElementById('customerCountry').value = customer.address.country || 'Brasil';
+                }
+                // Dispara o evento 'change' para ajustar a UI (CPF/CNPJ)
                 document.getElementById('customerType').dispatchEvent(new Event('change'));
-            }
+            };
+
+            // --- LÓGICA DE EVENTOS ---
+            const setupEventListeners = () => {
+                // Navegação por abas
+                const infoTab = document.getElementById('infoTab');
+                const addressTab = document.getElementById('addressTab');
+                const nextTabBtn = document.getElementById('nextTab');
+                const prevTabBtn = document.getElementById('previousTab');
+                
+                infoTab.addEventListener('click', () => switchTab('info'));
+                addressTab.addEventListener('click', () => switchTab('address'));
+                nextTabBtn.addEventListener('click', () => {
+                    if (validateBasicInfo()) switchTab('address');
+                });
+                prevTabBtn.addEventListener('click', () => switchTab('info'));
+
+                // Mudança de tipo de cliente (PF/PJ)
+                document.getElementById('customerType').addEventListener('change', handleCustomerTypeChange);
+                
+                // Busca por CEP
+                document.getElementById('searchCEP').addEventListener('click', searchCEP);
+
+                // Submissão do formulário
+                form.addEventListener('submit', handleFormSubmit);
+            };
+
+            const switchTab = (tabName) => {
+                const isInfo = tabName === 'info';
+                document.getElementById('infoTab').classList.toggle('active', isInfo);
+                document.getElementById('addressTab').classList.toggle('active', !isInfo);
+                document.getElementById('infoContent').classList.toggle('hidden', !isInfo);
+                document.getElementById('addressContent').classList.toggle('hidden', isInfo);
+                document.getElementById('previousTab').classList.toggle('hidden', isInfo);
+                document.getElementById('nextTab').classList.toggle('hidden', !isInfo);
+            };
+
+            const handleCustomerTypeChange = (e) => {
+                const isPJ = e.target.value === 'PJ';
+                document.getElementById('documentLabel').textContent = isPJ ? 'CNPJ*' : 'CPF*';
+                document.getElementById('birthDateField').classList.toggle('hidden', isPJ);
+            };
+
+            const searchCEP = async () => {
+                const cep = document.getElementById('customerCEP').value.replace(/\D/g, '');
+                if (cep.length !== 8) return showToast('CEP inválido.', 'error');
+                try {
+                    const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+                    if (!response.ok || response.erro) throw new Error();
+                    const data = await response.json();
+                    populateAddressFields(data);
+                } catch {
+                    showToast('CEP não encontrado.', 'error');
+                }
+            };
             
-            modal.classList.remove('hidden');
-        }
-        
-        // Close customer modal
-        function closeCustomerModal() {
-            document.getElementById('customerModal').classList.add('hidden');
-        }
-        
-        // Save customer
-        function saveCustomer() {
-            // Here you would normally save the customer data to your backend
-            // For demo purposes, we're just showing a toast notification
-            showToast('Cliente salvo com sucesso!');
-            closeCustomerModal();
-        }
-        
-        // Confirm delete customer
-        function confirmDeleteCustomer() {
-            document.getElementById('deleteModal').classList.remove('hidden');
-        }
-        
-        // Close delete modal
-        function closeDeleteModal() {
-            document.getElementById('deleteModal').classList.add('hidden');
-        }
-        
-        // Delete customer
-        function deleteCustomer() {
-            // Here you would normally delete the customer from your backend
-            // For demo purposes, we're just showing a toast notification
-            showToast('Cliente excluído com sucesso!');
-            closeDeleteModal();
-        }
-        
-        // Show toast notification
-        function showToast(message) {
+            const populateAddressFields = (data) => {
+                document.getElementById('customerStreet').value = data.logradouro;
+                document.getElementById('customerNeighborhood').value = data.bairro;
+                document.getElementById('customerCity').value = data.localidade;
+                document.getElementById('customerState').value = data.uf;
+            };
+
+            // --- SUBMISSÃO E VALIDAÇÃO ---
+            const handleFormSubmit = async (e) => {
+                e.preventDefault();
+                if (!validateBasicInfo()) {
+                    switchTab('info');
+                    return;
+                }
+
+                const id = document.getElementById('customerId').value;
+                const url = id ? `${API_URL}/api/cadastros/customers/${id}/` : `${API_URL}/api/cadastros/customers/`;
+                const method = id ? 'PUT' : 'POST';
+
+                const payload = {
+                    name: document.getElementById('customerName').value,
+                    customer_type: document.getElementById('customerType').value,
+                    document: document.getElementById('customerDocument').value,
+                    phone: document.getElementById('customerPhone').value,
+                    email: document.getElementById('customerEmail').value,
+                    birth_date: document.getElementById('customerBirthDate').value || null,
+                    status: document.getElementById('customerStatus').value,
+                    notes: document.getElementById('customerNotes').value,
+                    address: null
+                };
+
+                const cep = document.getElementById('customerCEP').value;
+                if (cep) {
+                    payload.address = {
+                        cep: cep,
+                        street: document.getElementById('customerStreet').value,
+                        number: document.getElementById('customerNumber').value,
+                        complement: document.getElementById('customerComplement').value,
+                        neighborhood: document.getElementById('customerNeighborhood').value,
+                        city: document.getElementById('customerCity').value,
+                        state: document.getElementById('customerState').value,
+                        country: document.getElementById('customerCountry').value
+                    };
+                }
+
+                try {
+                    const response = await fetch(url, {
+                        method: method,
+                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                        body: JSON.stringify(payload)
+                    });
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        const errorMessage = Object.entries(errorData).map(([key, value]) => `${key}: ${value.join(', ')}`).join('; ');
+                        throw new Error(errorMessage || 'Erro ao salvar os dados.');
+                    }
+                    showToast('Cliente salvo com sucesso!', 'success');
+                    setTimeout(() => window.location.href = 'clientes.html', 1500);
+                } catch (error) {
+                    showToast(error.message, 'error');
+                }
+            };
+            
+            const validateBasicInfo = () => {
+                const required = ['customerName', 'customerType', 'customerDocument', 'customerPhone', 'customerEmail', 'customerStatus'];
+                for (const id of required) {
+                    if (!document.getElementById(id).value) {
+                        showToast(`O campo "${document.getElementById(id).previousElementSibling.textContent}" é obrigatório.`, 'error');
+                        return false;
+                    }
+                }
+                return true;
+            };
+
+            // Inicia a aplicação
+            initialize();
+        });
+
+        function showToast(message, type = 'success') {
             const toast = document.getElementById('toast');
-            const toastMessage = document.getElementById('toastMessage');
-            
+            const toastMessage = document.getElementById('toast-message');
+            toast.className = `fixed bottom-5 right-5 px-5 py-3 rounded-lg shadow-lg text-white ${type === 'success' ? 'bg-green-500' : 'bg-red-500'}`;
             toastMessage.textContent = message;
             toast.classList.remove('hidden');
-            
-            setTimeout(() => {
-                toast.classList.add('hidden');
-            }, 3000);
+            setTimeout(() => toast.classList.add('hidden'), 3000);
         }
-        
-        // Input masks (would be implemented with a library like vanilla-masker in a real app)
-        // For demo purposes, we're just showing the concept
-        function applyMasks() {
-            // CPF mask
-            const cpfInput = document.getElementById('customerCPF');
-            cpfInput.addEventListener('input', function(e) {
-                let value = e.target.value.replace(/\D/g, '');
-                value = value.replace(/(\d{3})(\d)/, '$1.$2');
-                value = value.replace(/(\d{3})(\d)/, '$1.$2');
-                value = value.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
-                e.target.value = value;
-            });
-            
-            // CNPJ mask
-            const cnpjInput = document.getElementById('customerCNPJ');
-            cnpjInput.addEventListener('input', function(e) {
-                let value = e.target.value.replace(/\D/g, '');
-                value = value.replace(/^(\d{2})(\d)/, '$1.$2');
-                value = value.replace(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3');
-                value = value.replace(/\.(\d{3})(\d)/, '.$1/$2');
-                value = value.replace(/(\d{4})(\d)/, '$1-$2');
-                e.target.value = value;
-            });
-            
-            // Phone mask
-            const phoneInput = document.getElementById('customerPhone');
-            phoneInput.addEventListener('input', function(e) {
-                let value = e.target.value.replace(/\D/g, '');
-                if (value.length > 2) {
-                    value = value.replace(/^(\d{2})(\d)/g, '($1) $2');
-                }
-                if (value.length > 10) {
-                    value = value.replace(/(\d{5})(\d)/, '$1-$2');
-                } else if (value.length > 6) {
-                    value = value.replace(/(\d{4})(\d)/, '$1-$2');
-                }
-                e.target.value = value;
-            });
-        }
-        
-        // Initialize masks when the page loads
-        window.addEventListener('DOMContentLoaded', applyMasks);
     </script>
-<script src="../componentes/topbar.js"></script>
-        <script>
-            document.addEventListener('DOMContentLoaded', () => {
-                // Exemplo de permissões para um usuário do financeiro
-                const userPermissions = {
-                    dashboard: true,
-                    movimentacoes: true,
-                    relatorios: true,
-                    pagamentos: true,
-                    contas: true,
-                    cadastros: true,       
-                    configuracoes: true    
-                };
-                renderTopbar('cadastros', userPermissions);
-
-                // ...aqui entraria qualquer outro JS específico da página de entradas
-            });
-        </script>
 </body>
-
+</html>
+</body>
 </html>

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR"> payload
 
 <head>
     <meta charset="UTF-8">
@@ -22,38 +22,42 @@
                         <i class="fas fa-plus mr-2"></i>
                         Nova Saída
                     </button>
-                    
+
                 </div>
             </div>
 
-            <div class="bg-white rounded-lg shadow-sm p-4 mb-6 border border-gray-100">
+            <div class="bg-white rounded-lg shadow-sm p-4 border border-gray-100 mb-6">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h3 class="text-gray-700 font-medium">Total de Saídas</h3>
+                        <p class="text-xs text-gray-500">Período selecionado</p>
+                    </div>
+                    <p id="total-expenses-summary" class="text-2xl font-bold text-red-600">R$ 0,00</p>
+                </div>
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
                 <div class="bg-white rounded-xl shadow-sm p-4">
                     <h2 class="text-lg font-semibold mb-4 text-gray-700">Despesas por Categoria</h2>
-                    <div class="chart-container">
+                    <div class="chart-container" style="position: relative; height:300px">
                         <canvas id="expenseChart"></canvas>
                     </div>
                 </div>
                 <div class="bg-white rounded-xl shadow-sm p-4">
                     <h2 id="chart-by-account-title" class="text-lg font-semibold mb-4 text-gray-700">Despesas por Conta
                     </h2>
-                    <div class="chart-container">
+                    <div class="chart-container" style="position: relative; height:300px">
                         <canvas id="statusChart"></canvas>
                     </div>
                 </div>
             </div>
 
-            <div class="bg-white rounded-lg shadow-sm p-4 border border-gray-100">
-                <div class="flex justify-between items-center mb-4">
+            <div class="bg-white rounded-lg shadow-sm overflow-hidden border border-gray-100">
+                <div class="flex justify-between items-center p-4">
                     <h3 class="text-gray-800 font-medium">Lista de Saídas</h3>
-                    <div class="text-sm text-gray-500">
-                        Total: <span id="totalExpenses" class="font-semibold text-red-600">R$ 0,00</span>
-                    </div>
                 </div>
 
-                <div class="overflow-x-auto">
+                <div class="hidden md:block overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-200">
                         <thead class="bg-gray-50">
                             <tr>
@@ -73,13 +77,16 @@
                                     class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     Conta</th>
                                 <th
-                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     Ações</th>
                             </tr>
                         </thead>
                         <tbody id="expensesTableBody" class="bg-white divide-y divide-gray-200">
                         </tbody>
                     </table>
+                </div>
+
+                <div id="expenses-list-mobile" class="md:hidden">
                 </div>
             </div>
         </div>
@@ -184,6 +191,7 @@
         const toastNotification = document.getElementById('toast-notification');
         const toastMessage = document.getElementById('toast-message');
         const totalExpensesEl = document.getElementById('totalExpenses');
+        const totalExpensesSummary = document.getElementById('total-expenses-summary');
 
         let transactionIdToDelete = null;
         let expenseChart = null;
@@ -269,24 +277,37 @@
         async function renderExpenses() {
             const token = localStorage.getItem('accessToken');
             if (!token) { window.location.href = '../login.html'; return; }
+
             await populateDropdowns(token);
+
             try {
                 const response = await fetch(`${API_URL}/api/finance/transactions/?type=saida`, { headers: { 'Authorization': `Bearer ${token}` } });
                 if (!response.ok) throw new Error('Falha ao buscar despesas.');
+
                 const expenses = await response.json();
+
+                // Pega a referência para a lista mobile
+                const expensesListMobile = document.getElementById('expenses-list-mobile');
+
+                // Limpa o conteúdo anterior
                 expensesTableBody.innerHTML = '';
+                expensesListMobile.innerHTML = '';
 
                 if (expenses.length === 0) {
-                    expensesTableBody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-gray-500">Nenhuma despesa registrada.</td></tr>`;
+                    const emptyMessageTable = `<tr><td colspan="6" class="text-center py-4 text-gray-500">Nenhuma despesa registrada.</td></tr>`;
+                    expensesTableBody.innerHTML = emptyMessageTable;
+                    expensesListMobile.innerHTML = `<p class="text-center py-4 text-gray-500">Nenhuma despesa registrada.</p>`;
                     totalExpensesEl.textContent = formatMoney(0);
-                    updateCharts([]); // Limpa os gráficos
+                    totalExpensesSummary.textContent = formatMoney(0)
+                    updateCharts([]);
                     return;
                 }
 
                 const totalValue = expenses.reduce((sum, exp) => sum + parseFloat(exp.amount), 0);
-                totalExpensesEl.textContent = formatMoney(totalValue);
+                totalExpensesSummary.textContent = formatMoney(totalValue);
 
                 expenses.forEach(expense => {
+                    // 1. Preenche a Tabela para Desktop
                     const row = document.createElement('tr');
                     row.innerHTML = `
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${expense.description}</td>
@@ -300,7 +321,29 @@
                         </td>
                     `;
                     expensesTableBody.appendChild(row);
+
+                    // 2. Preenche a Lista de Cards para Mobile
+                    const card = document.createElement('div');
+                    card.className = 'p-4 border-b border-gray-200';
+                    card.innerHTML = `
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="font-semibold text-gray-800">${expense.description}</p>
+                                <p class="text-sm text-gray-500">${expense.category_name || 'N/A'}</p>
+                                <p class="text-xs text-gray-400 mt-1">${formatDate(expense.transaction_date)}</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="font-bold text-red-600">${formatMoney(expense.amount)}</p>
+                                <div class="mt-2">
+                                    <button onclick="openEditModal(${expense.id})" class="text-blue-600 hover:text-blue-800 mr-2"><i class="fas fa-edit"></i></button>
+                                    <button onclick="openDeleteModal(${expense.id})" class="text-red-500 hover:text-red-700"><i class="fas fa-trash-alt"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    expensesListMobile.appendChild(card);
                 });
+
                 updateCharts(expenses);
             } catch (error) { showToast(error.message, 'error'); }
         }

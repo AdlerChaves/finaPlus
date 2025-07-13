@@ -657,6 +657,7 @@
         </svg>
     </button>
 
+    <script src="../componentes/auth.js"></script> <script src="../componentes/topbar.js"></script>
     <script>
 
         const storedPermissions = localStorage.getItem('userPermissions');
@@ -696,6 +697,8 @@
 
         // Charts
         document.addEventListener('DOMContentLoaded', function () {
+
+            protectPage('dashboard');
             // Bar Chart - Receitas vs Despesas
             const barCtx = document.getElementById('barChart').getContext('2d');
             const barChart = new Chart(barCtx, {
@@ -878,8 +881,9 @@
             });
         });
     </script>
-    <script src="componentes/topBar.js"></script>
     <script src="script.js"></script>
 </body>
 
 </html>
+
+document.addEventListener

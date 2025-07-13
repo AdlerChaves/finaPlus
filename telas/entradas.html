@@ -157,10 +157,11 @@
         <span id="toast-message"></span>
     </div>
 
+    <script src="../componentes/auth.js"></script>
     <script src="../componentes/topbar.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            renderTopbar('movimentacoes', { dashboard: true, movimentacoes: true, relatorios: true, pagamentos: true, contas: true, cadastros: true, configuracoes: true });
+            protectPage('entradas');
         });
 
         const API_URL = 'http://127.0.0.1:8000';

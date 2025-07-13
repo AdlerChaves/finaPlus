@@ -317,6 +317,8 @@
 
     <div id="toast" class="hidden fixed bottom-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg">
     </div>
+    
+    <script src="../componentes/auth.js"></script>
     <script src="../componentes/topbar.js"></script>
     <script>
         // --- CONFIGURAÇÃO DA API ---
@@ -669,16 +671,9 @@
             periodFilter.value = currentMonth;
 
             // --- CÓDIGO DA TOPBAR ---
-            const userPermissions = {
-                dashboard: true,
-                movimentacoes: true,
-                relatorios: true,
-                pagamentos: true,
-                contas: true,
-                cadastros: true,
-                configuracoes: true
-            };
-            renderTopbar('contas-a-receber', userPermissions);
+            
+            protectPage('pagamentos')
+            
 
             // --- CARREGAMENTO INICIAL DOS DADOS ---
             fetchClients();

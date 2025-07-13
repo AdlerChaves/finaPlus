@@ -1,27 +1,39 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <base href="../"><title>Login | FinançaPlus</title>
+    <base href="../">
+    <title>Login | FinançaPlus</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
     <style>
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
+
         .fade-in {
             animation: fadeIn 0.5s ease-out forwards;
         }
+
         .input-focus:focus {
             border-color: #3B82F6;
             box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
         }
     </style>
 </head>
+
 <body class="bg-gray-50 font-['Inter'] min-h-screen flex items-center justify-center p-4">
     <div class="w-full max-w-md fade-in">
         <div class="text-center mb-8">
@@ -36,11 +48,11 @@
 
         <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
             <h2 class="text-xl font-semibold text-gray-800 mb-6">Acesse sua conta</h2>
-            
+
             <div id="error-message" class="hidden bg-red-50 border-l-4 border-red-500 text-red-700 p-4 mb-4 rounded">
                 <p id="error-text"></p>
             </div>
-            
+
             <form id="login-form" class="space-y-5">
                 <div>
                     <label for="email" class="block text-sm font-medium text-gray-700 mb-1">E-mail</label>
@@ -48,80 +60,79 @@
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                             <span class="text-gray-500">📧</span>
                         </div>
-                        <input 
-                            type="email" 
-                            id="email" 
-                            name="email" 
-                            required
-                            placeholder="exemplo@email.com"
+                        <input type="email" id="email" name="email" required placeholder="exemplo@email.com"
                             autocomplete="username"
                             class="input-focus pl-10 w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none transition duration-200">
                     </div>
                     <p class="mt-1 text-xs text-gray-500">Use um email válido para acessar o sistema</p>
                 </div>
-                
+
                 <div>
                     <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Senha</label>
                     <div class="relative">
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                             <span class="text-gray-500">🔒</span>
                         </div>
-                        <input 
-                            type="password" 
-                            id="password" 
-                            name="password" 
-                            required
-                            placeholder="••••••••"
+                        <input type="password" id="password" name="password" required placeholder="••••••••"
                             autocomplete="current-password"
                             class="input-focus pl-10 w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none transition duration-200">
-                        <button 
-                            type="button" 
-                            id="toggle-password" 
+                        <button type="button" id="toggle-password"
                             class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-gray-700">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                             </svg>
                         </button>
                     </div>
                 </div>
-                
+
                 <div class="flex items-center justify-between">
                     <div class="flex items-center">
-                        <input id="remember-me" name="remember-me" type="checkbox" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                        <input id="remember-me" name="remember-me" type="checkbox"
+                            class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
                         <label for="remember-me" class="ml-2 block text-sm text-gray-700">Lembrar-me</label>
                     </div>
-               <a href="#" id="forgot-password-link" class="text-sm text-blue-600 hover:text-blue-500">Esqueci minha senha</a> </div>
+                    <a href="#" id="forgot-password-link" class="text-sm text-blue-600 hover:text-blue-500">Esqueci
+                        minha senha</a>
+                </div>
 
-                <button 
-                    type="submit" 
-                    id="login-button"
+                <button type="submit" id="login-button"
                     class="w-full flex justify-center py-2 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-200">
                     <span id="button-text">Entrar</span>
                     <span id="button-loading" class="hidden">
-                        <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg"
+                            fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4">
+                            </circle>
+                            <path class="opacity-75" fill="currentColor"
+                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                            </path>
                         </svg>
                     </span>
                 </button>
             </form>
-            
+
             <div class="mt-6 text-center text-sm">
-                <p class="text-gray-600">Não tem uma conta? 
+                <p class="text-gray-600">Não tem uma conta?
                     <a href="#" id="signup-link" class="font-medium text-blue-600 hover:text-blue-500">Crie agora</a>
                 </p>
             </div>
         </div>
     </div>
 
-    <div id="forgot-password-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center p-4 z-50">
+    <div id="forgot-password-modal"
+        class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center p-4 z-50">
         <div class="bg-white rounded-lg shadow-xl max-w-md w-full p-6 fade-in">
             <div class="flex justify-between items-start mb-4">
                 <h3 class="text-lg font-semibold text-gray-800">Redefinir senha</h3>
                 <button id="close-modal" class="text-gray-500 hover:text-gray-700">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M6 18L18 6M6 6l12 12" />
                     </svg>
                 </button>
             </div>
@@ -129,22 +140,15 @@
             <form id="reset-password-form" class="space-y-4">
                 <div>
                     <label for="reset-email" class="block text-sm font-medium text-gray-700 mb-1">E-mail</label>
-                    <input 
-                        type="email" 
-                        id="reset-email" 
-                        required
-                        placeholder="exemplo@email.com"
+                    <input type="email" id="reset-email" required placeholder="exemplo@email.com"
                         class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                 </div>
                 <div class="flex justify-end space-x-3">
-                    <button 
-                        type="button" 
-                        id="cancel-reset"
+                    <button type="button" id="cancel-reset"
                         class="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
                         Cancelar
                     </button>
-                    <button 
-                        type="submit" 
+                    <button type="submit"
                         class="px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                         Enviar
                     </button>
@@ -153,204 +157,216 @@
         </div>
     </div>
 
-    <div id="success-toast" class="hidden fixed top-4 right-4 bg-green-50 border-l-4 border-green-500 text-green-700 p-4 rounded shadow-lg z-50 fade-in">
+    <div id="success-toast"
+        class="hidden fixed top-4 right-4 bg-green-50 border-l-4 border-green-500 text-green-700 p-4 rounded shadow-lg z-50 fade-in">
         <div class="flex items-center">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                <path fill-rule="evenodd"
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                    clip-rule="evenodd" />
             </svg>
             <p id="success-message"></p>
         </div>
     </div>
 
-   <script>
-    // URL base da sua API Django
-    const API_URL = 'http://127.0.0.1:8000';
+    <script>
 
-    // --- DOM ELEMENTS ---
-    const loginForm = document.getElementById('login-form');
-    const emailInput = document.getElementById('email');
-    const passwordInput = document.getElementById('password');
-    const togglePassword = document.getElementById('toggle-password');
-    const loginButton = document.getElementById('login-button');
-    const buttonText = document.getElementById('button-text');
-    const buttonLoading = document.getElementById('button-loading');
-    const errorMessage = document.getElementById('error-message');
-    const errorText = document.getElementById('error-text');
-    const signupLink = document.getElementById('signup-link');
+        // document.addEventListener('DOMContentLoaded', () => {
+        //     const token = localStorage.getItem('accessToken');
+        //     if (token) {
+        //         // Se já existe um token, tenta ir direto para o dashboard
+        //         window.location.href = '../index.html';
+        //     }
+        // });
+        // URL base da sua API Django
+        const API_URL = 'http://127.0.0.1:8000';
 
-    // Elementos do Modal "Esqueci minha senha"
-    const forgotPasswordLink = document.getElementById('forgot-password-link'); // ID CORRIGIDO
-    const forgotPasswordModal = document.getElementById('forgot-password-modal');
-    const resetPasswordForm = document.getElementById('reset-password-form');
-    const resetEmailInput = document.getElementById('reset-email');
-    const closeModal = document.getElementById('close-modal');
-    const cancelReset = document.getElementById('cancel-reset');
+        // --- DOM ELEMENTS ---
+        const loginForm = document.getElementById('login-form');
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+        const togglePassword = document.getElementById('toggle-password');
+        const loginButton = document.getElementById('login-button');
+        const buttonText = document.getElementById('button-text');
+        const buttonLoading = document.getElementById('button-loading');
+        const errorMessage = document.getElementById('error-message');
+        const errorText = document.getElementById('error-text');
+        const signupLink = document.getElementById('signup-link');
 
-    // --- FUNÇÕES DE FEEDBACK ---
-    function showError(message) {
-        errorText.textContent = message;
-        errorMessage.classList.remove('hidden');
-        setTimeout(() => {
-            errorMessage.classList.add('hidden');
-        }, 5000);
-    }
+        // Elementos do Modal "Esqueci minha senha"
+        const forgotPasswordLink = document.getElementById('forgot-password-link'); // ID CORRIGIDO
+        const forgotPasswordModal = document.getElementById('forgot-password-modal');
+        const resetPasswordForm = document.getElementById('reset-password-form');
+        const resetEmailInput = document.getElementById('reset-email');
+        const closeModal = document.getElementById('close-modal');
+        const cancelReset = document.getElementById('cancel-reset');
 
-    async function fetchUserData(token) {
-        try {
-            const response = await fetch(`${API_URL}/api/accounts/me/`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
+        // --- FUNÇÕES DE FEEDBACK ---
+        function showError(message) {
+            errorText.textContent = message;
+            errorMessage.classList.remove('hidden');
+            setTimeout(() => {
+                errorMessage.classList.add('hidden');
+            }, 5000);
+        }
+
+        async function fetchUserData(token) {
+            try {
+                const response = await fetch(`${API_URL}/api/accounts/me/`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Não foi possível buscar os dados do usuário.');
                 }
-            });
+                const userData = await response.json();
 
-            if (!response.ok) {
-                throw new Error('Não foi possível buscar os dados do usuário.');
+                // Armazena a lista de permissões no localStorage
+                if (userData.permissions_list) {
+                    localStorage.setItem('userPermissions', JSON.stringify(userData.permissions_list));
+                }
+
+                // Você pode armazenar outros dados do usuário se precisar
+                localStorage.setItem('userName', `${userData.first_name} ${userData.last_name}`);
+
+                // Redireciona para o dashboard somente após buscar os dados
+                window.location.href = '../index.html';
+
+            } catch (error) {
+                showError(error.message);
+                // Limpa o token se a chamada falhar para forçar um novo login
+                localStorage.removeItem('accessToken');
+                localStorage.removeItem('refreshToken');
             }
-            const userData = await response.json();
-            
-            // Armazena a lista de permissões no localStorage
-            if (userData.permissions_list) {
-                localStorage.setItem('userPermissions', JSON.stringify(userData.permissions_list));
-            }
-
-            // Você pode armazenar outros dados do usuário se precisar
-            localStorage.setItem('userName', `${userData.first_name} ${userData.last_name}`);
-            
-            // Redireciona para o dashboard somente após buscar os dados
-            window.location.href = '../index.html';
-
-        } catch (error) {
-            showError(error.message);
-            // Limpa o token se a chamada falhar para forçar um novo login
-            localStorage.removeItem('accessToken');
-            localStorage.removeItem('refreshToken');
         }
-    }
 
-    function showSuccessToast(message) {
-        const toast = document.createElement('div');
-        toast.className = 'fixed top-5 right-5 bg-green-500 text-white py-2 px-4 rounded-lg shadow-lg';
-        toast.style.transition = 'opacity 0.5s, transform 0.5s';
-        toast.style.transform = 'translateX(100%)';
-        toast.style.opacity = '0';
-        toast.textContent = message;
-        document.body.appendChild(toast);
-        setTimeout(() => {
-            toast.style.transform = 'translateX(0)';
-            toast.style.opacity = '1';
-        }, 100);
-        setTimeout(() => {
-            toast.remove();
-        }, 4000);
-    }
+        function showSuccessToast(message) {
+            const toast = document.createElement('div');
+            toast.className = 'fixed top-5 right-5 bg-green-500 text-white py-2 px-4 rounded-lg shadow-lg';
+            toast.style.transition = 'opacity 0.5s, transform 0.5s';
+            toast.style.transform = 'translateX(100%)';
+            toast.style.opacity = '0';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => {
+                toast.style.transform = 'translateX(0)';
+                toast.style.opacity = '1';
+            }, 100);
+            setTimeout(() => {
+                toast.remove();
+            }, 4000);
+        }
 
-    // --- LÓGICA DE UI ---
-    togglePassword.addEventListener('click', function() {
-        const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-        passwordInput.setAttribute('type', type);
-        this.querySelector('svg').classList.toggle('text-gray-700');
-    });
+        // --- LÓGICA DE UI ---
+        togglePassword.addEventListener('click', function () {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            this.querySelector('svg').classList.toggle('text-gray-700');
+        });
 
-    // --- LÓGICA DE LOGIN ---
+        // --- LÓGICA DE LOGIN ---
         // --- LÓGICA DE LOGIN ATUALIZADA ---
-    loginForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        const email = emailInput.value.trim();
-        const password = passwordInput.value;
-        
-        if (!email || !password) {
-            showError('Por favor, preencha o e-mail e a senha.');
-            return;
-        }
+        loginForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+            const email = emailInput.value.trim();
+            const password = passwordInput.value;
 
-        buttonText.classList.add('hidden');
-        buttonLoading.classList.remove('hidden');
-        loginButton.disabled = true;
-        
-        const payload = { username: email, password: password };
-
-        // 1. Primeiro, obtemos o token
-        fetch(`${API_URL}/api/token/`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-        })
-        .then(async response => {
-            const data = await response.json();
-            if (!response.ok) {
-                throw new Error(data.detail || 'Credenciais inválidas.');
+            if (!email || !password) {
+                showError('Por favor, preencha o e-mail e a senha.');
+                return;
             }
-            return data;
-        })
-        .then(data => {
-            // Token obtido com sucesso!
-            const accessToken = data.access;
-            localStorage.setItem('accessToken', accessToken);
-            localStorage.setItem('refreshToken', data.refresh);
 
-            // 2. Agora, usamos o token para buscar os dados do usuário (incluindo permissões)
-            return fetchUserData(accessToken); 
-        })
-        .catch(error => { 
-            showError(error.message); 
-        })
-        .finally(() => {
-            buttonText.classList.remove('hidden');
-            buttonLoading.classList.add('hidden');
-            loginButton.disabled = false;
+            buttonText.classList.add('hidden');
+            buttonLoading.classList.remove('hidden');
+            loginButton.disabled = true;
+
+            const payload = { username: email, password: password };
+
+            // 1. Primeiro, obtemos o token
+            fetch(`${API_URL}/api/token/`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            })
+                .then(async response => {
+                    const data = await response.json();
+                    if (!response.ok) {
+                        throw new Error(data.detail || 'Credenciais inválidas.');
+                    }
+                    return data;
+                })
+                .then(data => {
+                    // Token obtido com sucesso!
+                    const accessToken = data.access;
+                    localStorage.setItem('accessToken', accessToken);
+                    localStorage.setItem('refreshToken', data.refresh);
+
+                    // 2. Agora, usamos o token para buscar os dados do usuário (incluindo permissões)
+                    return fetchUserData(accessToken);
+                })
+                .catch(error => {
+                    showError(error.message);
+                })
+                .finally(() => {
+                    buttonText.classList.remove('hidden');
+                    buttonLoading.classList.add('hidden');
+                    loginButton.disabled = false;
+                });
         });
-    });
 
-    // --- LÓGICA DO MODAL ESQUECI MINHA SENHA ---
-    function closeForgotPasswordModal() {
-        forgotPasswordModal.classList.add('hidden');
-    }
-
-    forgotPasswordLink.addEventListener('click', function(e) {
-        e.preventDefault();
-        forgotPasswordModal.classList.remove('hidden');
-    });
-    
-    closeModal.addEventListener('click', closeForgotPasswordModal);
-    cancelReset.addEventListener('click', closeForgotPasswordModal);
-
-    resetPasswordForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        const email = resetEmailInput.value.trim();
-        const forgotPasswordButton = this.querySelector('button[type="submit"]');
-        if (!email) {
-            alert('Por favor, digite seu e-mail.');
-            return;
+        // --- LÓGICA DO MODAL ESQUECI MINHA SENHA ---
+        function closeForgotPasswordModal() {
+            forgotPasswordModal.classList.add('hidden');
         }
-        forgotPasswordButton.disabled = true;
-        forgotPasswordButton.textContent = 'Enviando...';
-        fetch(`${API_URL}/api/accounts/password_reset/`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email: email })
-        })
-        .then(async response => {
-            if (!response.ok) throw new Error('Não foi possível encontrar um usuário com este e-mail.');
-            return response.json();
-        })
-        .then(data => {
-            closeForgotPasswordModal();
-            showSuccessToast('E-mail de redefinição enviado! Verifique o console do Django.');
-        })
-        .catch(error => { alert(error.message); })
-        .finally(() => {
-            forgotPasswordButton.disabled = false;
-            forgotPasswordButton.textContent = 'Enviar';
-        });
-    });
 
-    // --- NAVEGAÇÃO EXTRA ---
-    signupLink.addEventListener('click', function(e) {
-        e.preventDefault();
-        window.location.href = 'telas/cadastroAdmin.html';
-    });
-</script>
+        forgotPasswordLink.addEventListener('click', function (e) {
+            e.preventDefault();
+            forgotPasswordModal.classList.remove('hidden');
+        });
+
+        closeModal.addEventListener('click', closeForgotPasswordModal);
+        cancelReset.addEventListener('click', closeForgotPasswordModal);
+
+        resetPasswordForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+            const email = resetEmailInput.value.trim();
+            const forgotPasswordButton = this.querySelector('button[type="submit"]');
+            if (!email) {
+                alert('Por favor, digite seu e-mail.');
+                return;
+            }
+            forgotPasswordButton.disabled = true;
+            forgotPasswordButton.textContent = 'Enviando...';
+            fetch(`${API_URL}/api/accounts/password_reset/`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: email })
+            })
+                .then(async response => {
+                    if (!response.ok) throw new Error('Não foi possível encontrar um usuário com este e-mail.');
+                    return response.json();
+                })
+                .then(data => {
+                    closeForgotPasswordModal();
+                    showSuccessToast('E-mail de redefinição enviado! Verifique o console do Django.');
+                })
+                .catch(error => { alert(error.message); })
+                .finally(() => {
+                    forgotPasswordButton.disabled = false;
+                    forgotPasswordButton.textContent = 'Enviar';
+                });
+        });
+
+        // --- NAVEGAÇÃO EXTRA ---
+        signupLink.addEventListener('click', function (e) {
+            e.preventDefault();
+            window.location.href = 'telas/cadastroAdmin.html';
+        });
+    </script>
 </body>
+
 </html>

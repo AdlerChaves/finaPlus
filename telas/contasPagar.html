@@ -8,7 +8,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="../style.css">
-</head> "bill-modal"
+</head>
 
 <body class="bg-gray-50 font-sans">
     <main class="mt-16 pt-6 pb-20">
@@ -187,9 +187,12 @@
         <span id="toast-message"></span>
     </div>
 
+    <script src="../componentes/auth.js"></script>
     <script src="../componentes/topbar.js"></script>
     <script>
         // --- INÍCIO DO SCRIPT UNIFICADO PARA CONTAS A PAGAR ---
+
+
 
         const API_URL = 'http://127.0.0.1:8000';
         let billIdToModify = null;
@@ -217,13 +220,11 @@
         });
 
         document.addEventListener('DOMContentLoaded', () => {
-            const userPermissions = {
-                dashboard: true, movimentacoes: true, relatorios: true,
-                pagamentos: true, contas: true, cadastros: true, configuracoes: true
-            };
-            renderTopbar('pagamentos', userPermissions);
+    
             setupPage();
             renderMonthlyBills();
+            protectPage('pagamentos')
+
         });
 
         function markAsPaid(id) {

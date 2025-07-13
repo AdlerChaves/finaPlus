@@ -387,6 +387,9 @@
         </div>
     </div>
 
+
+    <script src="../componentes/auth.js"></script>
+    <script src="../componentes/topbar.js"></script>
     <script>
         // Mobile menu toggle
         document.getElementById('mobile-menu-button').addEventListener('click', function () {
@@ -548,22 +551,12 @@
             }
         });
     </script>
-<script src="../componentes/topbar.js"></script>
+
         <script>
             document.addEventListener('DOMContentLoaded', () => {
-                // Exemplo de permissões para um usuário do financeiro
-                const userPermissions = {
-                    dashboard: true,
-                    movimentacoes: true,
-                    relatorios: true,
-                    pagamentos: true,
-                    contas: true,
-                    cadastros: true,       
-                    configuracoes: true    
-                };
-                renderTopbar('configuracoes', userPermissions);
 
-                // ...aqui entraria qualquer outro JS específico da página de entradas
+                protectPage('configuracoes')
+            
             });
         </script>
 </body>

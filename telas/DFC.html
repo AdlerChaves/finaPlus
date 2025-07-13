@@ -355,9 +355,12 @@
         </svg>
     </button>
 
+    <script src="../componentes/auth.js"></script>
+    <script src="../componentes/topbar.js"></script>
     <script>
         // Initialize charts when DOM is loaded
         document.addEventListener('DOMContentLoaded', function() {
+
             // Cash Flow Composition Chart
             const cashFlowCtx = document.getElementById('cashFlowChart').getContext('2d');
             const cashFlowChart = new Chart(cashFlowCtx, {
@@ -447,23 +450,10 @@
             });
         });
     </script>
-    <script src="../componentes/topbar.js"></script>
+    
         <script>
             document.addEventListener('DOMContentLoaded', () => {
-                // Exemplo de permissões para um usuário do financeiro
-                const userPermissions = {
-                    dashboard: true,
-                    movimentacoes: true,
-                    relatorios: true,
-                    pagamentos: true,
-                    contas: true,
-                    cadastros: true,       
-                    configuracoes: true    
-                };
-
-                renderTopbar('relatorios', userPermissions);
-
-                // ...aqui entraria qualquer outro JS específico da página de entradas
+                protectPage('relatorios');
             });
         </script>
 </body>

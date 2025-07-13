@@ -347,6 +347,8 @@
     </div>
 
 
+    <script src="../componentes/auth.js"></script>
+    <script src="../componentes/topbar.js"></script>
     <script>
         // URL base da sua API Django
         const API_URL = 'http://127.0.0.1:8000';
@@ -626,22 +628,13 @@
 
     </script>
 
-    <script src="../componentes/topbar.js"></script>
+    
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // Exemplo de permissões para um usuário do financeiro
-            const userPermissions = {
-                dashboard: true,
-                movimentacoes: true,
-                relatorios: true,
-                pagamentos: true,
-                contas: true,
-                cadastros: true,
-                configuracoes: true
-            };
-            renderTopbar('contas', userPermissions);
 
-            // ...aqui entraria qualquer outro JS específico da página de entradas
+            protectPage('contas')
+            
+
         });
     </script>
 </body>

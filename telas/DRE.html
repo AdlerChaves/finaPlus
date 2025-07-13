@@ -219,10 +219,12 @@
                 </path>
             </svg>
         </button>
-
+        <script src="../componentes/auth.js"></script>
+        <script src="../componentes/topbar.js"></script>
         <script>
             // Initialize charts when DOM is loaded
             document.addEventListener('DOMContentLoaded', function () {
+
                 // Revenue Chart
                 const revenueCtx = document.getElementById('revenueChart').getContext('2d');
                 const revenueChart = new Chart(revenueCtx, {
@@ -714,24 +716,9 @@
                 renderExpenses();
             });
         </script>
-        <script src="../componentes/topbar.js"></script>
         <script>
             document.addEventListener('DOMContentLoaded', () => {
-                // Exemplo de permissões para um usuário do financeiro
-                const userPermissions = {
-                    dashboard: true,
-                    movimentacoes: true,
-                    relatorios: true,
-                    pagamentos: true,
-                    contas: true,
-                    cadastros: true,       
-                    configuracoes: true   
-                };
-
-                // Chama a função, marcando o menu 'movimentacoes' como ativo
-                renderTopbar('relatorios', userPermissions);
-
-                // ...aqui entraria qualquer outro JS específico da página de entradas
+                protectPage('relatorios');
             });
         </script>
 </body>

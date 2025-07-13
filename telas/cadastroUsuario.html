@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -15,6 +16,7 @@
             font-weight: 600;
             color: white;
         }
+
         .permission-badge {
             display: inline-block;
             background-color: #EFF6FF;
@@ -25,17 +27,20 @@
             margin-right: 4px;
             margin-bottom: 4px;
         }
+
         .switch {
             position: relative;
             display: inline-block;
             width: 44px;
             height: 24px;
         }
+
         .switch input {
             opacity: 0;
             width: 0;
             height: 0;
         }
+
         .slider {
             position: absolute;
             cursor: pointer;
@@ -47,6 +52,7 @@
             transition: .4s;
             border-radius: 24px;
         }
+
         .slider:before {
             position: absolute;
             content: "";
@@ -58,32 +64,49 @@
             transition: .4s;
             border-radius: 50%;
         }
-        input:checked + .slider {
+
+        input:checked+.slider {
             background-color: #10B981;
         }
-        input:checked + .slider:before {
+
+        input:checked+.slider:before {
             transform: translateX(20px);
         }
+
         .modal {
             transition: opacity 0.3s ease, transform 0.3s ease;
         }
+
         .modal-hidden {
             opacity: 0;
             transform: translateY(10px);
             pointer-events: none;
         }
+
         .toast {
             animation: slideIn 0.3s ease, fadeOut 0.5s ease 2.5s forwards;
         }
+
         @keyframes slideIn {
-            from { transform: translateY(20px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
         }
+
         @keyframes fadeOut {
-            to { opacity: 0; }
+            to {
+                opacity: 0;
+            }
         }
     </style>
 </head>
+
 <body class="bg-gray-50 font-sans">
     <!-- Header -->
 
@@ -97,7 +120,8 @@
                     <p class="text-sm text-gray-600 mt-1">Gerencie os usuários e permissões de acesso</p>
                 </div>
                 <div class="mt-4 md:mt-0">
-                    <button id="add-user-button" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors flex items-center">
+                    <button id="add-user-button"
+                        class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors flex items-center">
                         <i class="fas fa-user-plus mr-2"></i>
                         Adicionar Usuário
                     </button>
@@ -110,7 +134,8 @@
                     <div>
                         <label class="block text-gray-600 text-sm mb-1">Buscar</label>
                         <div class="relative">
-                            <input type="text" placeholder="Nome ou e-mail" class="w-full border border-gray-300 rounded px-3 py-2 pl-10 text-sm">
+                            <input type="text" placeholder="Nome ou e-mail"
+                                class="w-full border border-gray-300 rounded px-3 py-2 pl-10 text-sm">
                             <i class="fas fa-search absolute left-3 top-2.5 text-gray-400"></i>
                         </div>
                     </div>
@@ -133,7 +158,8 @@
                         </select>
                     </div>
                     <div class="flex items-end">
-                        <button class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors w-full">
+                        <button
+                            class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors w-full">
                             Filtrar
                         </button>
                     </div>
@@ -147,12 +173,24 @@
                     <table class="min-w-full divide-y divide-gray-200">
                         <thead class="bg-gray-50">
                             <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Usuário</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">E-mail</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cargo</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Permissões</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
+                                <th
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Usuário</th>
+                                <th
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    E-mail</th>
+                                <th
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Cargo</th>
+                                <th
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Status</th>
+                                <th
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Permissões</th>
+                                <th
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Ações</th>
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
@@ -171,7 +209,8 @@
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">admin@empresa.com</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Administrador</td>
                                 <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">Ativo</span>
+                                    <span
+                                        class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">Ativo</span>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <div class="flex flex-wrap">
@@ -206,10 +245,12 @@
                                         </div>
                                     </div>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">financeiro@empresa.com</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">financeiro@empresa.com
+                                </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Financeiro</td>
                                 <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">Ativo</span>
+                                    <span
+                                        class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">Ativo</span>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <div class="flex flex-wrap">
@@ -244,7 +285,8 @@
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">gestor@empresa.com</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Gestor</td>
                                 <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">Ativo</span>
+                                    <span
+                                        class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">Ativo</span>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <div class="flex flex-wrap">
@@ -316,7 +358,8 @@
                         </div>
                         <div class="mt-3">
                             <p class="text-xs text-gray-500"><i class="fas fa-briefcase mr-1"></i> Administrador</p>
-                            <p class="text-xs text-gray-500 mt-1"><i class="fas fa-clock mr-1"></i> Último acesso: 15/06/2023</p>
+                            <p class="text-xs text-gray-500 mt-1"><i class="fas fa-clock mr-1"></i> Último acesso:
+                                15/06/2023</p>
                         </div>
                         <div class="mt-3 flex flex-wrap">
                             <span class="permission-badge">Dashboard</span>
@@ -343,40 +386,53 @@
                 <!-- Pagination -->
                 <div class="bg-gray-50 px-6 py-3 flex items-center justify-between border-t border-gray-200">
                     <div class="flex-1 flex justify-between sm:hidden">
-                        <a href="#" class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                        <a href="#"
+                            class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
                             Anterior
                         </a>
-                        <a href="#" class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                        <a href="#"
+                            class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
                             Próxima
                         </a>
                     </div>
                     <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
                         <div>
                             <p class="text-sm text-gray-700">
-                                Mostrando <span class="font-medium">1</span> a <span class="font-medium">4</span> de <span class="font-medium">12</span> usuários
+                                Mostrando <span class="font-medium">1</span> a <span class="font-medium">4</span> de
+                                <span class="font-medium">12</span> usuários
                             </p>
                         </div>
                         <div>
-                            <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
-                                <a href="#" class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                            <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px"
+                                aria-label="Pagination">
+                                <a href="#"
+                                    class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
                                     <span class="sr-only">Anterior</span>
-                                    <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                                    <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                        stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M15 19l-7-7 7-7" />
                                     </svg>
                                 </a>
-                                <a href="#" aria-current="page" class="z-10 bg-blue-50 border-blue-500 text-blue-600 relative inline-flex items-center px-4 py-2 border text-sm font-medium">
+                                <a href="#" aria-current="page"
+                                    class="z-10 bg-blue-50 border-blue-500 text-blue-600 relative inline-flex items-center px-4 py-2 border text-sm font-medium">
                                     1
                                 </a>
-                                <a href="#" class="bg-white border-gray-300 text-gray-500 hover:bg-gray-50 relative inline-flex items-center px-4 py-2 border text-sm font-medium">
+                                <a href="#"
+                                    class="bg-white border-gray-300 text-gray-500 hover:bg-gray-50 relative inline-flex items-center px-4 py-2 border text-sm font-medium">
                                     2
                                 </a>
-                                <a href="#" class="bg-white border-gray-300 text-gray-500 hover:bg-gray-50 relative inline-flex items-center px-4 py-2 border text-sm font-medium">
+                                <a href="#"
+                                    class="bg-white border-gray-300 text-gray-500 hover:bg-gray-50 relative inline-flex items-center px-4 py-2 border text-sm font-medium">
                                     3
                                 </a>
-                                <a href="#" class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                                <a href="#"
+                                    class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
                                     <span class="sr-only">Próxima</span>
-                                    <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                    <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                        stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M9 5l7 7-7 7" />
                                     </svg>
                                 </a>
                             </nav>
@@ -388,7 +444,8 @@
     </main>
 
     <!-- User Modal -->
-    <div id="user-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50 modal-hidden">
+    <div id="user-modal"
+        class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50 modal-hidden">
         <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-screen overflow-y-auto">
             <div class="p-6">
                 <div class="flex justify-between items-center mb-4">
@@ -397,47 +454,55 @@
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
-                
+
                 <form id="user-form">
                     <input type="hidden" id="user-id">
-                    
+
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <label for="full-name" class="block text-sm font-medium text-gray-700 mb-1">Nome completo *</label>
-                            <input type="text" id="full-name" required class="w-full border border-gray-300 rounded px-3 py-2 focus:ring-blue-500 focus:border-blue-500">
-                            <p class="mt-1 text-xs text-red-600 hidden" id="name-error">Por favor, insira um nome válido</p>
+                            <label for="full-name" class="block text-sm font-medium text-gray-700 mb-1">Nome completo
+                                *</label>
+                            <input type="text" id="full-name" required
+                                class="w-full border border-gray-300 rounded px-3 py-2 focus:ring-blue-500 focus:border-blue-500">
+                            <p class="mt-1 text-xs text-red-600 hidden" id="name-error">Por favor, insira um nome válido
+                            </p>
                         </div>
-                        
+
                         <div>
                             <label for="email" class="block text-sm font-medium text-gray-700 mb-1">E-mail *</label>
-                            <input type="email" id="email" required class="w-full border border-gray-300 rounded px-3 py-2 focus:ring-blue-500 focus:border-blue-500">
+                            <input type="email" id="email" required
+                                class="w-full border border-gray-300 rounded px-3 py-2 focus:ring-blue-500 focus:border-blue-500">
                             <p class="mt-1 text-xs text-gray-500">Será usado para login</p>
-                            <p class="mt-1 text-xs text-red-600 hidden" id="email-error">Por favor, insira um e-mail válido</p>
+                            <p class="mt-1 text-xs text-red-600 hidden" id="email-error">Por favor, insira um e-mail
+                                válido</p>
                         </div>
-                        
+
                         <div>
                             <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Senha *</label>
                             <div class="relative">
-                                <input type="password" id="password" required minlength="8" class="w-full border border-gray-300 rounded px-3 py-2 focus:ring-blue-500 focus:border-blue-500">
-                                <button type="button" id="toggle-password" class="absolute right-3 top-2.5 text-gray-500">
+                                <input type="password" id="password" required minlength="8"
+                                    class="w-full border border-gray-300 rounded px-3 py-2 focus:ring-blue-500 focus:border-blue-500">
+                                <button type="button" id="toggle-password"
+                                    class="absolute right-3 top-2.5 text-gray-500">
                                     <i class="fas fa-eye"></i>
                                 </button>
                             </div>
                             <p class="mt-1 text-xs text-gray-500">Mínimo de 8 caracteres</p>
-                            <p class="mt-1 text-xs text-red-600 hidden" id="password-error">A senha deve ter pelo menos 8 caracteres</p>
+                            <p class="mt-1 text-xs text-red-600 hidden" id="password-error">A senha deve ter pelo menos
+                                8 caracteres</p>
                         </div>
-                        
+
                         <div>
                             <label for="role" class="block text-sm font-medium text-gray-700 mb-1">Cargo/Função *</label>
                             <select id="role" required class="w-full border border-gray-300 rounded px-3 py-2 focus:ring-blue-500 focus:border-blue-500">
-                                <option value="">Selecione</option>
-                                <option value="Administrador">Administrador</option>
-                                <option value="Financeiro">Financeiro</option>
-                                <option value="Gestor">Gestor</option>
-                                <option value="Analista">Analista</option>
+                                <option value="" disabled selected>Selecione um cargo</option>
+                                <option value="admin">Administrador</option>
+                                <option value="finance">Financeiro</option>
+                                <option value="manager">Gestor</option>
+                                <option value="analyst">Analista</option>
                             </select>
                         </div>
-                        
+
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
                             <label class="switch">
@@ -447,54 +512,71 @@
                             <span class="ml-2 text-sm text-gray-600" id="status-label">Ativo</span>
                         </div>
                     </div>
-                    
+
                     <div class="mt-6">
                         <h4 class="text-lg font-medium text-gray-800 mb-3">Permissões de Acesso</h4>
                         <p class="text-sm text-gray-600 mb-4">Selecione os módulos que este usuário poderá acessar:</p>
-                        
+
                         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                             <div class="flex items-center">
-                                <input type="checkbox" id="permission-dashboard" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
-                                <label for="permission-dashboard" class="ml-2 block text-sm text-gray-700">Dashboard</label>
+                                <input type="checkbox" id="permission-dashboard"
+                                    class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                <label for="permission-dashboard"
+                                    class="ml-2 block text-sm text-gray-700">Dashboard</label>
                             </div>
                             <div class="flex items-center">
-                                <input type="checkbox" id="permission-entradas" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
-                                <label for="permission-entradas" class="ml-2 block text-sm text-gray-700">Entradas</label>
+                                <input type="checkbox" id="permission-entradas"
+                                    class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                <label for="permission-entradas"
+                                    class="ml-2 block text-sm text-gray-700">Entradas</label>
                             </div>
                             <div class="flex items-center">
-                                <input type="checkbox" id="permission-saidas" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                <input type="checkbox" id="permission-saidas"
+                                    class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
                                 <label for="permission-saidas" class="ml-2 block text-sm text-gray-700">Saídas</label>
                             </div>
                             <div class="flex items-center">
-                                <input type="checkbox" id="permission-dre" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                <input type="checkbox" id="permission-dre"
+                                    class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
                                 <label for="permission-dre" class="ml-2 block text-sm text-gray-700">DRE</label>
                             </div>
                             <div class="flex items-center">
-                                <input type="checkbox" id="permission-dfc" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                <input type="checkbox" id="permission-dfc"
+                                    class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
                                 <label for="permission-dfc" class="ml-2 block text-sm text-gray-700">DFC</label>
                             </div>
                             <div class="flex items-center">
-                                <input type="checkbox" id="permission-contas-pagar" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
-                                <label for="permission-contas-pagar" class="ml-2 block text-sm text-gray-700">Contas a Pagar</label>
+                                <input type="checkbox" id="permission-contas-pagar"
+                                    class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                <label for="permission-contas-pagar" class="ml-2 block text-sm text-gray-700">Contas a
+                                    Pagar</label>
                             </div>
                             <div class="flex items-center">
-                                <input type="checkbox" id="permission-contas-receber" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
-                                <label for="permission-contas-receber" class="ml-2 block text-sm text-gray-700">Contas a Receber</label>
+                                <input type="checkbox" id="permission-contas-receber"
+                                    class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                <label for="permission-contas-receber" class="ml-2 block text-sm text-gray-700">Contas a
+                                    Receber</label>
                             </div>
                             <div class="flex items-center">
-                                <input type="checkbox" id="permission-clientes" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
-                                <label for="permission-clientes" class="ml-2 block text-sm text-gray-700">Clientes</label>
+                                <input type="checkbox" id="permission-clientes"
+                                    class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                <label for="permission-clientes"
+                                    class="ml-2 block text-sm text-gray-700">Clientes</label>
                             </div>
                             <div class="flex items-center">
-                                <input type="checkbox" id="permission-fornecedores" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
-                                <label for="permission-fornecedores" class="ml-2 block text-sm text-gray-700">Fornecedores</label>
+                                <input type="checkbox" id="permission-fornecedores"
+                                    class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                <label for="permission-fornecedores"
+                                    class="ml-2 block text-sm text-gray-700">Fornecedores</label>
                             </div>
                             <div class="flex items-center">
-                                <input type="checkbox" id="permission-configuracoes" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
-                                <label for="permission-configuracoes" class="ml-2 block text-sm text-gray-700">Configurações</label>
+                                <input type="checkbox" id="permission-configuracoes"
+                                    class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                <label for="permission-configuracoes"
+                                    class="ml-2 block text-sm text-gray-700">Configurações</label>
                             </div>
                         </div>
-                        
+
                         <div class="mt-4 p-3 bg-gray-50 rounded">
                             <h5 class="text-sm font-medium text-gray-700 mb-2">Resumo das Permissões:</h5>
                             <div class="flex flex-wrap" id="permissions-summary">
@@ -502,12 +584,14 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="mt-6 flex justify-end space-x-3">
-                        <button type="button" id="cancel-button" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg transition-colors">
+                        <button type="button" id="cancel-button"
+                            class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg transition-colors">
                             Cancelar
                         </button>
-                        <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors">
+                        <button type="submit"
+                            class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors">
                             Salvar Usuário
                         </button>
                     </div>
@@ -517,7 +601,8 @@
     </div>
 
     <!-- Delete Confirmation Modal -->
-    <div id="delete-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50 modal-hidden">
+    <div id="delete-modal"
+        class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50 modal-hidden">
         <div class="bg-white rounded-lg shadow-xl max-w-md w-full">
             <div class="p-6">
                 <div class="flex justify-between items-center mb-4">
@@ -526,14 +611,17 @@
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
-                
-                <p class="text-gray-600 mb-6">Tem certeza que deseja excluir este usuário? Esta ação não pode ser desfeita.</p>
-                
+
+                <p class="text-gray-600 mb-6">Tem certeza que deseja excluir este usuário? Esta ação não pode ser
+                    desfeita.</p>
+
                 <div class="flex justify-end space-x-3">
-                    <button type="button" id="cancel-delete" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg transition-colors">
+                    <button type="button" id="cancel-delete"
+                        class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg transition-colors">
                         Cancelar
                     </button>
-                    <button type="button" id="confirm-delete" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors">
+                    <button type="button" id="confirm-delete"
+                        class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors">
                         Excluir Usuário
                     </button>
                 </div>
@@ -550,129 +638,274 @@
     </div>
 
     <!-- Floating Action Button -->
-    <button class="fab fixed bottom-6 right-6 w-14 h-14 bg-blue-500 text-white rounded-full flex items-center justify-center focus:outline-none shadow-lg hover:bg-blue-600 transition-colors md:hidden">
+    <button
+        class="fab fixed bottom-6 right-6 w-14 h-14 bg-blue-500 text-white rounded-full flex items-center justify-center focus:outline-none shadow-lg hover:bg-blue-600 transition-colors md:hidden">
         <i class="fas fa-user-plus"></i>
     </button>
 
+    <script src="../componentes/topbar.js"></script>
     <script>
-        // Mobile menu toggle
-        document.getElementById('mobile-menu-button').addEventListener('click', function() {
-            const menu = document.getElementById('mobile-menu');
-            menu.classList.toggle('hidden');
-        });
+        // --- CONFIGURAÇÃO DA API ---
+        const API_BASE_URL = 'http://127.0.0.1:8000/api/accounts'; // Ajuste se o endereço da sua API for diferente
 
-        // User modal functionality
-        const userModal = document.getElementById('user-modal');
-        const addUserButton = document.getElementById('add-user-button');
-        const closeModal = document.getElementById('close-modal');
-        const cancelButton = document.getElementById('cancel-button');
-        const fabButton = document.querySelector('.fab');
-        
-        function openUserModal(userId = null) {
-            if (userId) {
-                document.getElementById('modal-title').textContent = 'Editar Usuário';
-                // In a real app, you would load user data here
-                document.getElementById('user-id').value = userId;
-                // Example data for demo
-                document.getElementById('full-name').value = 'Admin User';
-                document.getElementById('email').value = 'admin@empresa.com';
-                document.getElementById('role').value = 'Administrador';
-                document.getElementById('status').checked = true;
-                document.getElementById('status-label').textContent = 'Ativo';
-                
-                // Check all permissions for admin
-                const checkboxes = document.querySelectorAll('input[type="checkbox"][id^="permission-"]');
-                checkboxes.forEach(checkbox => checkbox.checked = true);
-                updatePermissionsSummary();
-            } else {
-                document.getElementById('modal-title').textContent = 'Adicionar Novo Usuário';
-                document.getElementById('user-form').reset();
-                document.getElementById('status').checked = true;
-                document.getElementById('status-label').textContent = 'Ativo';
-                document.getElementById('permissions-summary').innerHTML = '<span class="text-xs text-gray-500">Nenhuma permissão selecionada</span>';
+        // --- FUNÇÕES AUXILIARES ---
+        const getAuthHeaders = () => {
+            const token = localStorage.getItem('accessToken');
+            if (!token) {
+                console.error("Token de acesso não encontrado. Redirecionando para o login.");
+                // window.location.href = '/login.html'; // Descomente para redirecionar em produção
+                return null;
             }
-            
-            userModal.classList.remove('modal-hidden');
-        }
-        
-        function closeUserModal() {
-            userModal.classList.add('modal-hidden');
-        }
-        
-        addUserButton.addEventListener('click', () => openUserModal());
-        fabButton.addEventListener('click', () => openUserModal());
-        closeModal.addEventListener('click', closeUserModal);
-        cancelButton.addEventListener('click', closeUserModal);
-        
-        // Edit user buttons
-        document.querySelectorAll('.edit-user').forEach(button => {
-            button.addEventListener('click', function() {
-                const userId = this.getAttribute('data-id');
-                openUserModal(userId);
-            });
-        });
-        
-        // Delete modal functionality
-        const deleteModal = document.getElementById('delete-modal');
-        const closeDeleteModal = document.getElementById('close-delete-modal');
-        const cancelDelete = document.getElementById('cancel-delete');
-        
-        function openDeleteModal(userId) {
-            document.getElementById('confirm-delete').setAttribute('data-id', userId);
-            deleteModal.classList.remove('modal-hidden');
-        }
-        
-        function closeDeleteModalFunc() {
-            deleteModal.classList.add('modal-hidden');
-        }
-        
-        document.querySelectorAll('.delete-user').forEach(button => {
-            button.addEventListener('click', function() {
-                const userId = this.getAttribute('data-id');
-                openDeleteModal(userId);
-            });
-        });
-        
-        closeDeleteModal.addEventListener('click', closeDeleteModalFunc);
-        cancelDelete.addEventListener('click', closeDeleteModalFunc);
-        
-        document.getElementById('confirm-delete').addEventListener('click', function() {
-            const userId = this.getAttribute('data-id');
-            // In a real app, you would delete the user here
-            showToast('Usuário excluído com sucesso!');
-            closeDeleteModalFunc();
-        });
-        
-        // Toggle password visibility
-        document.getElementById('toggle-password').addEventListener('click', function() {
-            const passwordInput = document.getElementById('password');
-            const icon = this.querySelector('i');
-            
-            if (passwordInput.type === 'password') {
-                passwordInput.type = 'text';
-                icon.classList.replace('fa-eye', 'fa-eye-slash');
-            } else {
-                passwordInput.type = 'password';
-                icon.classList.replace('fa-eye-slash', 'fa-eye');
+            return {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            };
+        };
+
+        const fetchApi = async (endpoint, options = {}) => {
+            const headers = getAuthHeaders();
+            if (!headers) return;
+
+            options.headers = { ...headers, ...options.headers };
+
+            try {
+                const response = await fetch(`${API_BASE_URL}${endpoint}`, options);
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    const errorMessage = errorData.detail || Object.values(errorData).join(' ');
+                    throw new Error(errorMessage || `Erro na API: ${response.statusText}`);
+                }
+                return response.status === 204 ? null : response.json();
+            } catch (error) {
+                console.error('Falha na requisição API:', error);
+                showToast(error.message, 'error');
+                throw error;
             }
-        });
-        
-        // Toggle status label
-        document.getElementById('status').addEventListener('change', function() {
-            document.getElementById('status-label').textContent = this.checked ? 'Ativo' : 'Inativo';
-        });
-        
-        // Update permissions summary
-        function updatePermissionsSummary() {
-            const summaryContainer = document.getElementById('permissions-summary');
-            const checkedPermissions = document.querySelectorAll('input[type="checkbox"][id^="permission-"]:checked');
-            
-            if (checkedPermissions.length === 0) {
-                summaryContainer.innerHTML = '<span class="text-xs text-gray-500">Nenhuma permissão selecionada</span>';
+        };
+
+        const showToast = (message, type = 'success') => {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toast-message');
+            const toastIcon = toast.querySelector('i');
+
+            toastMessage.textContent = message;
+            toast.className = 'fixed bottom-4 right-4 toast flex items-center text-white px-4 py-2 rounded-lg shadow-lg'; // Reset classes
+
+            if (type === 'error') {
+                toast.classList.add('bg-red-500');
+                toastIcon.className = 'fas fa-times-circle mr-2';
+            } else {
+                toast.classList.add('bg-green-500');
+                toastIcon.className = 'fas fa-check-circle mr-2';
+            }
+
+            toast.classList.remove('hidden');
+            setTimeout(() => {
+                toast.classList.add('hidden');
+            }, 3000);
+        };
+
+        // --- RENDERIZAÇÃO E DOM ---
+        const renderUsersTable = (users) => {
+            const tableBody = document.querySelector('tbody');
+            tableBody.innerHTML = '';
+            if (!users || users.length === 0) {
+                tableBody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-gray-500">Nenhum usuário encontrado.</td></tr>`;
                 return;
             }
+
+            users.forEach(user => {
+                const permissionsHtml = (user.permissions_list || []).map(p => `<span class="permission-badge">${p}</span>`).join('');
+                const fullName = `${user.first_name || ''} ${user.last_name || ''}`.trim();
+                const initials = `${(user.first_name || ' ')[0]}${(user.last_name || ' ')[0]}`.trim();
+
+                const row = `
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="flex items-center">
+                                <div class="avatar w-10 h-10 bg-blue-500 mr-3"><span>${initials.toUpperCase()}</span></div>
+                                <div>
+                                    <div class="text-sm font-medium text-gray-900">${fullName}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${user.email}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${user.role}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="px-2 py-1 text-xs rounded-full ${user.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
+                                ${user.is_active ? 'Ativo' : 'Inativo'}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4"><div class="flex flex-wrap max-w-xs">${permissionsHtml}</div></td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                            <button class="text-blue-500 hover:text-blue-700 mr-3 edit-user" data-id="${user.id}"><i class="fas fa-edit"></i></button>
+                            <button class="text-red-500 hover:text-red-700 delete-user" data-id="${user.id}"><i class="fas fa-trash-alt"></i></button>
+                        </td>
+                    </tr>`;
+                tableBody.innerHTML += row;
+            });
+        };
+
+        const fetchUsers = async () => {
+            try {
+                const users = await fetchApi('/users/', { method: 'GET' });
+                if (users) renderUsersTable(users.results || users);
+            } catch (error) {
+                console.error('Erro ao buscar usuários:', error);
+            }
+        };
+        
+        // --- MODAIS ---
+        const userModal = document.getElementById('user-modal');
+        const deleteModal = document.getElementById('delete-modal');
+        const userForm = document.getElementById('user-form');
+
+        const openUserModal = async (userId = null) => {
+            userForm.reset();
+            document.getElementById('user-id').value = '';
+            document.getElementById('email').disabled = false;
+            document.getElementById('password').required = true;
+
+            if (userId) {
+                document.getElementById('modal-title').textContent = 'Editar Usuário';
+                document.getElementById('password').required = false; // Senha não é obrigatória na edição
+                try {
+                    const user = await fetchApi(`/users/${userId}/`, { method: 'GET' });
+                    if(!user) return;
+                    
+                    document.getElementById('user-id').value = user.id;
+                    const fullName = `${user.first_name || ''} ${user.last_name || ''}`.trim();
+                    document.getElementById('full-name').value = fullName;
+                    document.getElementById('email').value = user.email;
+                    document.getElementById('email').disabled = true;
+                    document.getElementById('role').value = user.role;
+                    document.getElementById('status').checked = user.is_active;
+                    document.getElementById('status-label').textContent = user.is_active ? 'Ativo' : 'Inativo';
+                    
+                    // Marcar checkboxes de permissão
+                    document.querySelectorAll('input[id^="permission-"]').forEach(cb => cb.checked = false);
+                    (user.permissions_list || []).forEach(p => {
+                        const sanitizedPermission = p.toLowerCase().replace(/ /g, '-').replace(/ç/g, 'c').replace(/ã/g, 'a');
+                        const checkbox = document.getElementById(`permission-${sanitizedPermission}`);
+                        if (checkbox) checkbox.checked = true;
+                    });
+                    updatePermissionsSummary();
+                } catch (error) { console.error("Erro ao carregar dados do usuário", error); }
+            } else {
+                document.getElementById('modal-title').textContent = 'Adicionar Novo Usuário';
+                updatePermissionsSummary();
+            }
+            userModal.classList.remove('modal-hidden');
+        };
+        
+        const closeUserModal = () => userModal.classList.add('modal-hidden');
+
+        const openDeleteModal = (userId) => {
+            document.getElementById('confirm-delete').dataset.id = userId;
+            deleteModal.classList.remove('modal-hidden');
+        };
+
+        const closeDeleteModal = () => deleteModal.classList.add('modal-hidden');
+
+        // --- LÓGICA E EVENTOS ---
+        document.addEventListener('DOMContentLoaded', () => {
+            // Inicializa a Topbar
+            renderTopbar('cadastros', { /* ... permissões ... */ });
             
-            summaryContainer.innerHTML = '';
+            // Busca dados iniciais
+            fetchUsers();
+
+            // Eventos do modal de usuário
+            document.getElementById('add-user-button').addEventListener('click', () => openUserModal());
+            document.querySelector('.fab').addEventListener('click', () => openUserModal());
+            document.getElementById('close-modal').addEventListener('click', closeUserModal);
+            document.getElementById('cancel-button').addEventListener('click', closeUserModal);
+
+            // Delegação de eventos na tabela
+            document.querySelector('tbody').addEventListener('click', (e) => {
+                const editBtn = e.target.closest('.edit-user');
+                const deleteBtn = e.target.closest('.delete-user');
+                if (editBtn) openUserModal(editBtn.dataset.id);
+                if (deleteBtn) openDeleteModal(deleteBtn.dataset.id);
+            });
+
+            // Eventos do modal de exclusão
+            document.getElementById('close-delete-modal').addEventListener('click', closeDeleteModal);
+            document.getElementById('cancel-delete').addEventListener('click', closeDeleteModal);
+            document.getElementById('confirm-delete').addEventListener('click', async function() {
+                const userId = this.dataset.id;
+                try {
+                    await fetchApi(`/users/${userId}/`, { method: 'DELETE' });
+                    showToast('Usuário excluído com sucesso!');
+                    closeDeleteModal();
+                    fetchUsers();
+                } catch (error) {
+                    console.error('Erro ao excluir usuário:', error);
+                }
+            });
+
+            // Evento de submissão do formulário
+            userForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const fullName = document.getElementById('full-name').value.split(' ');
+                const permissions = Array.from(document.querySelectorAll('input[id^="permission-"]:checked'))
+                                         .map(cb => cb.nextElementSibling.textContent);
+                
+                const userData = {
+                    first_name: fullName.slice(0, 1).join(' '),
+                    last_name: fullName.slice(1).join(' ').trim(),
+                    email: document.getElementById('email').value,
+                    role: document.getElementById('role').value,
+                    is_active: document.getElementById('status').checked,
+                    permissions_list: permissions
+                };
+                
+                const password = document.getElementById('password').value;
+                const userId = document.getElementById('user-id').value;
+
+                // Adiciona a senha apenas se for um novo usuário ou se for preenchida na edição
+                if (!userId || (userId && password)) {
+                    userData.password = password;
+                }
+                
+                const method = userId ? 'PATCH' : 'POST';
+                const endpoint = userId ? `/users/${userId}/` : '/users/';
+
+                try {
+                    await fetchApi(endpoint, { method, body: JSON.stringify(userData) });
+                    showToast(`Usuário ${userId ? 'atualizado' : 'criado'} com sucesso!`);
+                    closeUserModal();
+                    fetchUsers();
+                } catch (error) { console.error("Erro ao salvar usuário:", error); }
+            });
+
+            // Lógica do UI do formulário
+            document.getElementById('toggle-password').addEventListener('click', function() {
+                const passwordInput = document.getElementById('password');
+                const icon = this.querySelector('i');
+                const isPassword = passwordInput.type === 'password';
+                passwordInput.type = isPassword ? 'text' : 'password';
+                icon.className = isPassword ? 'fas fa-eye-slash' : 'fas fa-eye';
+            });
+            
+            document.getElementById('status').addEventListener('change', function() {
+                document.getElementById('status-label').textContent = this.checked ? 'Ativo' : 'Inativo';
+            });
+            
+            document.querySelectorAll('input[id^="permission-"]').forEach(checkbox => {
+                checkbox.addEventListener('change', updatePermissionsSummary);
+            });
+        });
+
+        // Função para atualizar o resumo das permissões
+        function updatePermissionsSummary() {
+            const summaryContainer = document.getElementById('permissions-summary');
+            const checkedPermissions = document.querySelectorAll('input[id^="permission-"]:checked');
+            
+            summaryContainer.innerHTML = checkedPermissions.length === 0 
+                ? '<span class="text-xs text-gray-500">Nenhuma permissão selecionada</span>' 
+                : '';
+                
             checkedPermissions.forEach(checkbox => {
                 const label = document.querySelector(`label[for="${checkbox.id}"]`).textContent;
                 const badge = document.createElement('span');
@@ -681,84 +914,25 @@
                 summaryContainer.appendChild(badge);
             });
         }
-        
-        // Listen for permission checkbox changes
-        document.querySelectorAll('input[type="checkbox"][id^="permission-"]').forEach(checkbox => {
-            checkbox.addEventListener('change', updatePermissionsSummary);
-        });
-        
-        // Form validation and submission
-        document.getElementById('user-form').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            // Simple validation
-            let isValid = true;
-            const name = document.getElementById('full-name').value;
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            
-            // Validate name
-            if (name.trim() === '') {
-                document.getElementById('name-error').classList.remove('hidden');
-                isValid = false;
-            } else {
-                document.getElementById('name-error').classList.add('hidden');
-            }
-            
-            // Validate email
-            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-                document.getElementById('email-error').classList.remove('hidden');
-                isValid = false;
-            } else {
-                document.getElementById('email-error').classList.add('hidden');
-            }
-            
-            // Validate password
-            if (password.length < 8) {
-                document.getElementById('password-error').classList.remove('hidden');
-                isValid = false;
-            } else {
-                document.getElementById('password-error').classList.add('hidden');
-            }
-            
-            if (isValid) {
-                // In a real app, you would save the user data here
-                const userId = document.getElementById('user-id').value;
-                const message = userId ? 'Usuário atualizado com sucesso!' : 'Usuário cadastrado com sucesso!';
-                showToast(message);
-                closeUserModal();
-            }
-        });
-        
-        // Show toast notification
-        function showToast(message) {
-            const toast = document.getElementById('toast');
-            document.getElementById('toast-message').textContent = message;
-            toast.classList.remove('hidden');
-            
-            setTimeout(() => {
-                toast.classList.add('hidden');
-            }, 3000);
-        }
     </script>
-<script src="../componentes/topbar.js"></script>
-        <script>
-            document.addEventListener('DOMContentLoaded', () => {
-                // Exemplo de permissões para um usuário do financeiro
-                const userPermissions = {
-                    dashboard: true,
-                    movimentacoes: true,
-                    relatorios: true,
-                    pagamentos: true,
-                    contas: true,
-                    cadastros: true,       
-                    configuracoes: true    
-                };
-                renderTopbar('cadastros', userPermissions);
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Exemplo de permissões para um usuário do financeiro
+            const userPermissions = {
+                dashboard: true,
+                movimentacoes: true,
+                relatorios: true,
+                pagamentos: true,
+                contas: true,
+                cadastros: true,
+                configuracoes: true
+            };
+            renderTopbar('cadastros', userPermissions);
+            fetchUsers();
 
-                // ...aqui entraria qualquer outro JS específico da página de entradas
-            });
-        </script>
+            // ...aqui entraria qualquer outro JS específico da página de entradas
+        });
+    </script>
 </body>
 
 </html>

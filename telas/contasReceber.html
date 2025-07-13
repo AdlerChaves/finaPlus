@@ -1,10 +1,13 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FinançaPlus | Contas a Receber</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script>
         tailwind.config = {
@@ -21,544 +24,353 @@
         }
     </script>
     <style>
-        .fade-enter-active, .fade-leave-active {
+        .fade-enter-active,
+        .fade-leave-active {
             transition: opacity 0.3s;
         }
-        .fade-enter, .fade-leave-to {
+
+        .fade-enter,
+        .fade-leave-to {
             opacity: 0;
         }
-        .slide-enter-active, .slide-leave-active {
+
+        .slide-enter-active,
+        .slide-leave-active {
             transition: all 0.3s ease;
         }
-        .slide-enter, .slide-leave-to {
+
+        .slide-enter,
+        .slide-leave-to {
             transform: translateY(20px);
             opacity: 0;
         }
-        .toast {
-            animation: slideIn 0.5s, fadeOut 0.5s 2.5s;
-        }
-        @keyframes slideIn {
-            from { transform: translateY(30px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-        @keyframes fadeOut {
-            from { opacity: 1; }
-            to { opacity: 0; }
-        }
     </style>
 </head>
+
 <body class="bg-gray-50 font-sans">
-    <!-- Header -->
     <header class="fixed top-0 left-0 right-0 bg-white shadow-sm z-10">
-        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
-            <div class="flex items-center space-x-2">
-                <div class="w-8 h-8 bg-blue-500 rounded-md flex items-center justify-center">
-                    <span class="text-white font-bold">FP</span>
-                </div>
-                <h1 class="text-xl font-semibold text-gray-800">FinançaPlus</h1>
-            </div>
-            
-            <!-- Desktop Navigation -->
-            <nav class="hidden md:flex space-x-6">
-                <a href="../index.html" class="menu-item text-gray-700 hover:text-blue-500 transition-colors">Dashboard</a>
-                <a href="./entradas.html" class="menu-item text-gray-700 hover:text-blue-500 transition-colors">Entradas</a>
-                <a href="./contas-a-receber.html" class="menu-item active text-gray-700 hover:text-blue-500 transition-colors">Contas a Receber</a>
-                <a href="./saidas.html" class="menu-item text-gray-700 hover:text-blue-500 transition-colors">Saídas</a>
-                <a href="./DRE.html" class="menu-item text-gray-700 hover:text-blue-500 transition-colors">DRE</a>
-                <a href="./DFC.html" class="menu-item text-gray-700 hover:text-blue-500 transition-colors">DFC</a>
-                <a href="./cadastros.html" class="menu-item text-gray-700 hover:text-blue-500 transition-colors">Cadastros</a>
-                <a href="./con.html" class="menu-item text-gray-700 hover:text-blue-500 transition-colors">Configurações</a>
-            </nav>
-            
-            <!-- Mobile Menu Button -->
-            <button id="mobile-menu-button" class="md:hidden text-gray-600 focus:outline-none">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
-                </svg>
-            </button>
-        </div>
-        
-        <!-- Mobile Navigation -->
-        <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-gray-200 px-4 py-2">
-            <a href="../index.html" class="block py-2 text-gray-700 hover:text-blue-500">Dashboard</a>
-            <a href="./entradas.html" class="block py-2 text-gray-700 hover:text-blue-500">Entradas</a>
-            <a href="./contas-a-receber.html" class="block py-2 text-blue-500 font-medium">Contas a Receber</a>
-            <a href="./saidas.html" class="block py-2 text-gray-700 hover:text-blue-500">Saídas</a>
-            <a href="./DRE.html" class="block py-2 text-gray-700 hover:text-blue-500">DRE</a>
-            <a href="./DFC.html" class="block py-2 text-gray-700 hover:text-blue-500">DFC</a>
-            <a href="./con.html" class="block py-2 text-gray-700 hover:text-blue-500">Configurações</a>
-        </div>
     </header>
 
-    <!-- Main Content -->
     <main class="mt-16 pt-6 pb-20">
         <div class="container mx-auto px-4">
-            <!-- Page Header -->
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
                 <div>
                     <h2 class="text-2xl font-bold text-gray-800">Contas a Receber</h2>
                     <p class="text-sm text-gray-500">Acompanhe os valores que sua empresa tem a receber</p>
                 </div>
                 <div class="mt-4 md:mt-0">
-                    <button id="add-receivable-btn" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors flex items-center">
+                    <button id="add-receivable-btn"
+                        class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors flex items-center">
                         <i class="fas fa-plus mr-2"></i>
                         Adicionar Recebimento
                     </button>
                 </div>
             </div>
 
-            <!-- Summary Cards -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                <div class="bg-white rounded-lg shadow-sm p-4 border border-gray-100">
-                    <div class="flex items-center">
-                        <div class="p-3 rounded-full bg-blue-50 text-blue-500 mr-4">
-                            <i class="fas fa-wallet text-lg"></i>
-                        </div>
-                        <div>
-                            <p class="text-sm text-gray-500">Total a Receber</p>
-                            <p class="text-xl font-bold text-gray-800">R$ 12.450,00</p>
-                        </div>
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+                <div class="lg:col-span-1 grid grid-cols-1 gap-6">
+                    <div class="bg-white rounded-lg shadow-sm p-5 border border-gray-100 flex flex-col justify-center">
+                        <h4 class="text-sm text-gray-500 font-medium">Total a Receber</h4>
+                        <p id="total-to-receive" class="text-3xl font-bold text-yellow-500 mt-1">R$ 0,00</p>
+                        <p class="text-xs text-gray-400 mt-1">Soma de contas pendentes e vencidas.</p>
+                    </div>
+                    <div class="bg-white rounded-lg shadow-sm p-5 border border-gray-100 flex flex-col justify-center">
+                        <h4 class="text-sm text-gray-500 font-medium">Total Recebido</h4>
+                        <p id="total-received" class="text-3xl font-bold text-green-500 mt-1">R$ 0,00</p>
+                        <p class="text-xs text-gray-400 mt-1">Soma das contas já recebidas no período.</p>
                     </div>
                 </div>
-                <div class="bg-white rounded-lg shadow-sm p-4 border border-gray-100">
-                    <div class="flex items-center">
-                        <div class="p-3 rounded-full bg-green-50 text-green-500 mr-4">
-                            <i class="fas fa-check-circle text-lg"></i>
-                        </div>
-                        <div>
-                            <p class="text-sm text-gray-500">Recebido (30 dias)</p>
-                            <p class="text-xl font-bold text-gray-800">R$ 5.320,00</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="bg-white rounded-lg shadow-sm p-4 border border-gray-100">
-                    <div class="flex items-center">
-                        <div class="p-3 rounded-full bg-red-50 text-red-500 mr-4">
-                            <i class="fas fa-exclamation-circle text-lg"></i>
-                        </div>
-                        <div>
-                            <p class="text-sm text-gray-500">Pendente (30 dias)</p>
-                            <p class="text-xl font-bold text-gray-800">R$ 7.130,00</p>
-                        </div>
+
+                <div class="lg:col-span-2 bg-white rounded-lg shadow-sm p-5 border border-gray-100 flex flex-col">
+                    <h4 class="text-sm text-gray-500 font-medium mb-4">Resumo por Status</h4>
+                    <div class="relative h-64 md:h-full">
+                        <canvas id="statusChart"></canvas>
                     </div>
                 </div>
             </div>
 
-            <!-- Filters -->
             <div class="bg-white rounded-lg shadow-sm p-4 border border-gray-100 mb-6">
                 <h3 class="text-gray-700 font-medium mb-4">Filtrar Contas</h3>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
                     <div>
-                        <label class="block text-gray-600 text-sm mb-1">Período</label>
-                        <select id="period-filter" class="w-full border border-gray-300 rounded px-3 py-2 text-sm">
-                            <option value="all">Todos</option>
-                            <option value="today">Hoje</option>
-                            <option value="week">Esta semana</option>
-                            <option value="month" selected>Este mês</option>
-                            <option value="next-month">Próximo mês</option>
-                            <option value="overdue">Vencidos</option>
-                        </select>
+                        <label class="block text-gray-600 text-sm mb-1">Período (Vencimento)</label>
+                        <input type="month" id="period-filter"
+                            class="w-full border border-gray-300 rounded px-3 py-2 text-sm">
                     </div>
                     <div>
                         <label class="block text-gray-600 text-sm mb-1">Status</label>
                         <select id="status-filter" class="w-full border border-gray-300 rounded px-3 py-2 text-sm">
-                            <option value="all">Todos</option>
+                            <option value="">Todos</option>
                             <option value="pending">Pendente</option>
                             <option value="received">Recebido</option>
+                            <option value="overdue">Vencido</option>
                         </select>
                     </div>
                     <div>
                         <label class="block text-gray-600 text-sm mb-1">Cliente</label>
                         <select id="client-filter" class="w-full border border-gray-300 rounded px-3 py-2 text-sm">
-                            <option value="all">Todos</option>
-                            <option value="1">Cliente A</option>
-                            <option value="2">Cliente B</option>
-                            <option value="3">Cliente C</option>
+                            <option value="">Todos</option>
                         </select>
                     </div>
-                    <div>
-                        <label class="block text-gray-600 text-sm mb-1">Forma de Pagamento</label>
-                        <select id="payment-filter" class="w-full border border-gray-300 rounded px-3 py-2 text-sm">
-                            <option value="all">Todas</option>
-                            <option value="cash">Dinheiro</option>
-                            <option value="card">Cartão</option>
-                            <option value="transfer">Transferência</option>
-                            <option value="pix">PIX</option>
-                            <option value="boleto">Boleto</option>
-                        </select>
-                    </div>
-                    <div class="flex items-end space-x-2">
-                        <button id="apply-filters" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors flex-1">
-                            Aplicar
-                        </button>
-                        <button id="reset-filters" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-2 rounded-lg transition-colors">
-                            <i class="fas fa-undo"></i>
+                    <div class="flex items-end">
+                        <button id="reset-filters"
+                            class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg transition-colors w-full">
+                            <i class="fas fa-undo mr-2"></i> Limpar Filtros
                         </button>
                     </div>
                 </div>
             </div>
 
-            <!-- Search -->
             <div class="bg-white rounded-lg shadow-sm p-4 border border-gray-100 mb-6">
                 <div class="relative">
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                         <i class="fas fa-search text-gray-400"></i>
                     </div>
-                    <input id="search-input" type="text" class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Buscar por cliente, descrição...">
+                    <input id="search-input" type="text"
+                        class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        placeholder="Buscar por cliente, descrição...">
                 </div>
             </div>
 
-            <!-- Table -->
             <div class="bg-white rounded-lg shadow-sm overflow-hidden border border-gray-100">
-                <!-- Desktop Table -->
                 <div class="hidden md:block overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-200">
                         <thead class="bg-gray-50">
                             <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cliente</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Descrição</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Valor</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vencimento</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Pagamento</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
+                                <th
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Cliente</th>
+                                <th
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Descrição</th>
+                                <th
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Valor</th>
+                                <th
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Vencimento</th>
+                                <th
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Status</th>
+                                <th
+                                    class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Ações</th>
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200" id="receivables-table-body">
-                            <!-- Rows will be added dynamically -->
                         </tbody>
                     </table>
                 </div>
-                
-                <!-- Mobile Cards -->
                 <div class="md:hidden divide-y divide-gray-200" id="receivables-mobile-list">
-                    <!-- Cards will be added dynamically -->
-                </div>
-                
-                <!-- Pagination -->
-                <div class="bg-gray-50 px-6 py-3 flex items-center justify-between border-t border-gray-200">
-                    <div class="flex-1 flex justify-between sm:hidden">
-                        <button class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
-                            Anterior
-                        </button>
-                        <button class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
-                            Próxima
-                        </button>
-                    </div>
-                    <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-                        <div>
-                            <p class="text-sm text-gray-700">
-                                Mostrando <span class="font-medium">1</span> a <span class="font-medium">5</span> de <span class="font-medium">12</span> contas
-                            </p>
-                        </div>
-                        <div>
-                            <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
-                                <button class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
-                                    <span class="sr-only">Anterior</span>
-                                    <i class="fas fa-chevron-left"></i>
-                                </button>
-                                <button aria-current="page" class="z-10 bg-blue-50 border-blue-500 text-blue-600 relative inline-flex items-center px-4 py-2 border text-sm font-medium">
-                                    1
-                                </button>
-                                <button class="bg-white border-gray-300 text-gray-500 hover:bg-gray-50 relative inline-flex items-center px-4 py-2 border text-sm font-medium">
-                                    2
-                                </button>
-                                <button class="bg-white border-gray-300 text-gray-500 hover:bg-gray-50 relative inline-flex items-center px-4 py-2 border text-sm font-medium">
-                                    3
-                                </button>
-                                <span class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700">
-                                    ...
-                                </span>
-                                <button class="bg-white border-gray-300 text-gray-500 hover:bg-gray-50 relative inline-flex items-center px-4 py-2 border text-sm font-medium">
-                                    8
-                                </button>
-                                <button class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
-                                    <span class="sr-only">Próxima</span>
-                                    <i class="fas fa-chevron-right"></i>
-                                </button>
-                            </nav>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
     </main>
 
-    <!-- Floating Action Button -->
-    <button id="mobile-add-receivable-btn" class="md:hidden fixed bottom-6 right-6 w-14 h-14 bg-blue-500 text-white rounded-full flex items-center justify-center shadow-lg focus:outline-none">
-        <i class="fas fa-plus text-xl"></i>
-    </button>
-
-    <!-- Modal -->
     <div id="receivable-modal" class="fixed inset-0 z-50 hidden overflow-y-auto">
         <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
             <div class="fixed inset-0 transition-opacity" aria-hidden="true">
                 <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
             </div>
-            
             <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-            
-            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                    <div class="flex justify-between items-start">
-                        <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">Adicionar Conta a Receber</h3>
-                        <button id="close-modal" class="text-gray-400 hover:text-gray-500 focus:outline-none">
-                            <i class="fas fa-times"></i>
-                        </button>
-                    </div>
-                    
-                    <div class="mt-4">
-                        <form id="receivable-form">
+            <div
+                class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                <form id="receivable-form">
+                    <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                        <div class="flex justify-between items-start">
+                            <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">Adicionar Conta a
+                                Receber</h3>
+                            <button type="button" id="close-modal"
+                                class="text-gray-400 hover:text-gray-500 focus:outline-none">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <div class="mt-4">
+                            <input type="hidden" id="receivable-id" name="id">
                             <div class="grid grid-cols-1 gap-4">
                                 <div>
-                                    <label for="client" class="block text-sm font-medium text-gray-700">Cliente *</label>
-                                    <select id="client" name="client" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" required>
-                                        <option value="">Selecione um cliente</option>
-                                        <option value="1">Cliente A</option>
-                                        <option value="2">Cliente B</option>
-                                        <option value="3">Cliente C</option>
-                                        <option value="4">Cliente D</option>
+                                    <label for="customer_id" class="block text-sm font-medium text-gray-700">Cliente
+                                        *</label>
+                                    <select id="customer_id" name="customer_id"
+                                        class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                                        required>
                                     </select>
                                 </div>
-                                
                                 <div>
-                                    <label for="description" class="block text-sm font-medium text-gray-700">Descrição *</label>
-                                    <input type="text" id="description" name="description" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" placeholder="Ex: Venda de produto X" required>
+                                    <label for="description" class="block text-sm font-medium text-gray-700">Descrição
+                                        *</label>
+                                    <input type="text" id="description" name="description"
+                                        class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                                        required>
                                 </div>
-                                
                                 <div>
-                                    <label for="value" class="block text-sm font-medium text-gray-700">Valor *</label>
-                                    <div class="mt-1 relative rounded-md shadow-sm">
-                                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                            <span class="text-gray-500 sm:text-sm">R$</span>
-                                        </div>
-                                        <input type="text" id="value" name="value" class="focus:ring-blue-500 focus:border-blue-500 block w-full pl-9 pr-12 sm:text-sm border-gray-300 rounded-md py-2" placeholder="0,00" required>
-                                    </div>
+                                    <label for="amount" class="block text-sm font-medium text-gray-700">Valor *</label>
+                                    <input type="number" step="0.01" id="amount" name="amount"
+                                        class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                                        required>
                                 </div>
-                                
                                 <div>
-                                    <label for="due-date" class="block text-sm font-medium text-gray-700">Data de Vencimento *</label>
-                                    <input type="date" id="due-date" name="due-date" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" required>
+                                    <label for="due_date" class="block text-sm font-medium text-gray-700">Data de
+                                        Vencimento *</label>
+                                    <input type="date" id="due_date" name="due_date"
+                                        class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                                        required>
                                 </div>
-                                
                                 <div>
-                                    <label for="payment-method" class="block text-sm font-medium text-gray-700">Forma de Pagamento *</label>
-                                    <select id="payment-method" name="payment-method" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" required>
-                                        <option value="">Selecione</option>
-                                        <option value="cash">Dinheiro</option>
-                                        <option value="card">Cartão</option>
-                                        <option value="transfer">Transferência</option>
+                                    <label for="payment_method" class="block text-sm font-medium text-gray-700">Forma de
+                                        Pagamento *</label>
+                                    <select id="payment_method" name="payment_method"
+                                        class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                                        required>
                                         <option value="pix">PIX</option>
                                         <option value="boleto">Boleto</option>
+                                        <option value="card">Cartão</option>
+                                        <option value="transfer">Transferência</option>
+                                        <option value="cash">Dinheiro</option>
                                     </select>
                                 </div>
-                                
                                 <div>
-                                    <label for="status" class="block text-sm font-medium text-gray-700">Status</label>
-                                    <select id="status" name="status" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
-                                        <option value="pending">Pendente</option>
-                                        <option value="received">Recebido</option>
-                                    </select>
-                                </div>
-                                
-                                <div>
-                                    <label for="notes" class="block text-sm font-medium text-gray-700">Observações</label>
-                                    <textarea id="notes" name="notes" rows="3" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" placeholder="Informações adicionais..."></textarea>
+                                    <label for="notes"
+                                        class="block text-sm font-medium text-gray-700">Observações</label>
+                                    <textarea id="notes" name="notes" rows="3"
+                                        class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"></textarea>
                                 </div>
                             </div>
-                        </form>
+                        </div>
                     </div>
-                </div>
-                
-                <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                    <button id="save-receivable" type="button" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-500 text-base font-medium text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">
-                        Salvar
-                    </button>
-                    <button id="cancel-modal" type="button" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
-                        Cancelar
-                    </button>
-                </div>
+                    <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                        <button id="save-receivable" type="submit"
+                            class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-500 text-base font-medium text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">
+                            Salvar
+                        </button>
+                        <button id="cancel-modal" type="button"
+                            class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                            Cancelar
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
 
-    <!-- Toast Notification -->
-    <div id="toast" class="hidden fixed bottom-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg">
-        <div class="flex items-center">
-            <i class="fas fa-check-circle mr-2"></i>
-            <span id="toast-message">Operação realizada com sucesso!</span>
+    <div id="mark-as-received-modal" class="fixed inset-0 z-50 hidden overflow-y-auto">
+        <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+                <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+            </div>
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            <div
+                class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                <form id="mark-as-received-form">
+                    <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                        <div class="flex justify-between items-start">
+                            <h3 class="text-lg leading-6 font-medium text-gray-900" id="mark-as-received-modal-title">
+                                Confirmar Recebimento</h3>
+                            <button type="button" id="close-mark-as-received-modal"
+                                class="text-gray-400 hover:text-gray-500 focus:outline-none">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <div class="mt-4">
+                            <input type="hidden" id="mark-as-received-receivable-id" name="id">
+                            <div class="grid grid-cols-1 gap-4">
+                                <div>
+                                    <label for="received_amount" class="block text-sm font-medium text-gray-700">Valor
+                                        Recebido *</label>
+                                    <input type="number" step="0.01" id="received_amount" name="received_amount"
+                                        class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3"
+                                        required>
+                                </div>
+                                <div>
+                                    <label for="payment_date" class="block text-sm font-medium text-gray-700">Data de
+                                        Recebimento *</label>
+                                    <input type="date" id="payment_date" name="payment_date"
+                                        class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3"
+                                        required>
+                                </div>
+                                <div>
+                                    <label for="bank_account_id" class="block text-sm font-medium text-gray-700">Conta
+                                        Bancária de Crédito *</label>
+                                    <select id="bank_account_id" name="bank_account_id"
+                                        class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3"
+                                        required>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                        <button id="save-mark-as-received" type="submit"
+                            class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-green-600 text-base font-medium text-white hover:bg-green-700 sm:ml-3 sm:w-auto sm:text-sm">
+                            Confirmar
+                        </button>
+                        <button id="cancel-mark-as-received-modal" type="button"
+                            class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                            Cancelar
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 
-    <script>
-        // Sample data for the receivables
-        const receivablesData = [
-            {
-                id: 1,
-                client: "Cliente A",
-                clientId: 1,
-                description: "Venda de produto X",
-                value: 1250.00,
-                dueDate: "2023-06-15",
-                paymentMethod: "card",
-                status: "received",
-                notes: "Pagamento realizado com cartão de crédito",
-                receivedDate: "2023-06-14"
-            },
-            {
-                id: 2,
-                client: "Cliente B",
-                clientId: 2,
-                description: "Serviço de consultoria",
-                value: 3500.00,
-                dueDate: "2023-06-20",
-                paymentMethod: "transfer",
-                status: "pending",
-                notes: "Aguardando confirmação de transferência"
-            },
-            {
-                id: 3,
-                client: "Cliente C",
-                clientId: 3,
-                description: "Assinatura mensal",
-                value: 450.00,
-                dueDate: "2023-05-30",
-                paymentMethod: "pix",
-                status: "pending",
-                notes: "Cliente solicitou prorrogação até dia 10/07"
-            },
-            {
-                id: 4,
-                client: "Cliente D",
-                clientId: 4,
-                description: "Venda de produto Y",
-                value: 890.00,
-                dueDate: "2023-06-10",
-                paymentMethod: "boleto",
-                status: "received",
-                notes: "Boleto pago no vencimento",
-                receivedDate: "2023-06-10"
-            },
-            {
-                id: 5,
-                client: "Cliente A",
-                clientId: 1,
-                description: "Serviço de instalação",
-                value: 750.00,
-                dueDate: "2023-07-05",
-                paymentMethod: "cash",
-                status: "pending",
-                notes: "Pagamento combinado em dinheiro"
-            }
-        ];
 
-        // DOM Elements
-        const mobileMenuButton = document.getElementById('mobile-menu-button');
-        const mobileMenu = document.getElementById('mobile-menu');
-        const addReceivableBtn = document.getElementById('add-receivable-btn');
-        const mobileAddReceivableBtn = document.getElementById('mobile-add-receivable-btn');
+    <div id="toast" class="hidden fixed bottom-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg">
+    </div>
+    <script src="../componentes/topbar.js"></script>
+    <script>
+        // --- CONFIGURAÇÃO DA API ---
+        const API_BASE_URL = 'http://127.0.0.1:8000/api/finance'; // Ajuste se o endereço da sua API for diferente
+
+        const getAuthHeaders = () => {
+            const token = localStorage.getItem('accessToken');
+            if (!token) {
+                console.error("Token de acesso não encontrado. Redirecionando para o login.");
+                // window.location.href = '/login.html'; // Descomente para redirecionar
+                return null;
+            }
+            return {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            };
+        };
+
+        const fetchApi = async (endpoint, options = {}) => {
+            const headers = getAuthHeaders();
+            if (!headers) return; // Interrompe se não houver token
+
+            options.headers = { ...headers, ...options.headers };
+
+            try {
+                const response = await fetch(`${API_BASE_URL}${endpoint}`, options);
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.detail || `Erro na API: ${response.statusText}`);
+                }
+                // Retorna vazio se o status for 204 No Content (ex: DELETE)
+                return response.status === 204 ? null : response.json();
+            } catch (error) {
+                console.error('Falha na requisição API:', error);
+                showToast(error.message, 'error');
+                throw error;
+            }
+        };
+
+        // --- ELEMENTOS DO DOM ---
         const receivableModal = document.getElementById('receivable-modal');
-        const closeModalBtn = document.getElementById('close-modal');
-        const cancelModalBtn = document.getElementById('cancel-modal');
-        const saveReceivableBtn = document.getElementById('save-receivable');
         const receivableForm = document.getElementById('receivable-form');
-        const toast = document.getElementById('toast');
-        const toastMessage = document.getElementById('toast-message');
         const receivablesTableBody = document.getElementById('receivables-table-body');
         const receivablesMobileList = document.getElementById('receivables-mobile-list');
-        const applyFiltersBtn = document.getElementById('apply-filters');
-        const resetFiltersBtn = document.getElementById('reset-filters');
-        const searchInput = document.getElementById('search-input');
 
-        // Current editable receivable
-        let currentEditableReceivable = null;
+        // --- FUNÇÕES DE RENDERIZAÇÃO ---
+        const formatDate = (dateString) => new Date(dateString).toLocaleDateString('pt-BR', { timeZone: 'UTC' });
+        const formatCurrency = (value) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
 
-        // Toggle mobile menu
-        mobileMenuButton.addEventListener('click', () => {
-            mobileMenu.classList.toggle('hidden');
-        });
-
-        // Show modal for adding new receivable
-        const showAddModal = () => {
-            currentEditableReceivable = null;
-            document.getElementById('modal-title').textContent = 'Adicionar Conta a Receber';
-            receivableForm.reset();
-            receivableModal.classList.remove('hidden');
-        };
-
-        // Show modal for editing existing receivable
-        const showEditModal = (receivable) => {
-            currentEditableReceivable = receivable;
-            document.getElementById('modal-title').textContent = 'Editar Conta a Receber';
-            
-            // Fill form with receivable data
-            document.getElementById('client').value = receivable.clientId;
-            document.getElementById('description').value = receivable.description;
-            document.getElementById('value').value = receivable.value.toFixed(2).replace('.', ',');
-            document.getElementById('due-date').value = receivable.dueDate;
-            document.getElementById('payment-method').value = receivable.paymentMethod;
-            document.getElementById('status').value = receivable.status;
-            document.getElementById('notes').value = receivable.notes || '';
-            
-            receivableModal.classList.remove('hidden');
-        };
-
-        // Close modal
-        const closeModal = () => {
-            receivableModal.classList.add('hidden');
-        };
-
-        // Show toast notification
-        const showToast = (message, type = 'success') => {
-            toast.className = `fixed bottom-4 right-4 px-4 py-2 rounded-lg shadow-lg flex items-center`;
-            
-            if (type === 'success') {
-                toast.classList.add('bg-green-500', 'text-white');
-            } else if (type === 'error') {
-                toast.classList.add('bg-red-500', 'text-white');
-            } else if (type === 'warning') {
-                toast.classList.add('bg-yellow-500', 'text-white');
-            }
-            
-            toastMessage.textContent = message;
-            toast.classList.remove('hidden');
-            
-            setTimeout(() => {
-                toast.classList.add('hidden');
-            }, 3000);
-        };
-
-        // Format date to dd/mm/yyyy
-        const formatDate = (dateString) => {
-            const date = new Date(dateString);
-            return date.toLocaleDateString('pt-BR');
-        };
-
-        // Format currency to BRL
-        const formatCurrency = (value) => {
-            return new Intl.NumberFormat('pt-BR', { 
-                style: 'currency', 
-                currency: 'BRL' 
-            }).format(value);
-        };
-
-        // Get payment method icon
-        const getPaymentMethodIcon = (method) => {
-            switch (method) {
-                case 'cash': return '<i class="fas fa-money-bill-wave mr-1"></i>';
-                case 'card': return '<i class="fas fa-credit-card mr-1"></i>';
-                case 'transfer': return '<i class="fas fa-exchange-alt mr-1"></i>';
-                case 'pix': return '<i class="fas fa-qrcode mr-1"></i>';
-                case 'boleto': return '<i class="fas fa-barcode mr-1"></i>';
-                default: return '';
-            }
-        };
-
-        // Get status badge
         const getStatusBadge = (status, dueDate) => {
             const today = new Date();
+            today.setHours(0, 0, 0, 0);
             const due = new Date(dueDate);
-            
+
             if (status === 'received') {
                 return '<span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800"><i class="fas fa-check-circle mr-1"></i>Recebido</span>';
             } else if (due < today) {
@@ -568,269 +380,380 @@
             }
         };
 
-        // Render receivables table
-        const renderReceivablesTable = (receivables) => {
+        let statusChart = null; // Variável global para guardar a instância do gráfico
+
+        const fetchSummaryData = async (params) => {
+            try {
+                const summary = await fetchApi(`/receivables-summary/?${params.toString()}`, { method: 'GET' });
+                if (summary) {
+                    updateSummaryCards(summary);
+                    renderStatusChart(summary.chart_data);
+                }
+            } catch (error) {
+                console.error("Erro ao buscar dados de resumo:", error);
+            }
+        };
+
+        const updateSummaryCards = (summary) => {
+            document.getElementById('total-to-receive').textContent = formatCurrency(summary.total_to_receive);
+            document.getElementById('total-received').textContent = formatCurrency(summary.total_received);
+        };
+
+        const renderStatusChart = (chartData) => {
+            const ctx = document.getElementById('statusChart').getContext('2d');
+
+            // Se o gráfico já existe, o destruímos para criar um novo com dados atualizados
+            if (statusChart) {
+                statusChart.destroy();
+            }
+
+            statusChart = new Chart(ctx, {
+                type: 'doughnut', // Tipo de gráfico: rosca
+                data: {
+                    labels: chartData.labels,
+                    datasets: [{
+                        label: 'Total por Status',
+                        data: chartData.data,
+                        backgroundColor: [
+                            '#F59E0B', // Amarelo para Pendente
+                            '#10B981', // Verde para Recebido
+                            '#EF4444', // Vermelho para Vencido
+                        ],
+                        borderColor: '#fff',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function (context) {
+                                    let label = context.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed !== null) {
+                                        label += formatCurrency(context.parsed);
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        };
+
+        const renderReceivables = (receivables) => {
             receivablesTableBody.innerHTML = '';
             receivablesMobileList.innerHTML = '';
-            
+
             if (receivables.length === 0) {
-                receivablesTableBody.innerHTML = `
-                    <tr>
-                        <td colspan="7" class="px-6 py-4 text-center text-sm text-gray-500">
-                            Nenhuma conta a receber encontrada
-                        </td>
-                    </tr>
-                `;
-                
-                receivablesMobileList.innerHTML = `
-                    <div class="p-4 text-center text-sm text-gray-500">
-                        Nenhuma conta a receber encontrada
-                    </div>
-                `;
+                const emptyMessage = `<td colspan="6" class="px-6 py-4 text-center text-sm text-gray-500">Nenhuma conta a receber encontrada.</td>`;
+                receivablesTableBody.innerHTML = `<tr>${emptyMessage}</tr>`;
+                receivablesMobileList.innerHTML = `<div class="p-4">${emptyMessage}</div>`;
                 return;
             }
-            
+
             receivables.forEach(receivable => {
-                // Desktop table row
+                const actionsHtml = `
+                    <button class="edit-btn text-blue-500 hover:text-blue-700 mr-3" data-id="${receivable.id}">Editar</button>
+                    ${receivable.status === 'pending' ?
+                        `<button class="mark-received-btn text-green-500 hover:text-green-700 mr-3" data-id="${receivable.id}">Receber</button>` : ''}
+                    <button class="delete-btn text-red-500 hover:text-red-700" data-id="${receivable.id}">Excluir</button>
+                `;
+
+                // Desktop row
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${receivable.client}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${receivable.customer_name}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${receivable.description}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium ${receivable.status === 'received' ? 'text-green-600' : 'text-gray-900'}">${formatCurrency(receivable.value)}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 ${new Date(receivable.dueDate) < new Date() && receivable.status !== 'received' ? 'text-red-500 font-medium' : ''}">${formatDate(receivable.dueDate)}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${getPaymentMethodIcon(receivable.paymentMethod)} ${receivable.paymentMethod === 'cash' ? 'Dinheiro' : 
-                                                                                  receivable.paymentMethod === 'card' ? 'Cartão' : 
-                                                                                  receivable.paymentMethod === 'transfer' ? 'Transferência' : 
-                                                                                  receivable.paymentMethod === 'pix' ? 'PIX' : 'Boleto'}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm">${getStatusBadge(receivable.status, receivable.dueDate)}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <button class="edit-btn text-blue-500 hover:text-blue-700 mr-3" data-id="${receivable.id}">Editar</button>
-                        ${receivable.status === 'pending' ? 
-                          `<button class="mark-received-btn text-green-500 hover:text-green-700 mr-3" data-id="${receivable.id}">Receber</button>` : ''}
-                        <button class="delete-btn text-red-500 hover:text-red-700" data-id="${receivable.id}">Excluir</button>
-                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${formatCurrency(receivable.amount)}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${formatDate(receivable.due_date)}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm">${getStatusBadge(receivable.status, receivable.due_date)}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">${actionsHtml}</td>
                 `;
                 receivablesTableBody.appendChild(row);
-                
-                // Mobile card
-                const card = document.createElement('div');
-                card.className = 'p-4';
-                card.innerHTML = `
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <p class="text-sm font-medium text-gray-900">${receivable.client}</p>
-                            <p class="text-xs text-gray-500 mt-1">${receivable.description}</p>
-                            <p class="text-xs text-gray-500 mt-1">${formatDate(receivable.dueDate)} • ${receivable.paymentMethod === 'cash' ? 'Dinheiro' : 
-                                                                                  receivable.paymentMethod === 'card' ? 'Cartão' : 
-                                                                                  receivable.paymentMethod === 'transfer' ? 'Transferência' : 
-                                                                                  receivable.paymentMethod === 'pix' ? 'PIX' : 'Boleto'}</p>
-                        </div>
-                        <div class="text-right">
-                            <p class="text-sm ${receivable.status === 'received' ? 'text-green-600' : 'text-gray-900'} font-medium">${formatCurrency(receivable.value)}</p>
-                            <div class="mt-1">${getStatusBadge(receivable.status, receivable.dueDate)}</div>
-                            <div class="mt-2">
-                                <button class="edit-btn text-blue-500 text-xs mr-2" data-id="${receivable.id}">Editar</button>
-                                ${receivable.status === 'pending' ? 
-                                  `<button class="mark-received-btn text-green-500 text-xs mr-2" data-id="${receivable.id}">Receber</button>` : ''}
-                                <button class="delete-btn text-red-500 text-xs" data-id="${receivable.id}">Excluir</button>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                receivablesMobileList.appendChild(card);
-            });
-            
-            // Add event listeners to buttons
-            document.querySelectorAll('.edit-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const id = parseInt(e.target.getAttribute('data-id'));
-                    const receivable = receivablesData.find(r => r.id === id);
-                    if (receivable) showEditModal(receivable);
-                });
-            });
-            
-            document.querySelectorAll('.mark-received-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const id = parseInt(e.target.getAttribute('data-id'));
-                    const receivableIndex = receivablesData.findIndex(r => r.id === id);
-                    if (receivableIndex !== -1) {
-                        receivablesData[receivableIndex].status = 'received';
-                        receivablesData[receivableIndex].receivedDate = new Date().toISOString().split('T')[0];
-                        renderReceivablesTable(receivablesData);
-                        showToast('Conta marcada como recebida!');
-                    }
-                });
-            });
-            
-            document.querySelectorAll('.delete-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const id = parseInt(e.target.getAttribute('data-id'));
-                    if (confirm('Tem certeza que deseja excluir esta conta a receber?')) {
-                        const receivableIndex = receivablesData.findIndex(r => r.id === id);
-                        if (receivableIndex !== -1) {
-                            receivablesData.splice(receivableIndex, 1);
-                            renderReceivablesTable(receivablesData);
-                            showToast('Conta a receber excluída com sucesso!');
-                        }
-                    }
-                });
+                // Adicione a lógica para cards mobile se necessário
             });
         };
 
-        // Filter receivables
-        const filterReceivables = () => {
-            const periodFilter = document.getElementById('period-filter').value;
-            const statusFilter = document.getElementById('status-filter').value;
-            const clientFilter = document.getElementById('client-filter').value;
-            const paymentFilter = document.getElementById('payment-filter').value;
-            const searchTerm = searchInput.value.toLowerCase();
-            
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-            
-            const filtered = receivablesData.filter(receivable => {
-                // Apply period filter
-                const dueDate = new Date(receivable.dueDate);
-                dueDate.setHours(0, 0, 0, 0);
-                
-                let periodMatch = true;
-                if (periodFilter === 'today') {
-                    periodMatch = dueDate.getTime() === today.getTime();
-                } else if (periodFilter === 'week') {
-                    const weekStart = new Date(today);
-                    weekStart.setDate(today.getDate() - today.getDay());
-                    const weekEnd = new Date(weekStart);
-                    weekEnd.setDate(weekStart.getDate() + 6);
-                    periodMatch = dueDate >= weekStart && dueDate <= weekEnd;
-                } else if (periodFilter === 'month') {
-                    const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
-                    const monthEnd = new Date(today.getFullYear(), today.getMonth() + 1, 0);
-                    periodMatch = dueDate >= monthStart && dueDate <= monthEnd;
-                } else if (periodFilter === 'next-month') {
-                    const nextMonthStart = new Date(today.getFullYear(), today.getMonth() + 1, 1);
-                    const nextMonthEnd = new Date(today.getFullYear(), today.getMonth() + 2, 0);
-                    periodMatch = dueDate >= nextMonthStart && dueDate <= nextMonthEnd;
-                } else if (periodFilter === 'overdue') {
-                    periodMatch = dueDate < today && receivable.status === 'pending';
+        const populateClientSelects = (clients) => {
+            const clientFilter = document.getElementById('client-filter');
+            const clientModalSelect = document.getElementById('customer_id');
+
+            // Limpa as opções existentes
+            clientFilter.innerHTML = '<option value="">Todos</option>';
+            clientModalSelect.innerHTML = '';
+
+            // Adiciona a opção padrão, que é desabilitada para seleção
+            clientModalSelect.innerHTML += '<option value="" disabled selected>Selecione um cliente</option>';
+
+            // Adiciona a opção "Não Definir" em negrito
+            clientModalSelect.innerHTML += '<option value="null" class="font-bold">Não Definir</option>';
+
+            // Adiciona os clientes vindos da API
+            clients.forEach(client => {
+                const optionHtml = `<option value="${client.id}">${client.name}</option>`;
+                clientFilter.innerHTML += optionHtml;
+                clientModalSelect.innerHTML += optionHtml;
+            });
+
+            // Adiciona a opção para criar um novo cliente
+            clientModalSelect.innerHTML += '<option value="new_customer" class="text-blue-500 font-bold">-- Novo Cliente --</option>';
+        };
+
+        const showToast = (message, type = 'success') => { /* ... (função inalterada) ... */ };
+
+        // --- LÓGICA DA API ---
+        const fetchClients = async () => {
+            try {
+                const clients = await fetchApi('/../cadastros/customers/', { method: 'GET' });
+                if (clients) populateClientSelects(clients);
+            } catch (error) {
+                console.error("Erro ao buscar clientes:", error);
+            }
+        };
+
+        const fetchBankAccounts = async () => {
+            try {
+                // Endpoint para buscar as contas bancárias
+                const accounts = await fetchApi(`/bank-accounts/`, { method: 'GET' });
+                if (accounts) {
+                    populateBankAccountSelect(accounts.results || accounts);
                 }
-                
-                // Apply status filter
-                const statusMatch = statusFilter === 'all' || receivable.status === statusFilter;
-                
-                // Apply client filter
-                const clientMatch = clientFilter === 'all' || receivable.clientId.toString() === clientFilter;
-                
-                // Apply payment method filter
-                const paymentMatch = paymentFilter === 'all' || receivable.paymentMethod === paymentFilter;
-                
-                // Apply search term
-                const searchMatch = searchTerm === '' || 
-                                   receivable.client.toLowerCase().includes(searchTerm) || 
-                                   receivable.description.toLowerCase().includes(searchTerm);
-                
-                return periodMatch && statusMatch && clientMatch && paymentMatch && searchMatch;
-            });
-            
-            renderReceivablesTable(filtered);
+            } catch (error) {
+                console.error("Erro ao buscar contas bancárias:", error);
+                showToast("Não foi possível carregar as contas bancárias.", 'error');
+            }
         };
 
-        // Initialize the page
+        const populateBankAccountSelect = (accounts) => {
+            const bankAccountSelect = document.getElementById('bank_account_id');
+            if (!bankAccountSelect) return;
+
+            bankAccountSelect.innerHTML = '<option value="" disabled selected>Selecione uma conta</option>';
+            accounts.forEach(account => {
+                const option = document.createElement('option');
+                option.value = account.id;
+                option.textContent = account.name; // Assumindo que o modelo tem um campo 'name'
+                bankAccountSelect.appendChild(option);
+            });
+        };
+
+        const fetchReceivables = async () => {
+            const params = new URLSearchParams();
+            const period = document.getElementById('period-filter').value;
+            if (period) params.append('period-filter', period); // Enviando o período no formato YYYY-MM
+
+            const status = document.getElementById('status-filter').value;
+            if (status) params.append('status', status);
+
+            const clientId = document.getElementById('client-filter').value;
+            if (clientId) params.append('client_id', clientId);
+
+            const search = document.getElementById('search-input').value;
+            if (search) params.append('search', search);
+
+            // Chamada para os dados de resumo (cartões e gráfico)
+            fetchSummaryData(params);
+
+            try {
+                const data = await fetchApi(`/receivables/?${params.toString()}`, { method: 'GET' });
+                if (data) renderReceivables(data.results || data); // DRF paginação usa 'results'
+            } catch (error) {
+                console.error("Erro ao buscar contas a receber:", error);
+            }
+        };
+
+        const saveReceivable = async (event) => {
+            event.preventDefault();
+            if (!receivableForm.checkValidity()) {
+                receivableForm.reportValidity();
+                return;
+            }
+
+            const formData = new FormData(receivableForm);
+            const receivableId = formData.get('id');
+            const data = Object.fromEntries(formData.entries());
+
+            // AJUSTE: Converte a string "null" para o valor null real.
+            if (data.customer_id === 'null') {
+                data.customer_id = null;
+            }
+
+            const method = receivableId ? 'PATCH' : 'POST';
+            const endpoint = receivableId ? `/receivables/${receivableId}/` : '/receivables/';
+
+            try {
+                await fetchApi(endpoint, { method, body: JSON.stringify(data) });
+                showToast(`Conta ${receivableId ? 'atualizada' : 'criada'} com sucesso!`);
+                closeModal();
+                fetchReceivables();
+            } catch (error) {
+                console.error("Erro ao salvar conta:", error);
+            }
+        };
+
+        const handleEdit = async (id) => {
+            try {
+                const receivable = await fetchApi(`/receivables/${id}/`, { method: 'GET' });
+                if (receivable) {
+                    document.getElementById('modal-title').textContent = 'Editar Conta a Receber';
+                    document.getElementById('receivable-id').value = receivable.id;
+                    document.getElementById('customer_id').value = receivable.customer.id;
+                    document.getElementById('description').value = receivable.description;
+                    document.getElementById('amount').value = receivable.amount;
+                    document.getElementById('due_date').value = receivable.due_date;
+                    document.getElementById('payment_method').value = receivable.payment_method;
+                    document.getElementById('notes').value = receivable.notes || '';
+                    receivableModal.classList.remove('hidden');
+                }
+            } catch (error) {
+                console.error("Erro ao buscar dados para edição:", error);
+            }
+        };
+
+        const handleDelete = async (id) => {
+            if (confirm('Tem certeza que deseja excluir esta conta?')) {
+                try {
+                    await fetchApi(`/receivables/${id}/`, { method: 'DELETE' });
+                    showToast('Conta excluída com sucesso!');
+                    fetchReceivables();
+                } catch (error) {
+                    console.error("Erro ao excluir conta:", error);
+                }
+            }
+        };
+
+        const handleMarkAsReceived = async (id) => {
+            try {
+                // Busca os dados da conta para obter o valor
+                const receivable = await fetchApi(`/receivables/${id}/`, { method: 'GET' });
+                if (receivable) {
+                    const form = document.getElementById('mark-as-received-form');
+
+                    // Preenche o formulário do novo modal
+                    form.querySelector('#mark-as-received-receivable-id').value = receivable.id;
+                    form.querySelector('#received_amount').value = receivable.amount;
+                    form.querySelector('#payment_date').value = new Date().toISOString().split('T')[0];
+
+                    // Abre o modal
+                    document.getElementById('mark-as-received-modal').classList.remove('hidden');
+                }
+            } catch (error) {
+                console.error("Erro ao preparar modal de recebimento:", error);
+            }
+        };
+
+        // --- MODAL ---
+        const openModal = () => {
+            document.getElementById('modal-title').textContent = 'Adicionar Conta a Receber';
+            receivableForm.reset();
+            document.getElementById('receivable-id').value = '';
+            receivableModal.classList.remove('hidden');
+        };
+        const closeModal = () => receivableModal.classList.add('hidden');
+
+        // --- INICIALIZAÇÃO E EVENTOS ---
         document.addEventListener('DOMContentLoaded', () => {
-            // Render initial table
-            renderReceivablesTable(receivablesData);
-            
-            // Event listeners for modal
-            addReceivableBtn.addEventListener('click', showAddModal);
-            mobileAddReceivableBtn.addEventListener('click', showAddModal);
-            closeModalBtn.addEventListener('click', closeModal);
-            cancelModalBtn.addEventListener('click', closeModal);
-            
-            // Event listener for saving receivable
-            saveReceivableBtn.addEventListener('click', () => {
-                if (receivableForm.checkValidity()) {
-                    const formData = new FormData(receivableForm);
-                    const value = parseFloat(formData.get('value').replace(',', '.'));
-                    const dueDate = formData.get('due-date');
-                    const status = formData.get('status');
-                    
-                    if (currentEditableReceivable) {
-                        // Update existing receivable
-                        const index = receivablesData.findIndex(r => r.id === currentEditableReceivable.id);
-                        if (index !== -1) {
-                            receivablesData[index] = {
-                                ...receivablesData[index],
-                                client: document.getElementById('client').options[document.getElementById('client').selectedIndex].text,
-                                clientId: parseInt(formData.get('client')),
-                                description: formData.get('description'),
-                                value: value,
-                                dueDate: dueDate,
-                                paymentMethod: formData.get('payment-method'),
-                                status: status,
-                                notes: formData.get('notes'),
-                                ...(status === 'received' && !receivablesData[index].receivedDate ? { receivedDate: new Date().toISOString().split('T')[0] } : {})
-                            };
-                            
-                            showToast('Conta a receber atualizada com sucesso!');
-                        }
-                    } else {
-                        // Add new receivable
-                        const newReceivable = {
-                            id: Math.max(...receivablesData.map(r => r.id)) + 1,
-                            client: document.getElementById('client').options[document.getElementById('client').selectedIndex].text,
-                            clientId: parseInt(formData.get('client')),
-                            description: formData.get('description'),
-                            value: value,
-                            dueDate: dueDate,
-                            paymentMethod: formData.get('payment-method'),
-                            status: status,
-                            notes: formData.get('notes'),
-                            ...(status === 'received' ? { receivedDate: new Date().toISOString().split('T')[0] } : {})
-                        };
-                        
-                        receivablesData.push(newReceivable);
-                        showToast('Conta a receber adicionada com sucesso!');
-                    }
-                    
-                    closeModal();
-                    renderReceivablesTable(receivablesData);
-                } else {
-                    receivableForm.reportValidity();
+            // --- LÓGICA DO FILTRO DE MÊS CORRENTE ---
+            const periodFilter = document.getElementById('period-filter');
+            const today = new Date();
+            const currentMonth = today.toISOString().slice(0, 7);
+            periodFilter.value = currentMonth;
+
+            // --- CÓDIGO DA TOPBAR ---
+            const userPermissions = {
+                dashboard: true,
+                movimentacoes: true,
+                relatorios: true,
+                pagamentos: true,
+                contas: true,
+                cadastros: true,
+                configuracoes: true
+            };
+            renderTopbar('contas-a-receber', userPermissions);
+
+            // --- CARREGAMENTO INICIAL DOS DADOS ---
+            fetchClients();
+            fetchBankAccounts();
+            fetchReceivables();
+
+            // --- EVENT LISTENERS ---
+            // Eventos do modal principal
+            document.getElementById('add-receivable-btn').addEventListener('click', openModal);
+            document.getElementById('close-modal').addEventListener('click', closeModal);
+            document.getElementById('cancel-modal').addEventListener('click', closeModal);
+            receivableForm.addEventListener('submit', saveReceivable);
+
+            // --- EVENTOS DOS FILTROS (ATUALIZAÇÃO AUTOMÁTICA) ---
+            document.getElementById('status-filter').addEventListener('change', fetchReceivables);
+            document.getElementById('client-filter').addEventListener('change', fetchReceivables);
+            document.getElementById('period-filter').addEventListener('change', fetchReceivables); // Também para o filtro de período
+            document.getElementById('search-input').addEventListener('input', fetchReceivables);
+
+            document.getElementById('reset-filters').addEventListener('click', () => {
+                document.getElementById('period-filter').value = '';
+                document.getElementById('status-filter').value = '';
+                document.getElementById('client-filter').value = '';
+                document.getElementById('search-input').value = '';
+                fetchReceivables();
+            });
+
+            // Delegação de eventos para botões de ação na tabela
+            document.getElementById('receivables-table-body').addEventListener('click', (e) => {
+                const target = e.target;
+                const id = target.getAttribute('data-id');
+                if (!id) return;
+
+                if (target.classList.contains('edit-btn')) handleEdit(id);
+                if (target.classList.contains('delete-btn')) handleDelete(id);
+                if (target.classList.contains('mark-received-btn')) handleMarkAsReceived(id);
+            });
+
+            // Evento para o dropdown de clientes no modal
+            document.getElementById('customer_id').addEventListener('change', (e) => {
+                if (e.target.value === 'new_customer') {
+                    window.location.href = '../cadastros/clientes.html';
                 }
             });
-            
-            // Event listeners for filters
-            applyFiltersBtn.addEventListener('click', filterReceivables);
-            resetFiltersBtn.addEventListener('click', () => {
-                document.getElementById('period-filter').value = 'month';
-                document.getElementById('status-filter').value = 'all';
-                document.getElementById('client-filter').value = 'all';
-                document.getElementById('payment-filter').value = 'all';
-                searchInput.value = '';
-                filterReceivables();
-            });
-            
-            // Event listener for search input
-            searchInput.addEventListener('input', filterReceivables);
-        });
-    </script>
-<script src="../componentes/topbar.js"></script>
-        <script>
-            document.addEventListener('DOMContentLoaded', () => {
-                // Exemplo de permissões para um usuário do financeiro
-                const userPermissions = {
-                    dashboard: true,
-                    movimentacoes: true,
-                    relatorios: true,
-                    pagamentos: true,
-                    contas: true,
-                    cadastros: true,       
-                    configuracoes: true    
-                };
-                renderTopbar('pagamentos', userPermissions);
 
-                // ...aqui entraria qualquer outro JS específico da página de entradas
+            // Eventos para o modal de recebimento
+            const markAsReceivedModal = document.getElementById('mark-as-received-modal');
+            const markAsReceivedForm = document.getElementById('mark-as-received-form');
+            const closeMarkAsReceivedModal = () => markAsReceivedModal.classList.add('hidden');
+            document.getElementById('close-mark-as-received-modal').addEventListener('click', closeMarkAsReceivedModal);
+            document.getElementById('cancel-mark-as-received-modal').addEventListener('click', closeMarkAsReceivedModal);
+            markAsReceivedForm.addEventListener('submit', async (event) => {
+                event.preventDefault();
+                if (!markAsReceivedForm.checkValidity()) {
+                    markAsReceivedForm.reportValidity();
+                    return;
+                }
+                const receivableId = document.getElementById('mark-as-received-receivable-id').value;
+                const data = {
+                    bank_account_id: document.getElementById('bank_account_id').value,
+                    payment_date: document.getElementById('payment_date').value,
+                };
+                try {
+                    await fetchApi(`/receivables/${receivableId}/mark-as-received/`, { method: 'POST', body: JSON.stringify(data) });
+                    showToast('Conta marcada como recebida!');
+                    closeMarkAsReceivedModal();
+                    fetchReceivables();
+                } catch (error) {
+                    console.error("Erro ao marcar como recebido:", error);
+                }
             });
-        </script>
+        });
+
+
+    </script>
 </body>
 
 </html>

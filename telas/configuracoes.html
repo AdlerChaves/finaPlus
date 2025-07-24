@@ -30,7 +30,7 @@
 
 <body class="bg-gray-50 font-sans">
     <!-- Header -->
-    
+
     <!-- Main Content -->
     <main class="mt-16 pt-6 pb-20">
         <div class="container mx-auto px-4">
@@ -391,102 +391,124 @@
     <script src="../componentes/auth.js"></script>
     <script src="../componentes/topbar.js"></script>
     <script>
-        // Mobile menu toggle
-        document.getElementById('mobile-menu-button').addEventListener('click', function () {
-            const menu = document.getElementById('mobile-menu');
-            menu.classList.toggle('hidden');
-        });
+        // Função para buscar os dados do usuário e popular a página
+        function loadUserSettings() {
+            fetch(`/api/accounts/me/`, {
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+            })
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('user-name').value = `${data.first_name} ${data.last_name}`.trim();
+                    document.getElementById('user-email').value = data.email;
 
-        // Settings sections toggle
-        const sectionHeaders = document.querySelectorAll('.settings-section-header');
-        sectionHeaders.forEach(header => {
-            header.addEventListener('click', function () {
-                const section = this.parentElement;
-                const content = this.nextElementSibling;
-                const icon = this.querySelector('i');
+                    // Preferências do Sistema
+                    document.getElementById('theme-toggle').checked = data.theme === 'dark';
+                    document.getElementById('currency').value = data.currency;
+                    document.getElementById('language').value = data.language;
 
-                content.classList.toggle('hidden');
-                icon.classList.toggle('rotate-180');
-            });
-        });
+                    // Notificações
+                    document.getElementById('weekly-goals-toggle').checked = data.notify_weekly_goals;
+                    document.getElementById('large-transactions-toggle').checked = data.notify_large_transactions;
+                    document.getElementById('bills-reminder-toggle').checked = data.notify_bills_reminder;
+                })
+                .catch(error => console.error('Erro ao carregar configurações:', error));
+        }
 
-        // Save settings button
+        // Salvar alterações
         document.getElementById('save-settings').addEventListener('click', function () {
-            const toast = document.getElementById('toast-notification');
-            toast.classList.remove('hidden');
-            setTimeout(() => {
-                toast.classList.add('hidden');
-            }, 3000);
+            const payload = {
+                first_name: document.getElementById('user-name').value.split(' ')[0],
+                last_name: document.getElementById('user-name').value.split(' ').slice(1).join(' '),
+                theme: document.getElementById('theme-toggle').checked ? 'dark' : 'light',
+                currency: document.getElementById('currency').value,
+                language: document.getElementById('language').value,
+                notify_weekly_goals: document.getElementById('weekly-goals-toggle').checked,
+                notify_large_transactions: document.getElementById('large-transactions-toggle').checked,
+                notify_bills_reminder: document.getElementById('bills-reminder-toggle').checked
+            };
 
-            // Save preferences to localStorage
-            const theme = document.getElementById('theme-toggle').checked ? 'dark' : 'light';
-            const currency = document.getElementById('currency').value;
-            const language = document.getElementById('language').value;
-
-            localStorage.setItem('financaplus-theme', theme);
-            localStorage.setItem('financaplus-currency', currency);
-            localStorage.setItem('financaplus-language', language);
+            fetch(`${API_URL}/api/accounts/me/`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${getAccessToken()}`
+                },
+                body: JSON.stringify(payload)
+            })
+                .then(response => {
+                    if (response.ok) {
+                        const toast = document.getElementById('toast-notification');
+                        toast.classList.remove('hidden');
+                        setTimeout(() => toast.classList.add('hidden'), 3000);
+                    } else {
+                        throw new Error('Falha ao salvar configurações.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro ao salvar:', error);
+                    alert('Não foi possível salvar as configurações.');
+                });
         });
 
-        // Delete account modal
-        document.getElementById('delete-account').addEventListener('click', function () {
-            document.getElementById('delete-modal').classList.remove('hidden');
-        });
-
-        document.getElementById('cancel-delete').addEventListener('click', function () {
-            document.getElementById('delete-modal').classList.add('hidden');
-        });
-
-        document.getElementById('confirm-delete').addEventListener('click', function () {
-            alert('Conta excluída com sucesso (simulação)');
-            document.getElementById('delete-modal').classList.add('hidden');
-        });
-
-        // Change password modal
-        document.getElementById('change-password').addEventListener('click', function () {
-            document.getElementById('password-modal').classList.remove('hidden');
-        });
-
-        document.getElementById('close-password-modal').addEventListener('click', function () {
-            document.getElementById('password-modal').classList.add('hidden');
-        });
-
+        // Atualizar senha
         document.getElementById('update-password').addEventListener('click', function () {
-            const currentPass = document.getElementById('current-password').value;
-            const newPass = document.getElementById('new-password').value;
-            const confirmPass = document.getElementById('confirm-password').value;
+            const payload = {
+                current_password: document.getElementById('current-password').value,
+                new_password: document.getElementById('new-password').value
+            };
 
-            if (newPass !== confirmPass) {
-                alert('As senhas não coincidem!');
+            if (payload.new_password !== document.getElementById('confirm-password').value) {
+                alert('A nova senha e a confirmação não coincidem!');
                 return;
             }
 
-            if (newPass.length < 8) {
-                alert('A nova senha deve ter pelo menos 8 caracteres!');
-                return;
-            }
-
-            alert('Senha alterada com sucesso (simulação)');
-            document.getElementById('password-modal').classList.add('hidden');
+            fetch(`${API_URL}/api/accounts/change-password/`, {
+                method: 'PUT', // ou PATCH dependendo da sua view
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${getAccessToken()}`
+                },
+                body: JSON.stringify(payload)
+            })
+                .then(async response => {
+                    if (response.ok) {
+                        alert('Senha alterada com sucesso!');
+                        document.getElementById('password-modal').classList.add('hidden');
+                    } else {
+                        const errorData = await response.json();
+                        const errorMessage = Object.values(errorData).join('\n');
+                        throw new Error(errorMessage);
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro ao alterar senha:', error);
+                    alert(`Erro: ${error.message}`);
+                });
         });
 
-        // Toggle password visibility
-        const togglePasswordButtons = document.querySelectorAll('.toggle-password');
-        togglePasswordButtons.forEach(button => {
-            button.addEventListener('click', function () {
-                const input = this.previousElementSibling;
-                const icon = this.querySelector('i');
-
-                if (input.type === 'password') {
-                    input.type = 'text';
-                    icon.classList.remove('fa-eye');
-                    icon.classList.add('fa-eye-slash');
-                } else {
-                    input.type = 'password';
-                    icon.classList.remove('fa-eye-slash');
-                    icon.classList.add('fa-eye');
+        // Excluir conta
+        document.getElementById('confirm-delete').addEventListener('click', function () {
+            fetch(`${API_URL}/api/accounts/delete-account/`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${getAccessToken()}`
                 }
-            });
+            })
+                .then(response => {
+                    if (response.ok) {
+                        alert('Conta excluída com sucesso!');
+                        // Limpa os dados e redireciona
+                        localStorage.clear();
+                        window.location.href = "./login.html";
+                    } else {
+                        throw new Error('Falha ao excluir a conta.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro ao excluir conta:', error);
+                    alert('Não foi possível excluir a conta. Tente novamente.');
+                });
         });
 
         // 2FA modal
@@ -523,20 +545,20 @@
             if (confirm('Tem certeza que deseja sair da sua conta?')) {
                 // Faz uma chamada POST para a nova view de logout
                 fetch('/api/accounts/logout/', { method: 'POST' })
-                .then(response => {
-                    if (response.ok) {
-                        // Limpa qualquer dado que ainda possa existir no localStorage (boa prática)
-                        localStorage.clear();
-                        // Redireciona para a página de login
-                        window.location.href = "./login.html";
-                    } else {
-                        throw new Error('Falha ao fazer logout.');
-                    }
-                })
-                .catch(error => {
-                    console.error('Erro no logout:', error);
-                    alert('Não foi possível fazer logout. Tente novamente.');
-                });
+                    .then(response => {
+                        if (response.ok) {
+                            // Limpa qualquer dado que ainda possa existir no localStorage (boa prática)
+                            localStorage.clear();
+                            // Redireciona para a página de login
+                            window.location.href = "./login.html";
+                        } else {
+                            throw new Error('Falha ao fazer logout.');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Erro no logout:', error);
+                        alert('Não foi possível fazer logout. Tente novamente.');
+                    });
             }
         });
 
@@ -563,13 +585,12 @@
         });
     </script>
 
-        <script>
-            document.addEventListener('DOMContentLoaded', () => {
-
-                protectPage('configuracoes')
-            
-            });
-        </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            protectPage('configuracoes');
+            loadUserSettings();
+        });
+    </script>
 </body>
 
 </html>

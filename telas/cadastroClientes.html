@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -21,6 +22,7 @@
         }
     </script>
 </head>
+
 <body class="bg-gray-100 min-h-screen">
     <div class="container mx-auto px-4 py-8">
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
@@ -29,7 +31,8 @@
                 <p id="page-subtitle" class="text-gray-600 mt-1">Preencha os dados do cliente abaixo</p>
             </div>
             <div class="flex gap-2 w-full md:w-auto">
-                <button onclick="window.location.href='clientes.html'" class="flex items-center justify-center gap-2 px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition w-full md:w-auto">
+                <button onclick="window.location.href='clientes.html'"
+                    class="flex items-center justify-center gap-2 px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition w-full md:w-auto">
                     <i class="fas fa-arrow-left"></i>
                     <span>Voltar para Lista</span>
                 </button>
@@ -39,10 +42,12 @@
         <div class="bg-white rounded-lg shadow-md overflow-hidden">
             <div class="border-b border-gray-200">
                 <nav class="flex -mb-px">
-                    <button type="button" id="infoTab" class="tab-button active py-4 px-6 text-center border-b-2 font-medium text-sm border-primary text-primary">
+                    <button type="button" id="infoTab"
+                        class="tab-button active py-4 px-6 text-center border-b-2 font-medium text-sm border-primary text-primary">
                         <i class="fas fa-user mr-2"></i>Informações Básicas
                     </button>
-                    <button type="button" id="addressTab" class="tab-button py-4 px-6 text-center border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300">
+                    <button type="button" id="addressTab"
+                        class="tab-button py-4 px-6 text-center border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300">
                         <i class="fas fa-map-marker-alt mr-2"></i>Endereço (Opcional)
                     </button>
                 </nav>
@@ -50,46 +55,62 @@
 
             <form id="customerForm" class="p-6">
                 <input type="hidden" id="customerId">
-                
+
                 <div id="infoContent" class="tab-content">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <label for="customerName" class="block text-sm font-medium text-gray-700 mb-1">Nome/Razão Social*</label>
-                            <input type="text" id="customerName" required class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary">
+                            <label for="customerName" class="block text-sm font-medium text-gray-700 mb-1">Nome/Razão
+                                Social*</label>
+                            <input type="text" id="customerName" required
+                                class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary">
                         </div>
                         <div>
                             <label for="customerType" class="block text-sm font-medium text-gray-700 mb-1">Tipo*</label>
-                            <select id="customerType" required class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary">
+                            <select id="customerType" required
+                                class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary">
                                 <option value="PF">Pessoa Física</option>
                                 <option value="PJ">Pessoa Jurídica</option>
                             </select>
                         </div>
                         <div id="documentField">
-                            <label id="documentLabel" for="customerDocument" class="block text-sm font-medium text-gray-700 mb-1">CPF*</label>
-                            <input type="text" id="customerDocument" required class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary">
+                            <label id="documentLabel" for="customerDocument"
+                                class="block text-sm font-medium text-gray-700 mb-1">CPF*</label>
+                            <input type="text" id="customerDocument" required
+                                class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary">
                         </div>
                         <div>
-                            <label for="customerPhone" class="block text-sm font-medium text-gray-700 mb-1">Telefone*</label>
-                            <input type="tel" id="customerPhone" required class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary">
+                            <label for="customerPhone"
+                                class="block text-sm font-medium text-gray-700 mb-1">Telefone*</label>
+                            <input type="tel" id="customerPhone" required
+                                class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary">
                         </div>
                         <div>
-                            <label for="customerEmail" class="block text-sm font-medium text-gray-700 mb-1">E-mail*</label>
-                            <input type="email" id="customerEmail" required class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary" placeholder="exemplo@dominio.com">
+                            <label for="customerEmail"
+                                class="block text-sm font-medium text-gray-700 mb-1">E-mail*</label>
+                            <input type="email" id="customerEmail" required
+                                class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary"
+                                placeholder="exemplo@dominio.com">
                         </div>
                         <div id="birthDateField">
-                            <label for="customerBirthDate" class="block text-sm font-medium text-gray-700 mb-1">Data de Nascimento</label>
-                            <input type="date" id="customerBirthDate" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary">
+                            <label for="customerBirthDate" class="block text-sm font-medium text-gray-700 mb-1">Data de
+                                Nascimento</label>
+                            <input type="date" id="customerBirthDate"
+                                class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary">
                         </div>
                         <div>
-                            <label for="customerStatus" class="block text-sm font-medium text-gray-700 mb-1">Status*</label>
-                            <select id="customerStatus" required class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary">
+                            <label for="customerStatus"
+                                class="block text-sm font-medium text-gray-700 mb-1">Status*</label>
+                            <select id="customerStatus" required
+                                class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary">
                                 <option value="active">Ativo</option>
                                 <option value="inactive">Inativo</option>
                             </select>
                         </div>
                         <div class="col-span-2">
-                            <label for="customerNotes" class="block text-sm font-medium text-gray-700 mb-1">Observações</label>
-                            <textarea id="customerNotes" rows="3" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary"></textarea>
+                            <label for="customerNotes"
+                                class="block text-sm font-medium text-gray-700 mb-1">Observações</label>
+                            <textarea id="customerNotes" rows="3"
+                                class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary"></textarea>
                         </div>
                     </div>
                 </div>
@@ -98,32 +119,46 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                             <label for="customerCEP" class="block text-sm font-medium text-gray-700 mb-1">CEP</label>
-                            <input type="text" id="customerCEP" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary">
-                            <button type="button" id="searchCEP" class="mt-2 text-xs text-primary hover:underline">Buscar endereço</button>
+                            <input type="text" id="customerCEP"
+                                class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary">
+                            <button type="button" id="searchCEP"
+                                class="mt-2 text-xs text-primary hover:underline">Buscar endereço</button>
                         </div>
                         <div class="col-span-2 md:col-span-1">
-                            <label for="customerStreet" class="block text-sm font-medium text-gray-700 mb-1">Logradouro</label>
-                            <input type="text" id="customerStreet" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary">
+                            <label for="customerStreet"
+                                class="block text-sm font-medium text-gray-700 mb-1">Logradouro</label>
+                            <input type="text" id="customerStreet"
+                                class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary">
                         </div>
                         <div>
-                            <label for="customerNumber" class="block text-sm font-medium text-gray-700 mb-1">Número</label>
-                            <input type="text" id="customerNumber" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary">
+                            <label for="customerNumber"
+                                class="block text-sm font-medium text-gray-700 mb-1">Número</label>
+                            <input type="text" id="customerNumber"
+                                class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary">
                         </div>
                         <div>
-                            <label for="customerComplement" class="block text-sm font-medium text-gray-700 mb-1">Complemento</label>
-                            <input type="text" id="customerComplement" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary">
+                            <label for="customerComplement"
+                                class="block text-sm font-medium text-gray-700 mb-1">Complemento</label>
+                            <input type="text" id="customerComplement"
+                                class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary">
                         </div>
                         <div>
-                            <label for="customerNeighborhood" class="block text-sm font-medium text-gray-700 mb-1">Bairro</label>
-                            <input type="text" id="customerNeighborhood" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary">
+                            <label for="customerNeighborhood"
+                                class="block text-sm font-medium text-gray-700 mb-1">Bairro</label>
+                            <input type="text" id="customerNeighborhood"
+                                class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary">
                         </div>
                         <div>
-                            <label for="customerCity" class="block text-sm font-medium text-gray-700 mb-1">Cidade</label>
-                            <input type="text" id="customerCity" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary">
+                            <label for="customerCity"
+                                class="block text-sm font-medium text-gray-700 mb-1">Cidade</label>
+                            <input type="text" id="customerCity"
+                                class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary">
                         </div>
                         <div>
-                            <label for="customerState" class="block text-sm font-medium text-gray-700 mb-1">Estado</label>
-                            <select id="customerState" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary">
+                            <label for="customerState"
+                                class="block text-sm font-medium text-gray-700 mb-1">Estado</label>
+                            <select id="customerState"
+                                class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary">
                                 <option value="">Selecione</option>
                                 <option value="AC">Acre</option>
                                 <option value="AL">Alagoas</option>
@@ -133,20 +168,26 @@
                             </select>
                         </div>
                         <div>
-                            <label for="customerCountry" class="block text-sm font-medium text-gray-700 mb-1">País</label>
-                            <input type="text" id="customerCountry" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary" value="Brasil">
+                            <label for="customerCountry"
+                                class="block text-sm font-medium text-gray-700 mb-1">País</label>
+                            <input type="text" id="customerCountry"
+                                class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary"
+                                value="Brasil">
                         </div>
                     </div>
                 </div>
 
                 <div class="mt-8 flex flex-col sm:flex-row justify-end gap-3 border-t border-gray-200 pt-6">
-                    <button type="button" id="previousTab" class="hidden px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition">
+                    <button type="button" id="previousTab"
+                        class="hidden px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition">
                         <i class="fas fa-arrow-left mr-2"></i>Anterior
                     </button>
-                    <button type="button" id="nextTab" class="px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-600 transition">
+                    <button type="button" id="nextTab"
+                        class="px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-600 transition">
                         Próximo<i class="fas fa-arrow-right ml-2"></i>
                     </button>
-                    <button type="submit" id="saveButton" class="px-4 py-2 bg-success text-white rounded-md hover:bg-green-600 transition">
+                    <button type="submit" id="saveButton"
+                        class="px-4 py-2 bg-success text-white rounded-md hover:bg-green-600 transition">
                         <i class="fas fa-save mr-2"></i>Salvar Cliente
                     </button>
                 </div>
@@ -159,9 +200,8 @@
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const API_URL = 'http://127.0.0.1:8000'; // Ajuste se necessário
-            const token = localStorage.getItem('accessToken');
+        document.addEventListener('DOMContentLoaded', function () {
+
             const customerId = new URLSearchParams(window.location.search).get('id');
             const form = document.getElementById('customerForm');
 
@@ -186,8 +226,8 @@
                 document.getElementById('saveButton').innerHTML = '<i class="fas fa-save mr-2"></i>Salvar Alterações';
 
                 try {
-                    const response = await fetch(`${API_URL}/api/cadastros/customers/${id}/`, {
-                        headers: { 'Authorization': `Bearer ${token}` }
+                    const response = await fetch(`/api/cadastros/customers/${id}/`, {
+                        credentials: 'include'
                     });
                     if (!response.ok) throw new Error('Não foi possível carregar os dados do cliente.');
                     const customer = await response.json();
@@ -208,7 +248,7 @@
                 document.getElementById('customerStatus').value = customer.status;
                 document.getElementById('customerBirthDate').value = customer.birth_date || '';
                 document.getElementById('customerNotes').value = customer.notes || '';
-                
+
                 if (customer.address) {
                     document.getElementById('customerCEP').value = customer.address.cep || '';
                     document.getElementById('customerStreet').value = customer.address.street || '';
@@ -230,7 +270,7 @@
                 const addressTab = document.getElementById('addressTab');
                 const nextTabBtn = document.getElementById('nextTab');
                 const prevTabBtn = document.getElementById('previousTab');
-                
+
                 infoTab.addEventListener('click', () => switchTab('info'));
                 addressTab.addEventListener('click', () => switchTab('address'));
                 nextTabBtn.addEventListener('click', () => {
@@ -240,7 +280,7 @@
 
                 // Mudança de tipo de cliente (PF/PJ)
                 document.getElementById('customerType').addEventListener('change', handleCustomerTypeChange);
-                
+
                 // Busca por CEP
                 document.getElementById('searchCEP').addEventListener('click', searchCEP);
 
@@ -276,7 +316,7 @@
                     showToast('CEP não encontrado.', 'error');
                 }
             };
-            
+
             const populateAddressFields = (data) => {
                 document.getElementById('customerStreet').value = data.logradouro;
                 document.getElementById('customerNeighborhood').value = data.bairro;
@@ -293,7 +333,7 @@
                 }
 
                 const id = document.getElementById('customerId').value;
-                const url = id ? `${API_URL}/api/cadastros/customers/${id}/` : `${API_URL}/api/cadastros/customers/`;
+                const url = id ? `/api/cadastros/customers/${id}/` : `/api/cadastros/customers/`;
                 const method = id ? 'PUT' : 'POST';
 
                 const payload = {
@@ -325,7 +365,8 @@
                 try {
                     const response = await fetch(url, {
                         method: method,
-                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                        headers: { 'Content-Type': 'application/json' },
+                        credentials: 'include', // Necessário para enviar os cookies
                         body: JSON.stringify(payload)
                     });
                     if (!response.ok) {
@@ -339,7 +380,7 @@
                     showToast(error.message, 'error');
                 }
             };
-            
+
             const validateBasicInfo = () => {
                 const required = ['customerName', 'customerType', 'customerDocument', 'customerPhone', 'customerEmail', 'customerStatus'];
                 for (const id of required) {
@@ -365,6 +406,8 @@
         }
     </script>
 </body>
+
 </html>
 </body>
+
 </html>

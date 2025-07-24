@@ -518,17 +518,28 @@
             alert('Dados exportados com sucesso (simulação)');
         });
 
-        // Logout
-        // Logout
+        // --- LÓGICA DE LOGOUT ATUALIZADA ---
         document.getElementById('logout').addEventListener('click', function () {
             if (confirm('Tem certeza que deseja sair da sua conta?')) {
-                // Opcional: limpar dados do localStorage
-                localStorage.clear();
-
-                // Redireciona para a página de login
-                window.location.href = "./login.html"; // ajuste o caminho se estiver em outra pasta
+                // Faz uma chamada POST para a nova view de logout
+                fetch('/api/accounts/logout/', { method: 'POST' })
+                .then(response => {
+                    if (response.ok) {
+                        // Limpa qualquer dado que ainda possa existir no localStorage (boa prática)
+                        localStorage.clear();
+                        // Redireciona para a página de login
+                        window.location.href = "./login.html";
+                    } else {
+                        throw new Error('Falha ao fazer logout.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro no logout:', error);
+                    alert('Não foi possível fazer logout. Tente novamente.');
+                });
             }
         });
+
 
 
         // Load saved preferences

@@ -186,7 +186,7 @@
                             Próxima
                         </a>
                     </div>
-    
+
                 </div>
             </div>
         </div>
@@ -350,8 +350,6 @@
     <script src="../componentes/auth.js"></script>
     <script src="../componentes/topbar.js"></script>
     <script>
-        // URL base da sua API Django
-        const API_URL = 'http://127.0.0.1:8000';
 
         // --- DOM ELEMENTS ---
         const accountModal = document.getElementById('account-modal');
@@ -386,74 +384,74 @@
         // Dentro da tag <script> do seu contas.html
 
         async function renderAccounts() {
-    const token = localStorage.getItem('accessToken');
-    if (!token) {
-        window.location.href = './login.html';
-        return;
-    }
 
-    const cardsButton = document.getElementById('cards-button');
-    let cardsButtonListener = null; 
+            const cardsButton = document.getElementById('cards-button');
+            let cardsButtonListener = null;
 
-    try {
-        const response = await fetch(`${API_URL}/api/finance/bank-accounts/`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
+            try {
+                const response = await fetch(`/api/finance/bank-accounts/`, {
+                    credentials: 'include'
+                });
 
-        if (!response.ok) {
-            throw new Error('Falha ao buscar contas. Faça login novamente.');
-        }
+                if (response.status === 401) {
+                    window.location.href = './login.html'; // Ajustado para caminho relativo
+                    return;
+                }
 
-        const accounts = await response.json();
+                if (!response.ok) {
+                    throw new Error('Falha ao buscar contas. Faça login novamente.');
+                }
 
-        // Limpa a tabela e a lista móvel
-        accountsTableBody.innerHTML = '';
-        mobileAccountsList.innerHTML = '';
+                const accounts = await response.json();
 
-        // --- LÓGICA DO BOTÃO "CARTÕES" ---
-        if (accounts.length === 0) {
-            accountsTableBody.innerHTML = `<tr><td colspan="5" class="text-center py-4 text-gray-500">Nenhuma conta cadastrada.</td></tr>`;
-            
-            // Desabilita o botão "Cartões"
-            cardsButton.classList.add('opacity-50', 'cursor-not-allowed');
-            cardsButton.href = '#';
-            cardsButtonListener = (e) => {
-                e.preventDefault();
-                alert("Você precisa cadastrar ao menos uma conta bancária para cadastrar cartões.");
-            };
-            cardsButton.addEventListener('click', cardsButtonListener);
+                // Limpa a tabela e a lista móvel
+                accountsTableBody.innerHTML = '';
+                mobileAccountsList.innerHTML = '';
 
-            // Zera os resumos
-            document.getElementById('total-balance-summary').textContent = formatMoney(0);
-            document.getElementById('active-accounts-summary').textContent = 0;
-            document.getElementById('inactive-accounts-summary').textContent = 0;
-            return; // Encerra a função aqui se não houver contas
+                // --- LÓGICA DO BOTÃO "CARTÕES" ---
+                if (accounts.length === 0) {
+                    accountsTableBody.innerHTML = `<tr><td colspan="5" class="text-center py-4 text-gray-500">Nenhuma conta cadastrada.</td></tr>`;
 
-        } else {
-            // Garante que o botão esteja ativo se houver contas
-            cardsButton.classList.remove('opacity-50', 'cursor-not-allowed');
-            cardsButton.href = 'cadastroCartoes.html';
-            if (cardsButtonListener) {
-                cardsButton.removeEventListener('click', cardsButtonListener);
-            }
-        }
-        
-        // --- CÓDIGO DE RENDERIZAÇÃO E CÁLCULO (RESTAURADO) ---
-        let totalBalance = 0;
-        let activeAccounts = 0;
-        let inactiveAccounts = 0;
+                    // Desabilita o botão "Cartões"
+                    cardsButton.classList.add('opacity-50', 'cursor-not-allowed');
+                    cardsButton.href = '#';
+                    cardsButtonListener = (e) => {
+                        e.preventDefault();
+                        alert("Você precisa cadastrar ao menos uma conta bancária para cadastrar cartões.");
+                    };
+                    cardsButton.addEventListener('click', cardsButtonListener);
 
-        accounts.forEach(account => {
-            if (account.is_active) {
-                totalBalance += parseFloat(account.initial_balance);
-                activeAccounts++;
-            } else {
-                inactiveAccounts++;
-            }
+                    // Zera os resumos
+                    document.getElementById('total-balance-summary').textContent = formatMoney(0);
+                    document.getElementById('active-accounts-summary').textContent = 0;
+                    document.getElementById('inactive-accounts-summary').textContent = 0;
+                    return; // Encerra a função aqui se não houver contas
 
-            // Cria e adiciona a linha da tabela para Desktop
-            const row = document.createElement('tr');
-            row.innerHTML = `
+                } else {
+                    // Garante que o botão esteja ativo se houver contas
+                    cardsButton.classList.remove('opacity-50', 'cursor-not-allowed');
+                    cardsButton.href = 'cadastroCartoes.html';
+                    if (cardsButtonListener) {
+                        cardsButton.removeEventListener('click', cardsButtonListener);
+                    }
+                }
+
+                // --- CÓDIGO DE RENDERIZAÇÃO E CÁLCULO (RESTAURADO) ---
+                let totalBalance = 0;
+                let activeAccounts = 0;
+                let inactiveAccounts = 0;
+
+                accounts.forEach(account => {
+                    if (account.is_active) {
+                        totalBalance += parseFloat(account.initial_balance);
+                        activeAccounts++;
+                    } else {
+                        inactiveAccounts++;
+                    }
+
+                    // Cria e adiciona a linha da tabela para Desktop
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${account.name}</td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${account.type}</td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${formatMoney(account.initial_balance)}</td>
@@ -467,12 +465,12 @@
                     <button onclick="openDeleteModal(${account.id})" class="text-danger hover:text-red-700"><i class="fas fa-trash-alt"></i></button>
                 </td>
             `;
-            accountsTableBody.appendChild(row);
+                    accountsTableBody.appendChild(row);
 
-            // Cria e adiciona o card para Mobile
-            const card = document.createElement('div');
-            card.className = 'p-4 border-b';
-            card.innerHTML = `
+                    // Cria e adiciona o card para Mobile
+                    const card = document.createElement('div');
+                    card.className = 'p-4 border-b';
+                    card.innerHTML = `
                 <div class="flex justify-between items-start">
                     <div>
                         <p class="text-sm font-medium text-gray-900">${account.name}</p>
@@ -489,19 +487,19 @@
                     <button onclick="openDeleteModal(${account.id})" class="text-danger hover:text-red-700"><i class="fas fa-trash-alt"></i> Excluir</button>
                 </div>
             `;
-            mobileAccountsList.appendChild(card);
-        });
+                    mobileAccountsList.appendChild(card);
+                });
 
-        // Atualiza os cards de resumo
-        document.getElementById('total-balance-summary').textContent = formatMoney(totalBalance);
-        document.getElementById('active-accounts-summary').textContent = activeAccounts;
-        document.getElementById('inactive-accounts-summary').textContent = inactiveAccounts;
+                // Atualiza os cards de resumo
+                document.getElementById('total-balance-summary').textContent = formatMoney(totalBalance);
+                document.getElementById('active-accounts-summary').textContent = activeAccounts;
+                document.getElementById('inactive-accounts-summary').textContent = inactiveAccounts;
 
-    } catch (error) {
-        console.error('Erro:', error);
-        showToast(error.message, 'error');
-    }
-}
+            } catch (error) {
+                console.error('Erro:', error);
+                showToast(error.message, 'error');
+            }
+        }
 
         // --- LÓGICA DO MODAL E CRUD ---
 
@@ -514,10 +512,13 @@
         }
 
         async function openEditModal(id) {
-            const token = localStorage.getItem('accessToken');
-            const response = await fetch(`${API_URL}/api/finance/bank-accounts/${id}/`, {
-                headers: { 'Authorization': `Bearer ${token}` }
+
+            const response = await fetch(`/api/finance/bank-accounts/${id}/`, {
+                credentials: 'include'
             });
+            if (response.status === 401) { window.location.href = './login.html'; return; }
+            if (!response.ok) throw new Error('Falha ao buscar dados da conta.');
+
             const account = await response.json();
 
             document.getElementById('modal-title').textContent = 'Editar Conta';
@@ -535,7 +536,7 @@
         }
 
         async function saveAccount() {
-            const token = localStorage.getItem('accessToken');
+
             const id = document.getElementById('account-id').value;
             const name = document.getElementById('account-name').value;
             const type = document.getElementById('account-type').value;
@@ -543,15 +544,13 @@
             const is_active = document.getElementById('status-active').checked;
             const notes = document.getElementById('account-notes').value;
 
-            const url = id ? `${API_URL}/api/finance/bank-accounts/${id}/` : `${API_URL}/api/finance/bank-accounts/`;
+            const url = id ? `/api/finance/bank-accounts/${id}/` : `/api/finance/bank-accounts/`;
             const method = id ? 'PUT' : 'POST';
 
             const response = await fetch(url, {
                 method: method,
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
                 body: JSON.stringify({ name, type, initial_balance, is_active, notes })
             });
 
@@ -577,36 +576,33 @@
         }
 
         async function deleteAccount() {
-    if (!accountIdToDelete) return; // Segurança extra
-    
-    const token = localStorage.getItem('accessToken');
-    
-    try {
-        const response = await fetch(`${API_URL}/api/finance/bank-accounts/${accountIdToDelete}/`, {
-            method: 'DELETE',
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
+            if (!accountIdToDelete) return;
 
-        // Se a resposta NÃO for 204 (sucesso na exclusão)...
-        if (response.status !== 204) {
-            // ...lê o corpo da resposta para pegar a mensagem de erro específica.
-            const errorData = await response.json();
-            // Lança um erro com a mensagem do backend (ex: "Esta conta não pode ser excluída...")
-            throw new Error(errorData.detail || 'Ocorreu um erro desconhecido.');
+            try {
+                const response = await fetch(`/api/finance/bank-accounts/${accountIdToDelete}/`, {
+                    method: 'DELETE',
+                    credentials: 'include'
+                });
+
+                if (response.status !== 204) {
+                    // ...lê o corpo da resposta para pegar a mensagem de erro específica.
+                    const errorData = await response.json();
+                    // Lança um erro com a mensagem do backend (ex: "Esta conta não pode ser excluída...")
+                    throw new Error(errorData.detail || 'Ocorreu um erro desconhecido.');
+                }
+
+                // Se a exclusão foi bem-sucedida (status 204)
+                showToast('Conta excluída com sucesso!', 'success');
+                closeDeleteModal();
+                renderAccounts(); // Atualiza a lista na tela
+
+            } catch (error) {
+                // Agora o toast de erro exibirá a mensagem correta vinda da API
+                showToast(error.message, 'error');
+                // Também é bom fechar o modal de confirmação em caso de erro
+                closeDeleteModal();
+            }
         }
-
-        // Se a exclusão foi bem-sucedida (status 204)
-        showToast('Conta excluída com sucesso!', 'success');
-        closeDeleteModal();
-        renderAccounts(); // Atualiza a lista na tela
-
-    } catch (error) {
-        // Agora o toast de erro exibirá a mensagem correta vinda da API
-        showToast(error.message, 'error');
-        // Também é bom fechar o modal de confirmação em caso de erro
-        closeDeleteModal();
-    }
-}
 
         // --- FUNÇÕES DE FEEDBACK E EVENT LISTENERS ---
 
@@ -628,12 +624,12 @@
 
     </script>
 
-    
+
     <script>
         document.addEventListener('DOMContentLoaded', () => {
 
             protectPage('contas')
-            
+
 
         });
     </script>

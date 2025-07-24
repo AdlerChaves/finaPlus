@@ -172,9 +172,8 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             protectPage('movimentacoes');
+            renderExpenses();
         });
-
-        const API_URL = 'http://127.0.0.1:8000';
 
         // --- DOM ELEMENTS ---
         const expenseModal = document.getElementById('expenseModal');
@@ -238,14 +237,19 @@
         }
 
         // --- FUNÇÕES DA API E RENDERIZAÇÃO ---
-        async function populateDropdowns(token) {
+        async function populateDropdowns(t) {
             try {
                 // --- A CORREÇÃO ESTÁ NA URL DESTA REQUISIÇÃO ---
                 const [catRes, accRes] = await Promise.all([
                     // Adicionamos ?type=saida para filtrar apenas as categorias de despesa
-                    fetch(`${API_URL}/api/finance/categories/?type=saida`, { headers: { 'Authorization': `Bearer ${token}` } }),
-                    fetch(`${API_URL}/api/finance/bank-accounts/`, { headers: { 'Authorization': `Bearer ${token}` } })
+                    fetch(`/api/finance/categories/?type=saida`, { credentials: 'include' }),
+                    fetch(`/api/finance/bank-accounts/`, { credentials: 'include' })
                 ]);
+
+                if (catRes.status === 401 || accRes.status === 401) {
+                    window.location.href = 'login.html';
+                    return;
+                }
 
                 if (!catRes.ok || !accRes.ok) {
                     throw new Error('Falha ao carregar dados para o formulário.');
@@ -272,21 +276,23 @@
         }
 
         async function renderExpenses() {
-            const token = localStorage.getItem('accessToken');
-            if (!token) { window.location.href = '../login.html'; return; }
 
-            await populateDropdowns(token);
+            await populateDropdowns();
 
             try {
-                const response = await fetch(`${API_URL}/api/finance/transactions/?type=saida`, { headers: { 'Authorization': `Bearer ${token}` } });
+                // ADICIONADO: 'credentials: 'include''
+                const response = await fetch(`/api/finance/transactions/?type=saida`, { credentials: 'include' });
+
+                if (response.status === 401) {
+                    window.location.href = 'login.html';
+                    return;
+                }
                 if (!response.ok) throw new Error('Falha ao buscar despesas.');
 
                 const expenses = await response.json();
-
-                // Pega a referência para a lista mobile
+                // ... (resto da sua lógica de renderização é mantida) ...
                 const expensesListMobile = document.getElementById('expenses-list-mobile');
-
-                // Limpa o conteúdo anterior
+                const expensesTableBody = document.getElementById('expensesTableBody');
                 expensesTableBody.innerHTML = '';
                 expensesListMobile.innerHTML = '';
 
@@ -294,8 +300,7 @@
                     const emptyMessageTable = `<tr><td colspan="6" class="text-center py-4 text-gray-500">Nenhuma despesa registrada.</td></tr>`;
                     expensesTableBody.innerHTML = emptyMessageTable;
                     expensesListMobile.innerHTML = `<p class="text-center py-4 text-gray-500">Nenhuma despesa registrada.</p>`;
-                    totalExpensesEl.textContent = formatMoney(0);
-                    totalExpensesSummary.textContent = formatMoney(0)
+                    totalExpensesSummary.textContent = formatMoney(0);
                     updateCharts([]);
                     return;
                 }
@@ -304,40 +309,38 @@
                 totalExpensesSummary.textContent = formatMoney(totalValue);
 
                 expenses.forEach(expense => {
-                    // 1. Preenche a Tabela para Desktop
                     const row = document.createElement('tr');
                     row.innerHTML = `
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${expense.description}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-red-600 font-semibold">${formatMoney(expense.amount)}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${expense.category_name || 'N/A'}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${formatDate(expense.transaction_date)}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${expense.bank_account_name || 'N/A'}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                            <button onclick="openEditModal(${expense.id})" class="text-blue-600 hover:text-blue-800 mr-3"><i class="fas fa-edit"></i></button>
-                            <button onclick="openDeleteModal(${expense.id})" class="text-red-500 hover:text-red-700"><i class="fas fa-trash-alt"></i></button>
-                        </td>
-                    `;
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${expense.description}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-red-600 font-semibold">${formatMoney(expense.amount)}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${expense.category_name || 'N/A'}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${formatDate(expense.transaction_date)}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${expense.bank_account_name || 'N/A'}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <button onclick="openEditModal(${expense.id})" class="text-blue-600 hover:text-blue-800 mr-3"><i class="fas fa-edit"></i></button>
+                        <button onclick="openDeleteModal(${expense.id})" class="text-red-500 hover:text-red-700"><i class="fas fa-trash-alt"></i></button>
+                    </td>
+                `;
                     expensesTableBody.appendChild(row);
 
-                    // 2. Preenche a Lista de Cards para Mobile
                     const card = document.createElement('div');
                     card.className = 'p-4 border-b border-gray-200';
                     card.innerHTML = `
-                        <div class="flex justify-between items-start">
-                            <div>
-                                <p class="font-semibold text-gray-800">${expense.description}</p>
-                                <p class="text-sm text-gray-500">${expense.category_name || 'N/A'}</p>
-                                <p class="text-xs text-gray-400 mt-1">${formatDate(expense.transaction_date)}</p>
-                            </div>
-                            <div class="text-right">
-                                <p class="font-bold text-red-600">${formatMoney(expense.amount)}</p>
-                                <div class="mt-2">
-                                    <button onclick="openEditModal(${expense.id})" class="text-blue-600 hover:text-blue-800 mr-2"><i class="fas fa-edit"></i></button>
-                                    <button onclick="openDeleteModal(${expense.id})" class="text-red-500 hover:text-red-700"><i class="fas fa-trash-alt"></i></button>
-                                </div>
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="font-semibold text-gray-800">${expense.description}</p>
+                            <p class="text-sm text-gray-500">${expense.category_name || 'N/A'}</p>
+                            <p class="text-xs text-gray-400 mt-1">${formatDate(expense.transaction_date)}</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="font-bold text-red-600">${formatMoney(expense.amount)}</p>
+                            <div class="mt-2">
+                                <button onclick="openEditModal(${expense.id})" class="text-blue-600 hover:text-blue-800 mr-2"><i class="fas fa-edit"></i></button>
+                                <button onclick="openDeleteModal(${expense.id})" class="text-red-500 hover:text-red-700"><i class="fas fa-trash-alt"></i></button>
                             </div>
                         </div>
-                    `;
+                    </div>
+                `;
                     expensesListMobile.appendChild(card);
                 });
 
@@ -354,8 +357,9 @@
         }
 
         async function openEditModal(id) {
-            const token = localStorage.getItem('accessToken');
-            const response = await fetch(`${API_URL}/api/finance/transactions/${id}/`, { headers: { 'Authorization': `Bearer ${token}` } });
+
+            const response = await fetch(`/api/finance/transactions/${id}/`, { credentials: 'include' });
+            if (response.status === 401) { window.location.href = 'login.html'; return; }
             const expense = await response.json();
             document.getElementById('modal-title').textContent = 'Editar Saída';
             document.getElementById('transaction-id').value = expense.id;
@@ -371,32 +375,33 @@
         function closeModal() { expenseModal.classList.add('hidden'); }
 
         async function saveTransaction(event) {
-            event.preventDefault();
-            const token = localStorage.getItem('accessToken');
-            const id = document.getElementById('transaction-id').value;
-            const payload = {
-                description: document.getElementById('expense-description').value,
-                amount: document.getElementById('expense-amount').value,
-                transaction_date: document.getElementById('expense-date').value,
-                category: document.getElementById('expense-category').value,
-                bank_account: document.getElementById('expense-account').value,
-                notes: document.getElementById('expense-notes').value,
-                type: 'saida'
-            };
-            const url = id ? `${API_URL}/api/finance/transactions/${id}/` : `${API_URL}/api/finance/transactions/`;
-            const method = id ? 'PUT' : 'POST';
-            try {
-                const response = await fetch(url, {
-                    method: method,
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                    body: JSON.stringify(payload)
-                });
-                if (!response.ok) throw new Error('Erro ao salvar a despesa.');
-                showToast(id ? 'Saída atualizada com sucesso!' : 'Saída adicionada com sucesso!');
-                closeModal();
-                renderExpenses();
-            } catch (error) { showToast(error.message, 'error'); }
-        }
+        event.preventDefault();
+        const id = document.getElementById('transaction-id').value;
+        const payload = {
+            description: document.getElementById('expense-description').value,
+            amount: document.getElementById('expense-amount').value,
+            transaction_date: document.getElementById('expense-date').value,
+            category: document.getElementById('expense-category').value,
+            bank_account: document.getElementById('expense-account').value,
+            notes: document.getElementById('expense-notes').value,
+            type: 'saida'
+        };
+        const url = id ? `/api/finance/transactions/${id}/` : `/api/finance/transactions/`;
+        const method = id ? 'PUT' : 'POST';
+        try {
+            
+            const response = await fetch(url, {
+                method: method,
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include', 
+                body: JSON.stringify(payload)
+            });
+            if (!response.ok) throw new Error('Erro ao salvar a despesa.');
+            showToast(id ? 'Saída atualizada com sucesso!' : 'Saída adicionada com sucesso!');
+            closeModal();
+            renderExpenses();
+        } catch (error) { showToast(error.message, 'error'); }
+    }
 
         function openDeleteModal(id) {
             transactionIdToDelete = id;
@@ -409,19 +414,19 @@
         }
 
         async function deleteTransaction() {
-            if (!transactionIdToDelete) return;
-            const token = localStorage.getItem('accessToken');
-            try {
-                const response = await fetch(`${API_URL}/api/finance/transactions/${transactionIdToDelete}/`, {
-                    method: 'DELETE',
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-                if (response.status !== 204) throw new Error('Erro ao excluir a despesa.');
-                showToast('Despesa excluída com sucesso!');
-                closeDeleteModal();
-                renderExpenses();
-            } catch (error) { showToast(error.message, 'error'); }
-        }
+        if (!transactionIdToDelete) return;
+        try {
+            
+            const response = await fetch(`/api/finance/transactions/${transactionIdToDelete}/`, {
+                method: 'DELETE',
+                credentials: 'include'
+            });
+            if (response.status !== 204) throw new Error('Erro ao excluir a despesa.');
+            showToast('Despesa excluída com sucesso!');
+            closeDeleteModal();
+            renderExpenses();
+        } catch (error) { showToast(error.message, 'error'); }
+    }
 
         // --- EVENT LISTENERS ---
         document.addEventListener('DOMContentLoaded', renderExpenses);

@@ -146,10 +146,10 @@
         </div>
     </div>
 
-
+    <script src="../componentes/auth.js"></script>
+    <script src="../componentes/topbar.js"></script>
     <script>
-        const API_URL = 'http://127.0.0.1:8000';
-
+        
         // --- Funções Helper (sem alterações) ---
         function getQueryParams() {
             const urlParams = new URLSearchParams(window.location.search);
@@ -170,18 +170,15 @@
         // --- Função para Carregar Detalhes (sem alterações) ---
         async function loadBillDetails() {
             const params = getQueryParams();
-            const token = localStorage.getItem('accessToken');
+            
             if (!params.card_id || !params.month || !params.year) {
                 document.getElementById('card-name').textContent = "Parâmetros inválidos na URL.";
                 return;
             }
-            if (!token) {
-                window.location.href = '../login.html';
-                return;
-            }
-            const url = `${API_URL}/api/finance/card-bill-detail/?card_id=${params.card_id}&month=${params.month}&year=${params.year}`;
+            const url = `/api/finance/card-bill-detail/?card_id=${params.card_id}&month=${params.month}&year=${params.year}`;
             try {
-                const response = await fetch(url, { headers: { 'Authorization': `Bearer ${token}` } });
+                const response = await fetch(url, { credentials: 'include' });
+                if (response.status === 401) { window.location.href = '../login.html'; return; }
                 if (!response.ok) throw new Error('Falha ao buscar os detalhes da fatura.');
                 const data = await response.json();
                 renderBillData(data);
@@ -235,7 +232,7 @@
         const payModal = document.getElementById('mark-as-paid-modal');
 
         async function openPayModal() {
-            const token = localStorage.getItem('accessToken');
+            
             const accountSelect = document.getElementById('payment-account');
             
             // Popula o valor a ser pago e a data
@@ -247,7 +244,8 @@
             // Busca as contas bancárias
             accountSelect.innerHTML = '<option value="">Carregando...</option>';
             try {
-                const response = await fetch(`${API_URL}/api/finance/bank-accounts/?is_active=true`, { headers: { 'Authorization': `Bearer ${token}` } });
+                 const response = await fetch(`/api/finance/bank-accounts/?is_active=true`, { credentials: 'include' });
+                if (response.status === 401) { window.location.href = '../login.html'; return; }
                 const accounts = await response.json();
                 accountSelect.innerHTML = '<option value="">Selecione a conta</option>';
                 accounts.forEach(acc => {
@@ -267,7 +265,7 @@
 
         async function confirmPayment(event) {
             event.preventDefault();
-            const token = localStorage.getItem('accessToken');
+            
             const params = getQueryParams();
 
             const payload = {
@@ -285,9 +283,10 @@
             }
 
             try {
-                const response = await fetch(`${API_URL}/api/finance/pay-card-bill/`, {
+                const response = await fetch(`/api/finance/pay-card-bill/`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
                     body: JSON.stringify(payload)
                 });
                 const data = await response.json();
@@ -305,6 +304,7 @@
         // --- Event Listeners ---
         document.addEventListener('DOMContentLoaded', () => {
             loadBillDetails();
+            protectPage('pagamentos')
             document.getElementById('mark-as-paid-btn').addEventListener('click', openPayModal);
             document.getElementById('cancel-payment-btn').addEventListener('click', closePayModal);
             document.getElementById('payment-form').addEventListener('submit', confirmPayment);

@@ -161,10 +161,11 @@
     <script src="../componentes/topbar.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            protectPage('entradas');
+            protectPage('movimentacoes');
+            renderIncome();
         });
 
-        const API_URL = 'http://127.0.0.1:8000';
+
 
         // --- DOM ELEMENTS ---
         const incomeModal = document.getElementById('income-modal');
@@ -245,12 +246,19 @@
         }
 
         // --- FUNÇÕES DA API E RENDERIZAÇÃO ---
-        async function populateDropdowns(token) {
+        async function populateDropdowns() {
             try {
                 const [catRes, accRes] = await Promise.all([
-                    fetch(`${API_URL}/api/finance/categories/?type=entrada`, { headers: { 'Authorization': `Bearer ${token}` } }),
-                    fetch(`${API_URL}/api/finance/bank-accounts/`, { headers: { 'Authorization': `Bearer ${token}` } })
+                    fetch(`/api/finance/categories/?type=entrada`, { credentials: 'include' }),
+                    fetch(`/api/finance/bank-accounts/`, { credentials: 'include' })
                 ]);
+
+                // Adicionada verificação de status 401
+                if (catRes.status === 401 || accRes.status === 401) {
+                    window.location.href = 'login.html';
+                    return;
+                }
+
                 const categories = await catRes.json();
                 const accounts = await accRes.json();
 
@@ -263,77 +271,71 @@
         }
 
         async function renderIncome() {
-            const token = localStorage.getItem('accessToken');
-            if (!token) { window.location.href = '../login.html'; return; }
 
-            await populateDropdowns(token);
+            await populateDropdowns();
 
             try {
-                const response = await fetch(`${API_URL}/api/finance/transactions/?type=entrada`, { headers: { 'Authorization': `Bearer ${token}` } });
-                if (!response.ok) throw new Error('Falha ao buscar entradas.');
+            // ADICIONADO: 'credentials: 'include''
+            const response = await fetch(`/api/finance/transactions/?type=entrada`, { credentials: 'include' });
+            
+            if (response.status === 401) {
+                window.location.href = 'login.html';
+                return;
+            }
+            if (!response.ok) throw new Error('Falha ao buscar entradas.');
 
-                const incomeList = await response.json();
-
-                // Pega a referência para a lista mobile
-                const incomeListMobile = document.getElementById('income-list-mobile');
-
-                // Limpa o conteúdo anterior da tabela e da lista mobile
-                incomeTableBody.innerHTML = '';
-                incomeListMobile.innerHTML = '';
-
-                if (incomeList.length === 0) {
-                    const emptyMessage = `<tr><td colspan="6" class="text-center py-4 text-gray-500">Nenhuma entrada registrada.</td></tr>`;
-                    incomeTableBody.innerHTML = emptyMessage;
-                    incomeListMobile.innerHTML = `<p class="text-center py-4 text-gray-500">Nenhuma entrada registrada.</p>`;
-                    totalIncomeSummary.textContent = formatMoney(0);
-                    updateCharts([]);
-                    return;
-                }
-
-                const totalValue = incomeList.reduce((sum, item) => sum + parseFloat(item.amount), 0);
-                totalIncomeSummary.textContent = formatMoney(totalValue);
-
-                incomeList.forEach(income => {
-                    // --- 1. Preenche a Tabela (Desktop) ---
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${formatDate(income.transaction_date)}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${income.description}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${income.category_name || 'N/A'}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${income.bank_account_name || 'N/A'}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-green-600 font-semibold">${formatMoney(income.amount)}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                            <button onclick="openEditModal(${income.id})" class="text-blue-600 hover:text-blue-800 mr-3"><i class="fas fa-edit"></i></button>
-                            <button onclick="openDeleteModal(${income.id})" class="text-red-500 hover:text-red-700"><i class="fas fa-trash-alt"></i></button>
-                        </td>
-                    `;
-                    incomeTableBody.appendChild(row);
-
-                    // --- 2. Preenche a Lista de Cards (Mobile) ---
-                    const card = document.createElement('div');
-                    card.className = 'p-4 border-b border-gray-200';
-                    card.innerHTML = `
-                        <div class="flex justify-between items-start">
-                            <div>
-                                <p class="font-semibold text-gray-800">${income.description}</p>
-                                <p class="text-sm text-gray-500">${income.category_name || 'N/A'}</p>
-                                <p class="text-xs text-gray-400 mt-1">${formatDate(income.transaction_date)}</p>
-                            </div>
-                            <div class="text-right">
-                                <p class="font-bold text-green-600">${formatMoney(income.amount)}</p>
-                                <div class="mt-2">
-                                    <button onclick="openEditModal(${income.id})" class="text-blue-600 hover:text-blue-800 mr-2"><i class="fas fa-edit"></i></button>
-                                    <button onclick="openDeleteModal(${income.id})" class="text-red-500 hover:text-red-700"><i class="fas fa-trash-alt"></i></button>
-                                </div>
+            const incomeList = await response.json();
+            // ... (resto da lógica de renderização inalterada) ...
+            const incomeListMobile = document.getElementById('income-list-mobile');
+            incomeTableBody.innerHTML = '';
+            incomeListMobile.innerHTML = '';
+            if (incomeList.length === 0) {
+                const emptyMessage = `<tr><td colspan="6" class="text-center py-4 text-gray-500">Nenhuma entrada registrada.</td></tr>`;
+                incomeTableBody.innerHTML = emptyMessage;
+                incomeListMobile.innerHTML = `<p class="text-center py-4 text-gray-500">Nenhuma entrada registrada.</p>`;
+                totalIncomeSummary.textContent = formatMoney(0);
+                updateCharts([]);
+                return;
+            }
+            const totalValue = incomeList.reduce((sum, item) => sum + parseFloat(item.amount), 0);
+            totalIncomeSummary.textContent = formatMoney(totalValue);
+            incomeList.forEach(income => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${formatDate(income.transaction_date)}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${income.description}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${income.category_name || 'N/A'}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${income.bank_account_name || 'N/A'}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-green-600 font-semibold">${formatMoney(income.amount)}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <button onclick="openEditModal(${income.id})" class="text-blue-600 hover:text-blue-800 mr-3"><i class="fas fa-edit"></i></button>
+                        <button onclick="openDeleteModal(${income.id})" class="text-red-500 hover:text-red-700"><i class="fas fa-trash-alt"></i></button>
+                    </td>
+                `;
+                incomeTableBody.appendChild(row);
+                const card = document.createElement('div');
+                card.className = 'p-4 border-b border-gray-200';
+                card.innerHTML = `
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="font-semibold text-gray-800">${income.description}</p>
+                            <p class="text-sm text-gray-500">${income.category_name || 'N/A'}</p>
+                            <p class="text-xs text-gray-400 mt-1">${formatDate(income.transaction_date)}</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="font-bold text-green-600">${formatMoney(income.amount)}</p>
+                            <div class="mt-2">
+                                <button onclick="openEditModal(${income.id})" class="text-blue-600 hover:text-blue-800 mr-2"><i class="fas fa-edit"></i></button>
+                                <button onclick="openDeleteModal(${income.id})" class="text-red-500 hover:text-red-700"><i class="fas fa-trash-alt"></i></button>
                             </div>
                         </div>
-                    `;
-                    incomeListMobile.appendChild(card);
-                });
-
-                updateCharts(incomeList);
-            } catch (error) { showToast(error.message, 'error'); }
-        }
+                    </div>
+                `;
+                incomeListMobile.appendChild(card);
+            });
+            updateCharts(incomeList);
+        } catch (error) { showToast(error.message, 'error'); }
+    }
 
         // --- LÓGICA DO MODAL E CRUD ---
 
@@ -345,9 +347,9 @@
         }
 
         async function openEditModal(id) {
-            const token = localStorage.getItem('accessToken');
-            const response = await fetch(`${API_URL}/api/finance/transactions/${id}/`, { headers: { 'Authorization': `Bearer ${token}` } });
-            const income = await response.json();
+
+            const response = await fetch(`/api/finance/transactions/${id}/`, { credentials: 'include' });
+        const income = await response.json();
 
             document.getElementById('modal-title').textContent = 'Editar Entrada';
             document.getElementById('transaction-id').value = income.id;
@@ -364,7 +366,7 @@
 
         async function saveTransaction(event) {
             event.preventDefault();
-            const token = localStorage.getItem('accessToken');
+
             const id = document.getElementById('transaction-id').value;
             const payload = {
                 description: document.getElementById('income-description').value,
@@ -374,15 +376,16 @@
                 bank_account: document.getElementById('income-account').value,
                 type: 'entrada' // Fixo para esta tela
             };
-            const url = id ? `${API_URL}/api/finance/transactions/${id}/` : `${API_URL}/api/finance/transactions/`;
-            const method = id ? 'PUT' : 'POST';
+             const url = id ? `/api/finance/transactions/${id}/` : `/api/finance/transactions/`;
+       const method = id ? 'PUT' : 'POST';
 
             try {
-                const response = await fetch(url, {
-                    method: method,
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                    body: JSON.stringify(payload)
-                });
+               const response = await fetch(url, {
+                method: method,
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include', 
+                body: JSON.stringify(payload)
+            });
                 if (!response.ok) throw new Error('Erro ao salvar a entrada.');
 
                 showToast(id ? 'Entrada atualizada com sucesso!' : 'Entrada adicionada com sucesso!');
@@ -403,12 +406,12 @@
 
         async function deleteTransaction() {
             if (!transactionIdToDelete) return;
-            const token = localStorage.getItem('accessToken');
+
             try {
-                const response = await fetch(`${API_URL}/api/finance/transactions/${transactionIdToDelete}/`, {
-                    method: 'DELETE',
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
+                const response = await fetch(`/api/finance/transactions/${transactionIdToDelete}/`, {
+                method: 'DELETE',
+                credentials: 'include'
+            });
                 if (response.status !== 204) throw new Error('Erro ao excluir a entrada.');
 
                 showToast('Entrada excluída com sucesso!');

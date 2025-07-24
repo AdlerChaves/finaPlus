@@ -190,13 +190,15 @@
     <script src="../componentes/auth.js"></script>
     <script src="../componentes/topbar.js"></script>
     <script>
-        // --- INÍCIO DO SCRIPT UNIFICADO PARA CONTAS A PAGAR ---
+
+        document.addEventListener('DOMContentLoaded', () => {
+            protectPage('pagamentos')
+            setupPage();
+            renderMonthlyBills();
+        });
 
 
-
-        const API_URL = 'http://127.0.0.1:8000';
         let billIdToModify = null;
-
         let currentMonth = new Date();
 
         const prevMonthBtn = document.getElementById('prev-month-btn');
@@ -219,13 +221,6 @@
             renderMonthlyBills();
         });
 
-        document.addEventListener('DOMContentLoaded', () => {
-    
-            setupPage();
-            renderMonthlyBills();
-            protectPage('pagamentos')
-
-        });
 
         function markAsPaid(id) {
             const row = document.querySelector(`button[onclick="markAsPaid(${id})"]`).closest('tr');
@@ -235,12 +230,13 @@
         }
 
         async function openMarkAsPaidModal(billId, billAmount) {
-            const token = localStorage.getItem('accessToken');
+
             const modal = document.getElementById('mark-as-paid-modal');
             const accountSelect = document.getElementById('payment-account');
 
             try {
-                const response = await fetch(`${API_URL}/api/finance/bank-accounts/?is_active=true`, { headers: { 'Authorization': `Bearer ${token}` } });
+                const response = await fetch(`/api/finance/bank-accounts/?is_active=true`, { credentials: 'include' });
+           
                 const accounts = await response.json();
                 accountSelect.innerHTML = '<option value="">Selecione a conta de origem</option>';
                 accounts.forEach(acc => {
@@ -257,7 +253,7 @@
 
         async function confirmPayment(event) {
             event.preventDefault();
-            const token = localStorage.getItem('accessToken');
+
             const payableId = document.getElementById('payable-id-input').value;
 
             const payload = {
@@ -272,9 +268,10 @@
             }
 
             try {
-                const response = await fetch(`${API_URL}/api/finance/payables/${payableId}/mark_as_paid/`, {
+                const response = await fetch(`/api/finance/payables/${payableId}/mark_as_paid/`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    headers: { 'Content-Type': 'application/json'},
+                    credentials: 'include',
                     body: JSON.stringify(payload)
                 });
                 const data = await response.json();
@@ -423,40 +420,32 @@
         }
 
         async function renderMonthlyBills() {
-            updateMonthDisplay();
-            const token = localStorage.getItem('accessToken');
-            if (!token) { window.location.href = '../login.html'; return; }
+        updateMonthDisplay();
+        const year = currentMonth.getFullYear();
+        const month = currentMonth.getMonth() + 1;
+        const url = `/api/finance/monthly-bills/?month=${month}&year=${year}`;
 
-            const year = currentMonth.getFullYear();
-            const month = currentMonth.getMonth() + 1;
-            const url = `${API_URL}/api/finance/monthly-bills/?month=${month}&year=${year}`;
-
-            try {
-                const response = await fetch(url, { headers: { 'Authorization': `Bearer ${token}` } });
-                if (!response.ok) throw new Error('Falha ao buscar as contas do mês.');
-                const data = await response.json();
-
-                // Mapeia e adiciona um tipo a cada item para facilitar a renderização
-                const manualItems = data.manual_bills.map(bill => ({ ...bill, type: 'manual' }));
-                const cardItems = data.card_bills.map(bill => ({ ...bill, type: 'card' }));
-
-                // Unifica os dois tipos de contas em uma única lista
-                let allItems = [...manualItems, ...cardItems];
-
-                // Ordena a lista unificada por data de vencimento
-                allItems.sort((a, b) => {
-                    const dateA = a.type === 'card' ? new Date(year, month - 1, a.due_day) : new Date(a.due_date);
-                    const dateB = b.type === 'card' ? new Date(year, month - 1, b.due_day) : new Date(b.due_date);
-                    return dateA - dateB;
-                });
-
-                renderUnifiedTable(allItems);
-                updateSummaryCards(allItems);
-
-            } catch (error) {
-                showToast(error.message, 'error');
-            }
+        try {
+            
+            const response = await fetch(url, { credentials: 'include' });
+            if (response.status === 401) { window.location.href = 'login.html'; return; }
+            if (!response.ok) throw new Error('Falha ao buscar as contas do mês.');
+            
+            const data = await response.json();
+            const manualItems = data.manual_bills.map(bill => ({ ...bill, type: 'manual' }));
+            const cardItems = data.card_bills.map(bill => ({ ...bill, type: 'card' }));
+            let allItems = [...manualItems, ...cardItems];
+            allItems.sort((a, b) => {
+                const dateA = a.type === 'card' ? new Date(year, month - 1, a.due_day) : new Date(a.due_date);
+                const dateB = b.type === 'card' ? new Date(year, month - 1, b.due_day) : new Date(b.due_date);
+                return dateA - dateB;
+            });
+            renderUnifiedTable(allItems);
+            updateSummaryCards(allItems);
+        } catch (error) {
+            showToast(error.message, 'error');
         }
+    }
 
         function updateSummaryCards(items) {
             let totalOpen = 0, totalPaid = 0, totalOverdue = 0;
@@ -482,10 +471,10 @@
             document.getElementById('summary-total-overdue').textContent = formatMoney(totalOverdue);
         }
 
-        async function populateCategoriesDropdown(token) {
+        async function populateCategoriesDropdown() {
             const categorySelect = document.getElementById('bill-category');
             try {
-                const response = await fetch(`${API_URL}/api/finance/categories/?type=saida`, { headers: { 'Authorization': `Bearer ${token}` } });
+                const response = await fetch(`/api/finance/categories/?type=saida`);
                 if (!response.ok) throw new Error('Falha ao carregar categorias.');
                 const categories = await response.json();
                 categorySelect.innerHTML = '<option value="">Selecione uma Categoria</option>';
@@ -503,8 +492,8 @@
             billForm.reset();
             document.getElementById('modal-title').textContent = 'Nova Conta a Pagar';
             document.getElementById('bill-id').value = '';
-            const token = localStorage.getItem('accessToken');
-            await populateCategoriesDropdown(token);
+
+            await populateCategoriesDropdown();
             document.getElementById('bill-modal').classList.remove('hidden');
         }
 
@@ -514,7 +503,7 @@
 
         async function savePayable(event) {
             event.preventDefault();
-            const token = localStorage.getItem('accessToken');
+
             const id = document.getElementById('bill-id').value;
 
             // --- LÓGICA DO PAYLOAD CORRIGIDA ---
@@ -532,7 +521,7 @@
                 return;
             }
 
-            const url = id ? `${API_URL}/api/finance/payables/${id}/` : `${API_URL}/api/finance/payables/`;
+             const url = id ? `/api/finance/payables/${id}/` : `/api/finance/payables/`;
             const method = id ? 'PUT' : 'POST';
 
             const saveButton = document.getElementById('save-bill');
@@ -542,7 +531,8 @@
             try {
                 const response = await fetch(url, {
                     method: method,
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
                     body: JSON.stringify(payload)
                 });
                 if (!response.ok) {
@@ -561,14 +551,13 @@
         }
 
         async function openEditModal(id) {
-            document.getElementById('bill-id').value = id;
-            const token = localStorage.getItem('accessToken');
-            await populateCategoriesDropdown(token);
-
-            try {
-                const response = await fetch(`${API_URL}/api/finance/payables/${id}/`, { headers: { 'Authorization': `Bearer ${token}` } });
-                if (!response.ok) throw new Error('Falha ao buscar dados da conta.');
-                const bill = await response.json();
+        document.getElementById('bill-id').value = id;
+        await populateCategoriesDropdown();
+        try {
+            const response = await fetch(`/api/finance/payables/${id}/`, { credentials: 'include' });
+            if (response.status === 401) { window.location.href = 'login.html'; return; }
+            if (!response.ok) throw new Error('Falha ao buscar dados da conta.');
+            const bill = await response.json();
                 document.getElementById('modal-title').textContent = 'Editar Conta a Pagar';
                 document.getElementById('bill-description').value = bill.description;
                 document.getElementById('bill-amount').value = bill.amount;
@@ -596,13 +585,12 @@
         }
 
         async function deletePayable() {
-            if (!billIdToModify) return;
-            const token = localStorage.getItem('accessToken');
-            try {
-                const response = await fetch(`${API_URL}/api/finance/payables/${billIdToModify}/`, {
-                    method: 'DELETE',
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
+        if (!billIdToModify) return;
+        try {
+            const response = await fetch(`/api/finance/payables/${billIdToModify}/`, {
+                method: 'DELETE',
+                credentials: 'include' // CORRIGIDO
+            });
                 if (response.status !== 204) {
                     throw new Error('Erro ao excluir a conta.');
                 }
@@ -615,14 +603,13 @@
         }
 
         async function openCardExpenseModal() {
-            const token = localStorage.getItem('accessToken');
-            const cardSelect = document.getElementById('card-expense-card');
-            const categorySelect = document.getElementById('card-expense-category');
-            try {
-                const [cardsRes, catRes] = await Promise.all([
-                    fetch(`${API_URL}/api/finance/credit-cards/?is_active=true`, { headers: { 'Authorization': `Bearer ${token}` } }),
-                    fetch(`${API_URL}/api/finance/categories/?type=saida`, { headers: { 'Authorization': `Bearer ${token}` } })
-                ]);
+        const cardSelect = document.getElementById('card-expense-card');
+        const categorySelect = document.getElementById('card-expense-category');
+        try {
+            const [cardsRes, catRes] = await Promise.all([
+                fetch(`/api/finance/credit-cards/?is_active=true`, { credentials: 'include' }), // CORRIGIDO
+                fetch(`/api/finance/categories/?type=saida`, { credentials: 'include' }) // CORRIGIDO
+            ]);
                 const cards = await cardsRes.json();
                 const categories = await catRes.json();
                 cardSelect.innerHTML = '<option value="">Selecione um cartão</option>';
@@ -642,11 +629,7 @@
 
         async function saveCardExpense(event) {
             event.preventDefault();
-            const token = localStorage.getItem('accessToken');
-            if (!token) {
-                showToast('Você não está autenticado. Faça login novamente.', 'error');
-                return;
-            }
+
             const saveButton = document.getElementById('saveCardExpenseBtn');
             const payload = {
                 description: document.getElementById('card-expense-description').value,
@@ -665,11 +648,12 @@
             saveButton.textContent = 'Criando...';
 
             try {
-                const response = await fetch(`${API_URL}/api/finance/card-expense/`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                    body: JSON.stringify(payload)
-                });
+            const response = await fetch(`/api/finance/card-expense/`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include', 
+                body: JSON.stringify(payload)
+            });
                 const data = await response.json();
                 if (!response.ok) {
                     throw new Error(data.error || 'Ocorreu um erro ao registrar a despesa.');
@@ -690,3 +674,4 @@
 </body>
 
 </html>
+

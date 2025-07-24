@@ -36,141 +36,6 @@
 
 <body class="bg-gray-50 font-sans text-gray-800">
 
-    <!-- Mobile Sidebar -->
-    <div id="mobile-sidebar"
-        class="fixed inset-y-0 left-0 transform -translate-x-full w-64 bg-white shadow-lg z-30 sidebar-transition">
-        <div class="flex items-center justify-between px-4 py-3 border-b border-gray-200">
-            <div class="flex items-center space-x-2">
-                <div class="w-8 h-8 bg-blue-500 rounded-md flex items-center justify-center">
-                    <span class="text-white font-bold">FP</span>
-                </div>
-                <h1 class="text-lg font-semibold text-gray-800">FinançaPlus</h1>
-            </div>
-            <button id="close-sidebar" class="text-gray-500 hover:text-gray-700">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
-                    </path>
-                </svg>
-            </button>
-        </div>
-        <div class="px-4 py-3">
-            <div class="mb-4">
-                <button
-                    class="w-full flex justify-between items-center px-3 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-md">
-                    <span class="flex items-center">
-                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
-                        </svg>
-                        Movimentações
-                    </span>
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                    </svg>
-                </button>
-                <div class="ml-8 mt-1">
-                    <a href="./entradas.html"
-                        class="block px-3 py-2 text-sm text-gray-600 hover:bg-blue-50 hover:text-blue-600 rounded-md">Entradas</a>
-                    <a href="./saidas.html"
-                        class="block px-3 py-2 text-sm text-gray-600 hover:bg-blue-50 hover:text-blue-600 rounded-md">Saídas</a>
-                </div>
-            </div>
-
-            <div class="mb-4">
-                <button
-                    class="w-full flex justify-between items-center px-3 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-md">
-                    <span class="flex items-center">
-                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
-                            </path>
-                        </svg>
-                        Relatórios
-                    </span>
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                    </svg>
-                </button>
-                <div class="ml-8 mt-1">
-                    <a href="./DRE.html"
-                        class="block px-3 py-2 text-sm text-gray-600 hover:bg-blue-50 hover:text-blue-600 rounded-md">DRE</a>
-                    <a href="./DFC.html"
-                        class="block px-3 py-2 text-sm text-gray-600 hover:bg-blue-50 hover:text-blue-600 rounded-md">DFC</a>
-                </div>
-            </div>
-
-            <div class="mb-4">
-                <button
-                    class="w-full flex justify-between items-center px-3 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-md">
-                    <span class="flex items-center">
-                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
-                            </path>
-                        </svg>
-                        Contas
-                    </span>
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                    </svg>
-                </button>
-                <div class="ml-8 mt-1">
-                    <a href="#"
-                        class="block px-3 py-2 text-sm text-gray-600 hover:bg-blue-50 hover:text-blue-600 rounded-md">Contas
-                        a Pagar</a>
-                    <a href="#"
-                        class="block px-3 py-2 text-sm text-gray-600 hover:bg-blue-50 hover:text-blue-600 rounded-md">Contas
-                        a Receber</a>
-                </div>
-            </div>
-
-            <div class="mb-4">
-                <button
-                    class="w-full flex justify-between items-center px-3 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-md">
-                    <span class="flex items-center">
-                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10">
-                            </path>
-                        </svg>
-                        Cadastros
-                    </span>
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                    </svg>
-                </button>
-                <div class="ml-8 mt-1">
-                    <a href="./cadastros.html"
-                        class="block px-3 py-2 text-sm text-gray-600 hover:bg-blue-50 hover:text-blue-600 rounded-md">Clientes</a>
-                    <a href="#"
-                        class="block px-3 py-2 text-sm text-gray-600 hover:bg-blue-50 hover:text-blue-600 rounded-md">Fornecedores</a>
-                </div>
-            </div>
-
-            <a href="./con.html"
-                class="flex items-center px-3 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-md">
-                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c-.94 1.543.826 3.31 2.37 2.37.996.608 2.296.07 2.572-1.065z">
-                    </path>
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                </svg>
-                Configurações
-            </a>
-        </div>
-    </div>
-
     <!-- Overlay for mobile sidebar -->
     <div id="sidebar-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-20 hidden"></div>
 
@@ -192,7 +57,7 @@
                     <div class="flex justify-between items-start">
                         <div>
                             <p class="text-gray-500 text-sm">Saldo Atual</p>
-                            <h3 class="text-2xl font-bold mt-1">R$ 15.420,50</h3>
+                            <h3 id="current-balance" class="text-2xl font-bold mt-1">R$ 0,00</h3>
                             <div class="flex items-center mt-2">
                                 <span class="text-green-500 text-sm flex items-center">
                                     <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"
@@ -220,7 +85,7 @@
                     <div class="flex justify-between items-start">
                         <div>
                             <p class="text-gray-500 text-sm">Entradas do Mês</p>
-                            <h3 class="text-2xl font-bold mt-1 text-green-600">R$ 8.750,00</h3>
+                            <h3 id="monthly-income" class="text-2xl font-bold mt-1 text-green-600">R$ 0,00</h3>
                             <div class="flex items-center mt-2">
                                 <span class="text-green-500 text-sm flex items-center">
                                     <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"
@@ -247,7 +112,7 @@
                     <div class="flex justify-between items-start">
                         <div>
                             <p class="text-gray-500 text-sm">Saídas do Mês</p>
-                            <h3 class="text-2xl font-bold mt-1 text-red-600">R$ 5.320,50</h3>
+                            <h3 id="monthly-expenses" class="text-2xl font-bold mt-1 text-red-600">R$ 0,00</h3>
                             <div class="flex items-center mt-2">
                                 <span class="text-red-500 text-sm flex items-center">
                                     <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"
@@ -274,7 +139,7 @@
                     <div class="flex justify-between items-start">
                         <div>
                             <p class="text-gray-500 text-sm">Resultado</p>
-                            <h3 class="text-2xl font-bold mt-1 text-green-600">R$ 3.429,50</h3>
+                            <h3 id="monthly-result" class="text-2xl font-bold mt-1 text-green-600">R$ 0,00</h3>
                             <div class="flex items-center mt-2">
                                 <span class="text-green-500 text-sm flex items-center">
                                     <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"
@@ -302,7 +167,7 @@
                     <div class="flex justify-between items-start">
                         <div>
                             <p class="text-gray-500 text-sm">Contas a Pagar</p>
-                            <h3 class="text-2xl font-bold mt-1 text-red-600">R$ 2.150,00</h3>
+                            <h3 id="total-payables" class="text-2xl font-bold mt-1 text-red-600">R$ 0,00</h3>
                             <div class="flex items-center mt-2">
                                 <span class="text-red-500 text-sm flex items-center">
                                     <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"
@@ -329,7 +194,7 @@
                     <div class="flex justify-between items-start">
                         <div>
                             <p class="text-gray-500 text-sm">Contas a Receber</p>
-                            <h3 class="text-2xl font-bold mt-1 text-green-600">R$ 3.750,00</h3>
+                            <h3 id="total-receivables" class="text-2xl font-bold mt-1 text-green-600">R$ 0,00</h3>
                             <div class="flex items-center mt-2">
                                 <span class="text-green-500 text-sm flex items-center">
                                     <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"
@@ -392,13 +257,8 @@
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
                 <!-- Distribution by Category -->
                 <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100 lg:col-span-1">
-                    <div class="flex justify-between items-center mb-4">
-                        <h3 class="text-lg font-semibold text-gray-800">Distribuição de Despesas</h3>
-                        <a href="#" class="text-sm text-blue-500 hover:text-blue-700">Ver todas</a>
-                    </div>
-                    <div class="chart-container">
-                        <canvas id="pieChart"></canvas>
-                    </div>
+                    <h3 class="text-lg font-semibold mb-2">Evolução do Lucro Mensal</h3>
+                    <canvas id="lucroChart" height="100"></canvas>
                 </div>
 
                 <!-- Alerts Section -->
@@ -409,37 +269,13 @@
                     </div>
 
                     <!-- Vencimentos -->
-                    <div class="mb-6">
-                        <h4 class="text-md font-medium text-gray-700 mb-3 flex items-center">
-                            <svg class="w-5 h-5 text-red-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                                xmlns="http://www.w3.org/2000/svg">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z">
-                                </path>
-                            </svg>
-                            Vencimentos próximos
-                        </h4>
-                        <div class="space-y-3">
-                            <div class="flex justify-between items-center p-3 bg-red-50 rounded-lg">
-                                <div>
-                                    <p class="text-sm font-medium">Aluguel</p>
-                                    <p class="text-xs text-gray-500">Vence em 2 dias</p>
-                                </div>
-                                <div class="text-right">
-                                    <p class="text-sm font-medium text-red-600">R$ 1.200,00</p>
-                                    <a href="#" class="text-xs text-blue-500 hover:text-blue-700">Pagar</a>
-                                </div>
-                            </div>
-
-                            <div class="flex justify-between items-center p-3 bg-yellow-50 rounded-lg">
-                                <div>
-                                    <p class="text-sm font-medium">Energia</p>
-                                    <p class="text-xs text-gray-500">Vence em 5 dias</p>
-                                </div>
-                                <div class="text-right">
-                                    <p class="text-sm font-medium text-yellow-600">R$ 350,00</p>
-                                    <a href="#" class="text-xs text-blue-500 hover:text-blue-700">Pagar</a>
-                                </div>
+                    <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100 lg:col-span-2">
+                        <div class="mb-6">
+                            <h4 class="text-md font-medium text-gray-700 mb-3 flex items-center">
+                                Vencimentos próximos
+                            </h4>
+                            <div id="upcoming-payables-container" class="space-y-3">
+                                <p class="text-sm text-gray-500">Carregando vencimentos...</p>
                             </div>
                         </div>
                     </div>
@@ -472,180 +308,117 @@
             </div>
 
             <!-- Recent Transactions and Top Clients -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <!-- Recent Transactions -->
-                <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
-                    <div class="flex justify-between items-center mb-4">
-                        <h3 class="text-lg font-semibold text-gray-800">Últimos Lançamentos</h3>
-                        <a href="#" class="text-sm text-blue-500 hover:text-blue-700">Ver todos</a>
-                    </div>
-
-                    <div class="space-y-4">
-                        <div class="flex justify-between items-center pb-4 border-b border-gray-100">
-                            <div class="flex items-center">
-                                <div class="p-2 bg-green-50 rounded-lg mr-3">
-                                    <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
-                                        </path>
-                                    </svg>
-                                </div>
-                                <div>
-                                    <p class="text-sm font-medium">Venda Produto A</p>
-                                    <p class="text-xs text-gray-500">15/06/2023 • Cliente X</p>
-                                </div>
-                            </div>
-                            <div class="text-right">
-                                <p class="text-sm font-medium text-green-600">R$ 1.250,00</p>
-                                <p class="text-xs text-gray-500">Cartão</p>
-                            </div>
-                        </div>
-
-                        <div class="flex justify-between items-center pb-4 border-b border-gray-100">
-                            <div class="flex items-center">
-                                <div class="p-2 bg-red-50 rounded-lg mr-3">
-                                    <svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
-                                        </path>
-                                    </svg>
-                                </div>
-                                <div>
-                                    <p class="text-sm font-medium">Pagamento Fornecedor</p>
-                                    <p class="text-xs text-gray-500">14/06/2023 • Fornecedor Y</p>
-                                </div>
-                            </div>
-                            <div class="text-right">
-                                <p class="text-sm font-medium text-red-600">R$ 850,00</p>
-                                <p class="text-xs text-gray-500">Transferência</p>
-                            </div>
-                        </div>
-
-                        <div class="flex justify-between items-center pb-4 border-b border-gray-100">
-                            <div class="flex items-center">
-                                <div class="p-2 bg-green-50 rounded-lg mr-3">
-                                    <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
-                                        </path>
-                                    </svg>
-                                </div>
-                                <div>
-                                    <p class="text-sm font-medium">Serviço Consultoria</p>
-                                    <p class="text-xs text-gray-500">12/06/2023 • Cliente Z</p>
-                                </div>
-                            </div>
-                            <div class="text-right">
-                                <p class="text-sm font-medium text-green-600">R$ 2.500,00</p>
-                                <p class="text-xs text-gray-500">PIX</p>
-                            </div>
-                        </div>
-                    </div>
+            <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-semibold text-gray-800">Últimos Lançamentos</h3>
+                    <a href="#" class="text-sm text-blue-500 hover:text-blue-700">Ver todos</a>
                 </div>
 
-                <!-- Top Clients and Suppliers -->
-                <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
-                    <div class="flex justify-between items-center mb-4">
-                        <h3 class="text-lg font-semibold text-gray-800">Top Clientes e Fornecedores</h3>
-                        <a href="#" class="text-sm text-blue-500 hover:text-blue-700">Ver todos</a>
-                    </div>
+                <div id="recent-transactions-container" class="space-y-4">
+                    <p class="text-sm text-gray-500">Carregando lançamentos...</p>
+                </div>
+            </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <!-- Top Clients -->
-                        <div>
-                            <h4 class="text-md font-medium text-gray-700 mb-3 flex items-center">
-                                <svg class="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z">
-                                    </path>
-                                </svg>
-                                Top Clientes
-                            </h4>
+            <!-- Top Clients and Suppliers -->
+            <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-semibold text-gray-800">Top Clientes e Fornecedores</h3>
+                    <a href="#" class="text-sm text-blue-500 hover:text-blue-700">Ver todos</a>
+                </div>
 
-                            <div class="space-y-3">
-                                <div class="flex items-center p-2 bg-gray-50 rounded-lg">
-                                    <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-3">
-                                        <span class="text-blue-600 text-xs font-medium">CX</span>
-                                    </div>
-                                    <div class="flex-1">
-                                        <p class="text-sm font-medium">Cliente X</p>
-                                        <p class="text-xs text-gray-500">R$ 3.250,00</p>
-                                    </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Top Clients -->
+                    <div>
+                        <h4 class="text-md font-medium text-gray-700 mb-3 flex items-center">
+                            <svg class="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z">
+                                </path>
+                            </svg>
+                            Top Clientes
+                        </h4>
+
+                        <div class="space-y-3">
+                            <div class="flex items-center p-2 bg-gray-50 rounded-lg">
+                                <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-3">
+                                    <span class="text-blue-600 text-xs font-medium">CX</span>
                                 </div>
-
-                                <div class="flex items-center p-2 bg-gray-50 rounded-lg">
-                                    <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-3">
-                                        <span class="text-blue-600 text-xs font-medium">CZ</span>
-                                    </div>
-                                    <div class="flex-1">
-                                        <p class="text-sm font-medium">Cliente Z</p>
-                                        <p class="text-xs text-gray-500">R$ 2.850,00</p>
-                                    </div>
+                                <div class="flex-1">
+                                    <p class="text-sm font-medium">Cliente X</p>
+                                    <p class="text-xs text-gray-500">R$ 3.250,00</p>
                                 </div>
+                            </div>
 
-                                <div class="flex items-center p-2 bg-gray-50 rounded-lg">
-                                    <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-3">
-                                        <span class="text-blue-600 text-xs font-medium">CY</span>
-                                    </div>
-                                    <div class="flex-1">
-                                        <p class="text-sm font-medium">Cliente Y</p>
-                                        <p class="text-xs text-gray-500">R$ 1.750,00</p>
-                                    </div>
+                            <div class="flex items-center p-2 bg-gray-50 rounded-lg">
+                                <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-3">
+                                    <span class="text-blue-600 text-xs font-medium">CZ</span>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="text-sm font-medium">Cliente Z</p>
+                                    <p class="text-xs text-gray-500">R$ 2.850,00</p>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center p-2 bg-gray-50 rounded-lg">
+                                <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-3">
+                                    <span class="text-blue-600 text-xs font-medium">CY</span>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="text-sm font-medium">Cliente Y</p>
+                                    <p class="text-xs text-gray-500">R$ 1.750,00</p>
                                 </div>
                             </div>
                         </div>
+                    </div>
 
-                        <!-- Top Suppliers -->
-                        <div>
-                            <h4 class="text-md font-medium text-gray-700 mb-3 flex items-center">
-                                <svg class="w-5 h-5 text-red-500 mr-2" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10">
-                                    </path>
-                                </svg>
-                                Top Fornecedores
-                            </h4>
+                    <!-- Top Suppliers -->
+                    <div>
+                        <h4 class="text-md font-medium text-gray-700 mb-3 flex items-center">
+                            <svg class="w-5 h-5 text-red-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10">
+                                </path>
+                            </svg>
+                            Top Fornecedores
+                        </h4>
 
-                            <div class="space-y-3">
-                                <div class="flex items-center p-2 bg-gray-50 rounded-lg">
-                                    <div class="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center mr-3">
-                                        <span class="text-red-600 text-xs font-medium">FY</span>
-                                    </div>
-                                    <div class="flex-1">
-                                        <p class="text-sm font-medium">Fornecedor Y</p>
-                                        <p class="text-xs text-gray-500">R$ 1.850,00</p>
-                                    </div>
+                        <div class="space-y-3">
+                            <div class="flex items-center p-2 bg-gray-50 rounded-lg">
+                                <div class="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center mr-3">
+                                    <span class="text-red-600 text-xs font-medium">FY</span>
                                 </div>
-
-                                <div class="flex items-center p-2 bg-gray-50 rounded-lg">
-                                    <div class="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center mr-3">
-                                        <span class="text-red-600 text-xs font-medium">FX</span>
-                                    </div>
-                                    <div class="flex-1">
-                                        <p class="text-sm font-medium">Fornecedor X</p>
-                                        <p class="text-xs text-gray-500">R$ 1.250,00</p>
-                                    </div>
+                                <div class="flex-1">
+                                    <p class="text-sm font-medium">Fornecedor Y</p>
+                                    <p class="text-xs text-gray-500">R$ 1.850,00</p>
                                 </div>
+                            </div>
 
-                                <div class="flex items-center p-2 bg-gray-50 rounded-lg">
-                                    <div class="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center mr-3">
-                                        <span class="text-red-600 text-xs font-medium">FZ</span>
-                                    </div>
-                                    <div class="flex-1">
-                                        <p class="text-sm font-medium">Fornecedor Z</p>
-                                        <p class="text-xs text-gray-500">R$ 950,00</p>
-                                    </div>
+                            <div class="flex items-center p-2 bg-gray-50 rounded-lg">
+                                <div class="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center mr-3">
+                                    <span class="text-red-600 text-xs font-medium">FX</span>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="text-sm font-medium">Fornecedor X</p>
+                                    <p class="text-xs text-gray-500">R$ 1.250,00</p>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center p-2 bg-gray-50 rounded-lg">
+                                <div class="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center mr-3">
+                                    <span class="text-red-600 text-xs font-medium">FZ</span>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="text-sm font-medium">Fornecedor Z</p>
+                                    <p class="text-xs text-gray-500">R$ 950,00</p>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+        </div>
         </div>
     </main>
 
@@ -657,134 +430,134 @@
         </svg>
     </button>
 
-    <script src="../componentes/auth.js"></script> <script src="../componentes/topbar.js"></script>
+    <script src="../componentes/auth.js"></script>
+    <script src="../componentes/topbar.js"></script>
     <script>
 
-        const storedPermissions = localStorage.getItem('userPermissions');
-        console.log("Permissões carregadas do localStorage:", storedPermissions);
-        // Para ver o objeto de forma mais clara no console:
-        console.log("Permissões como objeto:", JSON.parse(storedPermissions));
+        let barChart = null;
+        let lineChart = null;
+        // --- PONTO DE PARTIDA DA EXECUÇÃO ---
+        // Adicionamos um listener que espera a página inteira carregar antes de executar qualquer código.
+        document.addEventListener('DOMContentLoaded', function () {
+            protectPage('dashboard'); // Função do auth.js para verificar se o usuário está logado.
+            setupMobileMenu(); // Função para configurar o menu mobile.
+            loadDashboardData(); // Função principal que busca os dados da API.
+            loadChartData();
+            loadCashFlowChartData();
 
-        const userName = localStorage.getItem('userName');
-        if (userName) {
-            const nameSpan = document.getElementById('user-name-display');
-            if (nameSpan) {
-                nameSpan.textContent = userName;
+            console.log("Itens no localStorage:", localStorage);
+        });
+
+    
+        // Função para exibir as informações do usuário
+        function displayUserInfo() {
+            const userName = localStorage.getItem('userName');
+            if (userName) {
+                // Atualiza o nome no corpo da página
+                const nameSpan = document.getElementById('user-name-display');
+                if (nameSpan) {
+                    nameSpan.textContent = userName;
+                }
+
             }
         }
 
 
-        // Mobile menu toggle
-        const mobileMenuButton = document.getElementById('mobile-menu-button');
-        const mobileSidebar = document.getElementById('mobile-sidebar');
-        const closeSidebar = document.getElementById('close-sidebar');
-        const sidebarOverlay = document.getElementById('sidebar-overlay');
+        // Adicione esta nova função para carregar os dados do gráfico Receitas Vs Despesas
+        async function loadChartData() {
 
-        mobileMenuButton.addEventListener('click', () => {
-            mobileSidebar.classList.remove('-translate-x-full');
-            sidebarOverlay.classList.remove('hidden');
-        });
+            try {
+                const response = await fetch('/api/finance/charts/income-expense/', {
+                    credentials: 'include'
+                });
+                if (!response.ok) throw new Error('Falha ao buscar dados do gráfico.');
 
-        closeSidebar.addEventListener('click', () => {
-            mobileSidebar.classList.add('-translate-x-full');
-            sidebarOverlay.classList.add('hidden');
-        });
+                const data = await response.json();
+                updateBarChart(data); // Chama a função para atualizar o gráfico com os novos dados
 
-        sidebarOverlay.addEventListener('click', () => {
-            mobileSidebar.classList.add('-translate-x-full');
-            sidebarOverlay.classList.add('hidden');
-        });
+            } catch (error) {
+                console.error("Erro ao carregar dados do gráfico:", error);
+            }
+        }
 
-        // Charts
-        document.addEventListener('DOMContentLoaded', function () {
+        // Adicione esta função para redesenhar o gráfico
+        function updateBarChart(data) {
+            const ctx = document.getElementById('barChart')?.getContext('2d');
+            if (!ctx) return;
 
-            protectPage('dashboard');
-            // Bar Chart - Receitas vs Despesas
-            const barCtx = document.getElementById('barChart').getContext('2d');
-            const barChart = new Chart(barCtx, {
+            // Destrói o gráfico antigo, se ele existir, para evitar bugs
+            if (barChart) {
+                barChart.destroy();
+            }
+
+            barChart = new Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'],
-                    datasets: [
-                        {
-                            label: 'Receitas',
-                            data: [6500, 5900, 8000, 8100, 8600, 8750],
-                            backgroundColor: '#10B981',
-                            borderRadius: 4
-                        },
-                        {
-                            label: 'Despesas',
-                            data: [4800, 5200, 6000, 5800, 5100, 5320],
-                            backgroundColor: '#EF4444',
-                            borderRadius: 4
-                        }
-                    ]
+                    labels: data.labels, // Vem da API
+                    datasets: [{
+                        label: 'Receitas',
+                        data: data.income_data, // Vem da API
+                        backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1
+                    }, {
+                        label: 'Despesas',
+                        data: data.expense_data, // Vem da API
+                        backgroundColor: 'rgba(255, 99, 132, 0.6)',
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        borderWidth: 1
+                    }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
                     scales: {
                         y: {
-                            beginAtZero: true,
-                            grid: {
-                                display: true,
-                                color: 'rgba(0, 0, 0, 0.05)'
-                            },
-                            ticks: {
-                                callback: function (value) {
-                                    return 'R$ ' + value.toLocaleString('pt-BR');
-                                }
-                            }
-                        },
-                        x: {
-                            grid: {
-                                display: false
-                            }
-                        }
-                    },
-                    plugins: {
-                        legend: {
-                            position: 'top',
-                            labels: {
-                                usePointStyle: true,
-                                padding: 20
-                            }
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function (context) {
-                                    let label = context.dataset.label || '';
-                                    if (label) {
-                                        label += ': ';
-                                    }
-                                    label += 'R$ ' + context.raw.toLocaleString('pt-BR');
-                                    return label;
-                                }
-                            }
+                            beginAtZero: true
                         }
                     }
                 }
             });
+        }
 
-            // Line Chart - Fluxo de Caixa
-            const lineCtx = document.getElementById('lineChart').getContext('2d');
-            const lineChart = new Chart(lineCtx, {
+
+        // Adicione esta nova função para carregar os dados do gráfico de fluxo de caixa
+        async function loadCashFlowChartData() {
+
+            try {
+                const response = await fetch('/api/finance/charts/cash-flow/', {
+                    credentials: 'include'
+                });
+                if (!response.ok) throw new Error('Falha ao buscar dados do fluxo de caixa.');
+
+                const data = await response.json();
+                updateLineChart(data);
+
+            } catch (error) {
+                console.error("Erro ao carregar dados do fluxo de caixa:", error);
+            }
+        }
+
+        // Adicione esta função para redesenhar o gráfico de linha
+        function updateLineChart(data) {
+            const ctx = document.getElementById('lineChart')?.getContext('2d');
+            if (!ctx) return;
+
+            if (lineChart) {
+                lineChart.destroy();
+            }
+
+            lineChart = new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'],
+                    labels: data.labels,
                     datasets: [{
                         label: 'Saldo Acumulado',
-                        data: [2500, 3200, 5200, 7500, 9800, 15420],
-                        borderColor: '#3B82F6',
-                        backgroundColor: 'rgba(59, 130, 246, 0.05)',
-                        borderWidth: 2,
-                        tension: 0.1,
-                        fill: true,
-                        pointBackgroundColor: '#3B82F6',
-                        pointBorderColor: '#fff',
-                        pointBorderWidth: 2,
-                        pointRadius: 4,
-                        pointHoverRadius: 6
+                        data: data.cumulative_balance,
+                        fill: false,
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                        tension: 0.1
                     }]
                 },
                 options: {
@@ -792,98 +565,165 @@
                     maintainAspectRatio: false,
                     scales: {
                         y: {
-                            beginAtZero: false,
-                            grid: {
-                                display: true,
-                                color: 'rgba(0, 0, 0, 0.05)'
-                            },
-                            ticks: {
-                                callback: function (value) {
-                                    return 'R$ ' + value.toLocaleString('pt-BR');
-                                }
-                            }
-                        },
-                        x: {
-                            grid: {
-                                display: false
-                            }
-                        }
-                    },
-                    plugins: {
-                        legend: {
-                            position: 'top',
-                            labels: {
-                                usePointStyle: true,
-                                padding: 20
-                            }
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function (context) {
-                                    let label = context.dataset.label || '';
-                                    if (label) {
-                                        label += ': ';
-                                    }
-                                    label += 'R$ ' + context.raw.toLocaleString('pt-BR');
-                                    return label;
-                                }
-                            }
+                            beginAtZero: false // O saldo pode ser negativo, então não forçamos começar em zero
                         }
                     }
                 }
             });
+        }
 
-            // Pie Chart - Distribuição de Despesas
-            const pieCtx = document.getElementById('pieChart').getContext('2d');
-            const pieChart = new Chart(pieCtx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Fornecedores', 'Salários', 'Aluguel', 'Serviços', 'Outros'],
-                    datasets: [{
-                        data: [35, 25, 20, 15, 5],
-                        backgroundColor: [
-                            '#3B82F6',
-                            '#10B981',
-                            '#F59E0B',
-                            '#6366F1',
-                            '#64748B'
-                        ],
-                        borderWidth: 0,
-                        borderRadius: 4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    cutout: '70%',
-                    plugins: {
-                        legend: {
-                            position: 'right',
-                            labels: {
-                                usePointStyle: true,
-                                padding: 20,
-                                boxWidth: 8
-                            }
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function (context) {
-                                    const label = context.label || '';
-                                    const value = context.raw;
-                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                                    const percentage = Math.round((value / total) * 100);
-                                    return `${label}: ${percentage}% (R$ ${value.toLocaleString('pt-BR')})`;
-                                }
-                            }
-                        }
-                    }
+
+        // Função para configurar a lógica do menu mobile
+        function setupMobileMenu() {
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileSidebar = document.getElementById('mobile-sidebar');
+            const closeSidebar = document.getElementById('close-sidebar');
+            const sidebarOverlay = document.getElementById('sidebar-overlay');
+
+            if (mobileMenuButton && mobileSidebar && closeSidebar && sidebarOverlay) {
+                mobileMenuButton.addEventListener('click', () => {
+                    mobileSidebar.classList.remove('-translate-x-full');
+                    sidebarOverlay.classList.remove('hidden');
+                });
+
+                const closeAction = () => {
+                    mobileSidebar.classList.add('-translate-x-full');
+                    sidebarOverlay.classList.add('hidden');
+                };
+
+                closeSidebar.addEventListener('click', closeAction);
+                sidebarOverlay.addEventListener('click', closeAction);
+            }
+        }
+
+        // Função principal para carregar os dados do dashboard da API
+        async function loadDashboardData() {
+            console.log("Iniciando a função loadDashboardData...");
+
+
+            try {
+                const response = await fetch('/api/finance/dashboard/', {
+                    credentials: 'include',
+                });
+
+                console.log("Resposta da API recebida com status:", response.status);
+
+                if (response.status === 401) {
+                    console.error("Não autorizado (401). Redirecionando para login.");
+                    window.location.href = '../telas/login.html';
+                    return;
                 }
+
+                if (!response.ok) {
+                    throw new Error(`Falha na rede: ${response.statusText}`);
+                }
+
+                const data = await response.json();
+                console.log("Dados recebidos do backend:", data);
+
+                // Se os dados foram recebidos, chama as funções para popular a tela
+                updateSummaryCards(data.summary_cards);
+                displayUpcomingPayables(data.alerts.upcoming_payables);
+                displayRecentTransactions(data.recent_transactions);
+
+                // Salva e exibe o nome do usuário retornado pela API
+                if (data.user_info && data.user_info.name) {
+                    localStorage.setItem('userName', data.user_info.name);
+                    displayUserInfo();
+                }
+
+            } catch (error) {
+                console.error('Erro fatal ao buscar dados do dashboard:', error);
+                // Exibe uma mensagem de erro clara para o usuário
+                const container = document.getElementById('upcoming-payables-container');
+                if (container) {
+                    container.innerHTML = `<div class="p-4 bg-red-50 text-red-700 rounded-lg">
+                    <p class="font-bold">Erro de Conexão</p>
+                    <p class="text-sm">Não foi possível carregar os dados do dashboard. Verifique sua conexão e tente recarregar a página.</p>
+                </div>`;
+                }
+            }
+        }
+
+
+        // --- FUNÇÕES AUXILIARES PARA ATUALIZAR A UI ---
+
+        const formatCurrency = (value) => {
+            return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value || 0);
+        };
+
+        const formatDate = (dateString) => {
+            if (!dateString) return 'Data inválida';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('pt-BR', { timeZone: 'UTC' });
+        };
+
+        function updateSummaryCards(summary) {
+            if (!summary) return;
+            document.getElementById('current-balance').textContent = formatCurrency(summary.current_balance);
+            document.getElementById('monthly-income').textContent = formatCurrency(summary.monthly_income);
+            document.getElementById('monthly-expenses').textContent = formatCurrency(summary.monthly_expenses);
+
+            const monthlyResultEl = document.getElementById('monthly-result');
+            monthlyResultEl.textContent = formatCurrency(summary.monthly_result);
+            monthlyResultEl.className = summary.monthly_result >= 0 ? 'text-2xl font-bold mt-1 text-green-600' : 'text-2xl font-bold mt-1 text-red-600';
+
+            document.getElementById('total-payables').textContent = formatCurrency(summary.total_payables);
+            document.getElementById('total-receivables').textContent = formatCurrency(summary.total_receivables);
+        }
+
+        function displayUpcomingPayables(payables) {
+            const container = document.getElementById('upcoming-payables-container');
+            if (!container) return;
+            container.innerHTML = '';
+
+            if (!payables || payables.length === 0) {
+                container.innerHTML = '<p class="text-sm text-gray-500 p-3 bg-gray-50 rounded-lg">Nenhum vencimento nos próximos 7 dias.</p>';
+                return;
+            }
+
+            payables.forEach(payable => {
+                container.innerHTML += `
+                <div class="flex justify-between items-center p-3 bg-yellow-50 rounded-lg">
+                    <div>
+                        <p class="text-sm font-medium">${payable.description}</p>
+                        <p class="text-xs text-gray-500">Vence em: ${formatDate(payable.due_date)}</p>
+                    </div>
+                    <p class="text-sm font-bold text-yellow-600">${formatCurrency(payable.amount)}</p>
+                </div>`;
             });
-        });
+        }
+
+        function displayRecentTransactions(transactions) {
+            const container = document.getElementById('recent-transactions-container');
+            if (!container) return;
+            container.innerHTML = '';
+
+            if (!transactions || transactions.length === 0) {
+                container.innerHTML = '<p class="text-sm text-gray-500 p-3">Nenhum lançamento recente.</p>';
+                return;
+            }
+
+            transactions.forEach(transaction => {
+                const isIncome = transaction.type === 'entrada';
+                const amountClass = isIncome ? 'text-green-600' : 'text-red-600';
+                const amountSign = isIncome ? '+' : '-';
+
+                container.innerHTML += `
+                <div class="flex justify-between items-center pb-3 mb-3 border-b last:border-b-0">
+                    <div>
+                        <p class="text-sm font-medium">${transaction.description}</p>
+                        <p class="text-xs text-gray-500">${formatDate(transaction.transaction_date)}</p>
+                    </div>
+                    <p class="text-sm font-bold ${amountClass}">${amountSign} ${formatCurrency(transaction.amount)}</p>
+                </div>`;
+            });
+        }
+
     </script>
-    <script src="script.js"></script>
+
 </body>
 
 </html>
 
-document.addEventListener
+Distribuição

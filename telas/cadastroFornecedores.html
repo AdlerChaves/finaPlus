@@ -430,8 +430,7 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            const API_URL = 'http://127.0.0.1:8000'; // Ajuste se necessário
-            const token = localStorage.getItem('accessToken');
+
             const supplierId = new URLSearchParams(window.location.search).get('id');
             const form = document.getElementById('supplierForm');
 
@@ -448,9 +447,13 @@
                 document.getElementById('saveButton').innerHTML = '<i class="fas fa-save mr-2"></i>Salvar Alterações';
 
                 try {
-                    const response = await fetch(`${API_URL}/api/cadastros/suppliers/${id}/`, {
-                        headers: { 'Authorization': `Bearer ${token}` }
+                    const response = await fetch(`/api/cadastros/suppliers/${id}/`, {
+                        credentials: 'include'
                     });
+                    if (response.status === 401) {
+                        window.location.href = 'fornecedores.html';
+                        return;
+                    }
                     if (!response.ok) throw new Error('Não foi possível carregar os dados.');
                     const supplier = await response.json();
                     populateForm(supplier);
@@ -541,11 +544,11 @@
                 e.preventDefault();
 
                 if (!validateForm()) {
-                    return; // Para a execução se o formulário for inválido
+                    return;
                 }
 
                 const id = document.getElementById('supplierId').value;
-                const url = id ? `${API_URL}/api/cadastros/suppliers/${id}/` : `${API_URL}/api/cadastros/suppliers/`;
+                const url = id ? `/api/cadastros/suppliers/${id}/` : `/api/cadastros/suppliers/`;
                 const method = id ? 'PUT' : 'POST';
 
                 const payload = {
@@ -591,7 +594,8 @@
                 try {
                     const response = await fetch(url, {
                         method: method,
-                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                        headers: { 'Content-Type': 'application/json' },
+                        credentials: 'include', // Necessário para enviar os cookies
                         body: JSON.stringify(payload)
                     });
 

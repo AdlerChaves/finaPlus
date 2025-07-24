@@ -185,12 +185,10 @@
         </div>
     </div>
 
+    <script src="../componentes/auth.js"></script>
     <script src="../componentes/topbar.js"></script>
     <script>
         // --- INÍCIO DO SCRIPT UNIFICADO E CORRIGIDO ---
-
-        // URL da API
-        const API_URL = 'http://127.0.0.1:8000';
 
         const formatMoney = (value) => {
             const numberValue = parseFloat(value);
@@ -200,298 +198,48 @@
 
         // Função principal que é chamada quando a página carrega
         document.addEventListener('DOMContentLoaded', () => {
-            // 1. Renderiza o Topbar primeiro
-            const userPermissions = {
-                dashboard: true, movimentacoes: true, relatorios: true,
-                pagamentos: true, contas: true, cadastros: true, configuracoes: true
-            };
-            renderTopbar('contas', userPermissions);
 
-            // 2. Carrega o HTML do modal e DEPOIS configura seus botões
+            protectPage('contas');
             loadAndSetupModal();
-
-            // 3. Busca e exibe os cartões na tabela (pode ser chamada aqui ou dentro de loadAndSetupModal)
             renderCreditCards();
         });
 
         // Esta nova função irá carregar o HTML do modal E configurar os seus eventos
         async function loadAndSetupModal() {
             try {
-                // Busca o conteúdo do arquivo do modal
                 const response = await fetch('../componentes/modalCartaoCredito.html');
                 const modalHtml = await response.text();
-                // Adiciona o HTML do modal ao final do <body>
                 document.body.insertAdjacentHTML('beforeend', modalHtml);
 
-                // AGORA que o modal existe no DOM, podemos configurar seus botões
                 document.getElementById('openModalBtn').addEventListener('click', openAddModal);
                 document.getElementById('cancelBtn').addEventListener('click', closeModal);
                 document.getElementById('creditCardForm').addEventListener('submit', saveCard);
-
-
                 document.getElementById('confirm-delete-btn').addEventListener('click', deleteCard);
                 document.getElementById('cancel-delete-btn').addEventListener('click', closeDeleteModal);
 
-
-
-                // Futuramente, adicionaremos os listeners do modal de exclusão aqui também
-                // document.getElementById('confirm-delete-btn').addEventListener('click', deleteCard);
-                // document.getElementById('cancel-delete-btn').addEventListener('click', closeDeleteModal);
 
             } catch (error) {
                 console.error("Falha ao carregar o componente do modal:", error);
             }
         }
 
-        // Função para abrir o modal para Adicionar
-        function openAddModal() {
-            const form = document.getElementById('creditCardForm');
-            if (form) {
-                form.reset();
-                document.getElementById('modalTitle').textContent = 'Cadastrar Cartão';
-
-                // --- LINHA CRUCIAL ADICIONADA/CORRIGIDA ---
-                // Limpa a variável para garantir que estamos no modo de CRIAÇÃO
-                cardIdToModify = null;
-
-                // Garante que o campo de ID oculto esteja vazio
-                const cardIdInput = document.getElementById('cardId');
-                if (cardIdInput) cardIdInput.value = '';
-
-                const token = localStorage.getItem('accessToken');
-                populateAccountsDropdown(token);
-
-                document.getElementById('creditCardModal').classList.remove('hidden');
-            }
-        }
-        async function openEditModal(id) {
-            // Guarda o ID do cartão que estamos editando
-            cardIdToModify = id;
-
-            const token = localStorage.getItem('accessToken');
-
-            try {
-                // 1. Busca os dados específicos do cartão na API
-                const response = await fetch(`${API_URL}/api/finance/credit-cards/${id}/`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-                if (!response.ok) throw new Error('Não foi possível carregar os dados do cartão.');
-
-                const card = await response.json();
-
-                // 2. Garante que o dropdown de contas está carregado
-                await populateAccountsDropdown(token);
-
-                // 3. Preenche o formulário do modal com os dados recebidos
-                const modal = document.getElementById('creditCardModal');
-                document.getElementById('modalTitle').textContent = 'Editar Cartão de Crédito';
-                document.getElementById('cardId').value = card.id;
-                document.getElementById('cardName').value = card.name;
-                document.getElementById('cardBrand').value = card.brand;
-                document.getElementById('lastDigits').value = card.last_digits;
-                document.getElementById('creditLimit').value = parseFloat(card.credit_limit).toFixed(2).replace('.', ',');
-                document.getElementById('closingDay').value = card.closing_day;
-                document.getElementById('dueDay').value = card.due_day;
-                document.getElementById('associatedAccount').value = card.associated_account;
-                document.getElementById('cardStatus').checked = card.is_active;
-
-                // 4. Abre o modal
-                modal.classList.remove('hidden');
-
-            } catch (error) {
-                alert(error.message); // Usando alert simples para feedback
-            }
-        }
-
-        // Função para fechar o modal
-        function closeModal() {
-            const modal = document.getElementById('creditCardModal');
-            if (modal) modal.classList.add('hidden');
-        }
-
-        function openDeleteModal(id) {
-            cardIdToModify = id; // Guarda o ID do cartão a ser deletado
-            document.getElementById('delete-modal').classList.remove('hidden');
-        }
-
-        function closeDeleteModal() {
-            cardIdToModify = null; // Limpa o ID
-            document.getElementById('delete-modal').classList.add('hidden');
-        }
-
-        async function deleteCard() {
-            if (!cardIdToModify) return;
-            const token = localStorage.getItem('accessToken');
-            try {
-                const response = await fetch(`${API_URL}/api/finance/credit-cards/${cardIdToModify}/`, {
-                    method: 'DELETE',
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-
-                if (response.status !== 204) { // 204 No Content é a resposta de sucesso para DELETE
-                    throw new Error('Erro ao excluir o cartão.');
-                }
-
-                alert('Cartão excluído com sucesso!');
-                closeDeleteModal();
-                renderCreditCards(); // Atualiza a lista na tela
-            } catch (error) {
-                alert(error.message);
-            }
-        }
-
-        function openDeleteModal(id) {
-            cardIdToModify = id; // Guarda o ID do cartão a ser deletado
-            document.getElementById('delete-modal').classList.remove('hidden');
-        }
-
-        // Função para fechar o modal de confirmação
-        function closeDeleteModal() {
-            cardIdToModify = null; // Limpa o ID
-            document.getElementById('delete-modal').classList.add('hidden');
-        }
-
-        // Função que realmente envia o pedido de exclusão para a API
-        async function deleteCard() {
-            if (!cardIdToModify) return;
-            const token = localStorage.getItem('accessToken');
-            try {
-                const response = await fetch(`${API_URL}/api/finance/credit-cards/${cardIdToModify}/`, {
-                    method: 'DELETE',
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-
-                if (response.status !== 204) throw new Error('Erro ao excluir o cartão.');
-
-                alert('Cartão excluído com sucesso!');
-                closeDeleteModal();
-                renderCreditCards(); // Atualiza a lista na tela
-            } catch (error) {
-                alert(error.message);
-            }
-        }
-
-        // --- Adicionando os Event Listeners para o Modal de Exclusão ---
-        // Garanta que esta lógica esteja dentro da sua função loadAndSetupModal
-        // Se não tiver, adicione-a ao final do seu script por enquanto.
-        document.addEventListener('DOMContentLoaded', () => {
-            // ...
-            // É importante que esses botões SÓ sejam procurados DEPOIS que o modal está na página.
-            // A melhor prática é colocar isso dentro da sua função `loadAndSetupModal`
-            // document.getElementById('confirm-delete-btn').addEventListener('click', deleteCard);
-            // document.getElementById('cancel-delete-btn').addEventListener('click', closeDeleteModal);
-        });
-
-
-
-        async function populateAccountsDropdown(token) {
-            // Encontra o elemento <select> dentro do modal
-            const associatedAccountSelect = document.getElementById('associatedAccount');
-            if (!associatedAccountSelect) return; // Segurança caso o modal não tenha carregado
-
-            try {
-                // 1. Busca as contas bancárias na sua API
-                const response = await fetch(`${API_URL}/api/finance/bank-accounts/`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-                if (!response.ok) throw new Error('Falha ao carregar contas.');
-
-                const accounts = await response.json();
-
-                // 2. Limpa as opções existentes (exceto a primeira "Selecione")
-                associatedAccountSelect.innerHTML = '<option value="">Selecione uma conta</option>';
-
-                // 3. Adiciona uma nova <option> para cada conta ATIVA
-                accounts
-                    .filter(account => account.is_active) // Filtra para pegar apenas contas ativas
-                    .forEach(account => {
-                        const option = document.createElement('option');
-                        option.value = account.id; // O valor será o ID da conta
-                        option.textContent = account.name; // O texto será o nome da conta
-                        associatedAccountSelect.appendChild(option);
-                    });
-
-            } catch (error) {
-                console.error("Erro ao popular contas:", error);
-                associatedAccountSelect.innerHTML = '<option value="">Erro ao carregar contas</option>';
-            }
-        }
-
-        // Função para salvar (ainda vazia, será o Passo 2)
-        async function saveCard(event) {
-    event.preventDefault(); 
-    
-    const token = localStorage.getItem('accessToken');
-    const id = cardIdToModify; // Pega o ID (pode ser nulo ou um número)
-
-    const payload = {
-        name: document.getElementById('cardName').value,
-        brand: document.getElementById('cardBrand').value,
-        last_digits: document.getElementById('lastDigits').value,
-        credit_limit: document.getElementById('creditLimit').value.replace(/\./g, '').replace(',', '.'),
-        closing_day: document.getElementById('closingDay').value,
-        due_day: document.getElementById('dueDay').value,
-        associated_account: document.getElementById('associatedAccount').value,
-        is_active: document.getElementById('cardStatus').checked
-    };
-
-    const url = id ? `${API_URL}/api/finance/credit-cards/${id}/` : `${API_URL}/api/finance/credit-cards/`;
-    const method = id ? 'PUT' : 'POST';
-
-    const saveButton = document.querySelector('button[type="submit"][form="creditCardForm"]');
-    saveButton.disabled = true;
-    saveButton.textContent = 'Salvando...';
-
-    try {
-        const response = await fetch(url, {
-            method: method,
-            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-            body: JSON.stringify(payload)
-        });
-
-        if (!response.ok) {
-            const errorData = await response.json();
-            let errorMsg = "Erro ao salvar: ";
-            for (const field in errorData) { 
-                const message = Array.isArray(errorData[field]) ? errorData[field].join(', ') : errorData[field];
-                errorMsg += `${field}: ${message} `; 
-            }
-            throw new Error(errorMsg);
-        }
-
-        alert(id ? 'Cartão atualizado com sucesso!' : 'Cartão criado com sucesso!');
-        closeModal();
-        renderCreditCards();
-
-    } catch (error) {
-        alert(error.message);
-    } finally {
-        saveButton.disabled = false;
-        saveButton.textContent = 'Salvar';
-    }
-}
-
-
         // Função para renderizar os cartões na tabela
         async function renderCreditCards() {
-            // 1. Pega o token de autenticação para provar quem você é
-            const token = localStorage.getItem('accessToken');
-            if (!token) {
-                window.location.href = '../login.html'; // Segurança: se não há token, vai para o login
-                return;
-            }
 
-            // Seleciona os elementos da página que vamos atualizar
             const cardsTableBody = document.getElementById('cards-table-body');
             const activeCardsCountEl = document.getElementById('active-cards-count');
             const totalLimitEl = document.getElementById('total-limit');
             const nextDueDateEl = document.getElementById('next-due-date');
 
             try {
-                // 2. Faz a chamada GET para a API para buscar os cartões
-                const response = await fetch(`${API_URL}/api/finance/credit-cards/`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
+                const response = await fetch(`/api/finance/credit-cards/`, {
+                    credentials: 'include'
                 });
+
+                if (response.status === 401) {
+                    window.location.href = '../login.html';
+                    return;
+                }
 
                 if (!response.ok) {
                     throw new Error('Falha ao buscar os cartões de crédito. Tente fazer login novamente.');
@@ -559,6 +307,213 @@
                 alert(error.message); // Usando alert simples para o erro
             }
         }
+
+        // Função para abrir o modal para Adicionar
+        function openAddModal() {
+            const form = document.getElementById('creditCardForm');
+            if (form) {
+                form.reset();
+                document.getElementById('modalTitle').textContent = 'Cadastrar Cartão';
+
+                cardIdToModify = null;
+
+                const cardIdInput = document.getElementById('cardId');
+                if (cardIdInput) cardIdInput.value = '';
+
+                populateAccountsDropdown();
+
+                document.getElementById('creditCardModal').classList.remove('hidden');
+            }
+        }
+        async function openEditModal(id) {
+            cardIdToModify = id;
+
+            try {
+                const response = await fetch(`/api/finance/credit-cards/${id}/`, {
+                    credentials: 'include'
+                });
+                if (response.status === 401) { window.location.href = '../login.html'; return; }
+                if (!response.ok) throw new Error('Não foi possível carregar os dados do cartão.');
+
+                const card = await response.json();
+
+                await populateAccountsDropdown();
+
+                const modal = document.getElementById('creditCardModal');
+                document.getElementById('modalTitle').textContent = 'Editar Cartão de Crédito';
+                document.getElementById('cardId').value = card.id;
+                document.getElementById('cardName').value = card.name;
+                document.getElementById('cardBrand').value = card.brand;
+                document.getElementById('lastDigits').value = card.last_digits;
+                document.getElementById('creditLimit').value = parseFloat(card.credit_limit).toFixed(2).replace('.', ',');
+                document.getElementById('closingDay').value = card.closing_day;
+                document.getElementById('dueDay').value = card.due_day;
+                document.getElementById('associatedAccount').value = card.associated_account;
+                document.getElementById('cardStatus').checked = card.is_active;
+
+                // 4. Abre o modal
+                modal.classList.remove('hidden');
+
+            } catch (error) {
+                alert(error.message); // Usando alert simples para feedback
+            }
+        }
+
+        // Função para salvar (ainda vazia, será o Passo 2)
+        async function saveCard(event) {
+            event.preventDefault();
+
+
+            const id = cardIdToModify; // Pega o ID (pode ser nulo ou um número)
+
+            const payload = {
+                name: document.getElementById('cardName').value,
+                brand: document.getElementById('cardBrand').value,
+                last_digits: document.getElementById('lastDigits').value,
+                credit_limit: document.getElementById('creditLimit').value.replace(/\./g, '').replace(',', '.'),
+                closing_day: document.getElementById('closingDay').value,
+                due_day: document.getElementById('dueDay').value,
+                associated_account: document.getElementById('associatedAccount').value,
+                is_active: document.getElementById('cardStatus').checked
+            };
+
+            const url = id ? `/api/finance/credit-cards/${id}/` : `/api/finance/credit-cards/`;
+            const method = id ? 'PUT' : 'POST';
+
+            const saveButton = document.querySelector('button[type="submit"][form="creditCardForm"]');
+            saveButton.disabled = true;
+            saveButton.textContent = 'Salvando...';
+
+            try {
+                const response = await fetch(url, {
+                    method: method,
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    let errorMsg = "Erro ao salvar: ";
+                    for (const field in errorData) {
+                        const message = Array.isArray(errorData[field]) ? errorData[field].join(', ') : errorData[field];
+                        errorMsg += `${field}: ${message} `;
+                    }
+                    throw new Error(errorMsg);
+                }
+
+                alert(id ? 'Cartão atualizado com sucesso!' : 'Cartão criado com sucesso!');
+                closeModal();
+                renderCreditCards();
+
+            } catch (error) {
+                alert(error.message);
+            } finally {
+                saveButton.disabled = false;
+                saveButton.textContent = 'Salvar';
+            }
+        }
+
+        async function deleteCard() {
+            if (!cardIdToModify) return;
+
+            try {
+                const response = await fetch(`/api/finance/credit-cards/${cardIdToModify}/`, {
+                    method: 'DELETE',
+                    credentials: 'include'
+                });
+
+                if (response.status !== 204) { // 204 No Content é a resposta de sucesso para DELETE
+                    throw new Error('Erro ao excluir o cartão.');
+                }
+
+                alert('Cartão excluído com sucesso!');
+                closeDeleteModal();
+                renderCreditCards(); // Atualiza a lista na tela
+            } catch (error) {
+                alert(error.message);
+            }
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('creditCardModal');
+            if (modal) modal.classList.add('hidden');
+        }
+
+        function openDeleteModal(id) {
+            cardIdToModify = id; // Guarda o ID do cartão a ser deletado
+            document.getElementById('delete-modal').classList.remove('hidden');
+        }
+
+        function closeDeleteModal() {
+            cardIdToModify = null; // Limpa o ID
+            document.getElementById('delete-modal').classList.add('hidden');
+        }
+
+        function openDeleteModal(id) {
+            cardIdToModify = id; // Guarda o ID do cartão a ser deletado
+            document.getElementById('delete-modal').classList.remove('hidden');
+        }
+
+        function closeDeleteModal() {
+            cardIdToModify = null; // Limpa o ID
+            document.getElementById('delete-modal').classList.add('hidden');
+        }
+
+        async function deleteCard() {
+            if (!cardIdToModify) return;
+
+            try {
+                const response = await fetch(`/api/finance/credit-cards/${cardIdToModify}/`, {
+                    method: 'DELETE',
+                    credentials: 'include'
+                });
+
+                if (response.status !== 204) throw new Error('Erro ao excluir o cartão.');
+
+                alert('Cartão excluído com sucesso!');
+                closeDeleteModal();
+                renderCreditCards(); 
+            } catch (error) {
+                alert(error.message);
+            }
+        }
+
+
+        async function populateAccountsDropdown() {
+            // Encontra o elemento <select> dentro do modal
+            const associatedAccountSelect = document.getElementById('associatedAccount');
+            if (!associatedAccountSelect) return; // Segurança caso o modal não tenha carregado
+
+            try {
+                const response = await fetch(`/api/finance/bank-accounts/`, {
+                    credentials: 'include'
+                });
+                if (response.status === 401) { window.location.href = '../login.html'; return; }
+                if (!response.ok) throw new Error('Falha ao carregar contas.');
+
+                const accounts = await response.json();
+
+                // 2. Limpa as opções existentes (exceto a primeira "Selecione")
+                associatedAccountSelect.innerHTML = '<option value="">Selecione uma conta</option>';
+
+                // 3. Adiciona uma nova <option> para cada conta ATIVA
+                accounts
+                    .filter(account => account.is_active) // Filtra para pegar apenas contas ativas
+                    .forEach(account => {
+                        const option = document.createElement('option');
+                        option.value = account.id; // O valor será o ID da conta
+                        option.textContent = account.name; // O texto será o nome da conta
+                        associatedAccountSelect.appendChild(option);
+                    });
+
+            } catch (error) {
+                console.error("Erro ao popular contas:", error);
+                associatedAccountSelect.innerHTML = '<option value="">Erro ao carregar contas</option>';
+            }
+        }
+
+
 
         // Seleciona os botões do modal de exclusão
         const confirmDeleteBtn = document.getElementById('confirm-delete-btn');

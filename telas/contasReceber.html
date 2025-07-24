@@ -317,46 +317,11 @@
 
     <div id="toast" class="hidden fixed bottom-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg">
     </div>
-    
+
     <script src="../componentes/auth.js"></script>
     <script src="../componentes/topbar.js"></script>
     <script>
-        // --- CONFIGURAÇÃO DA API ---
-        const API_BASE_URL = 'http://127.0.0.1:8000/api/finance'; // Ajuste se o endereço da sua API for diferente
 
-        const getAuthHeaders = () => {
-            const token = localStorage.getItem('accessToken');
-            if (!token) {
-                console.error("Token de acesso não encontrado. Redirecionando para o login.");
-                // window.location.href = '/login.html'; // Descomente para redirecionar
-                return null;
-            }
-            return {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            };
-        };
-
-        const fetchApi = async (endpoint, options = {}) => {
-            const headers = getAuthHeaders();
-            if (!headers) return; // Interrompe se não houver token
-
-            options.headers = { ...headers, ...options.headers };
-
-            try {
-                const response = await fetch(`${API_BASE_URL}${endpoint}`, options);
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.detail || `Erro na API: ${response.statusText}`);
-                }
-                // Retorna vazio se o status for 204 No Content (ex: DELETE)
-                return response.status === 204 ? null : response.json();
-            } catch (error) {
-                console.error('Falha na requisição API:', error);
-                showToast(error.message, 'error');
-                throw error;
-            }
-        };
 
         // --- ELEMENTOS DO DOM ---
         const receivableModal = document.getElementById('receivable-modal');
@@ -386,7 +351,13 @@
 
         const fetchSummaryData = async (params) => {
             try {
-                const summary = await fetchApi(`/receivables-summary/?${params.toString()}`, { method: 'GET' });
+
+                const response = await fetch(`/api/finance/receivables-summary/?${params.toString()}`, {
+                    method: 'GET',
+                    credentials: 'include'
+                });
+                if (response.status === 401) { window.location.href = 'login.html'; return; }
+                const summary = await response.json();
                 if (summary) {
                     updateSummaryCards(summary);
                     renderStatusChart(summary.chart_data);
@@ -515,7 +486,9 @@
         // --- LÓGICA DA API ---
         const fetchClients = async () => {
             try {
-                const clients = await fetchApi('/../cadastros/customers/', { method: 'GET' });
+                const response = await fetch(`/api/cadastros/customers/`, { method: 'GET', credentials: 'include' });
+                if (response.status === 401) { window.location.href = 'login.html'; return; }
+                const clients = await response.json();
                 if (clients) populateClientSelects(clients);
             } catch (error) {
                 console.error("Erro ao buscar clientes:", error);
@@ -524,8 +497,9 @@
 
         const fetchBankAccounts = async () => {
             try {
-                // Endpoint para buscar as contas bancárias
-                const accounts = await fetchApi(`/bank-accounts/`, { method: 'GET' });
+                const response = await fetch(`/api/finance/bank-accounts/`, { method: 'GET', credentials: 'include' });
+                if (response.status === 401) { window.location.href = 'login.html'; return; }
+                const accounts = await response.json();
                 if (accounts) {
                     populateBankAccountSelect(accounts.results || accounts);
                 }
@@ -566,45 +540,57 @@
             fetchSummaryData(params);
 
             try {
-                const data = await fetchApi(`/receivables/?${params.toString()}`, { method: 'GET' });
-                if (data) renderReceivables(data.results || data); // DRF paginação usa 'results'
+                const response = await fetch(`/api/finance/receivables/?${params.toString()}`, { method: 'GET', credentials: 'include' });
+                if (response.status === 401) { window.location.href = 'login.html'; return; }
+                const data = await response.json();
+                if (data) renderReceivables(data.results || data);
             } catch (error) {
                 console.error("Erro ao buscar contas a receber:", error);
             }
         };
 
         const saveReceivable = async (event) => {
-            event.preventDefault();
-            if (!receivableForm.checkValidity()) {
-                receivableForm.reportValidity();
-                return;
+        event.preventDefault();
+        if (!receivableForm.checkValidity()) {
+            receivableForm.reportValidity();
+            return;
+        }
+        const formData = new FormData(receivableForm);
+        const receivableId = formData.get('id');
+        const data = Object.fromEntries(formData.entries());
+        if (data.customer_id === 'null') data.customer_id = null;
+
+        const method = receivableId ? 'PATCH' : 'POST';
+        
+        const endpoint = receivableId ? `/api/finance/receivables/${receivableId}/` : '/api/finance/receivables/';
+
+        try {
+            const response = await fetch(endpoint, {
+                method: method,
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include', // Necessário para enviar os cookies
+                body: JSON.stringify(data)
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.detail || 'Falha ao salvar a conta.');
             }
 
-            const formData = new FormData(receivableForm);
-            const receivableId = formData.get('id');
-            const data = Object.fromEntries(formData.entries());
-
-            // AJUSTE: Converte a string "null" para o valor null real.
-            if (data.customer_id === 'null') {
-                data.customer_id = null;
-            }
-
-            const method = receivableId ? 'PATCH' : 'POST';
-            const endpoint = receivableId ? `/receivables/${receivableId}/` : '/receivables/';
-
-            try {
-                await fetchApi(endpoint, { method, body: JSON.stringify(data) });
-                showToast(`Conta ${receivableId ? 'atualizada' : 'criada'} com sucesso!`);
-                closeModal();
-                fetchReceivables();
-            } catch (error) {
-                console.error("Erro ao salvar conta:", error);
-            }
-        };
+            showToast(`Conta ${receivableId ? 'atualizada' : 'criada'} com sucesso!`);
+            closeModal();
+            fetchReceivables();
+        } catch (error) {
+            console.error("Erro ao salvar conta:", error);
+            showToast(error.message, 'error');
+        }
+    };
 
         const handleEdit = async (id) => {
             try {
-                const receivable = await fetchApi(`/receivables/${id}/`, { method: 'GET' });
+                const response = await fetch(`/api/finance/receivables/${id}/`, { method: 'GET', credentials: 'include' });
+                if (response.status === 401) { window.location.href = 'login.html'; return; }
+                const receivable = await response.json();
                 if (receivable) {
                     document.getElementById('modal-title').textContent = 'Editar Conta a Receber';
                     document.getElementById('receivable-id').value = receivable.id;
@@ -624,7 +610,8 @@
         const handleDelete = async (id) => {
             if (confirm('Tem certeza que deseja excluir esta conta?')) {
                 try {
-                    await fetchApi(`/receivables/${id}/`, { method: 'DELETE' });
+                    const response = await fetch(`/api/finance/receivables/${id}/`, { method: 'DELETE', credentials: 'include' });
+                    if (response.status !== 204) throw new Error('Falha ao excluir.');
                     showToast('Conta excluída com sucesso!');
                     fetchReceivables();
                 } catch (error) {
@@ -636,7 +623,9 @@
         const handleMarkAsReceived = async (id) => {
             try {
                 // Busca os dados da conta para obter o valor
-                const receivable = await fetchApi(`/receivables/${id}/`, { method: 'GET' });
+                const response = await fetch(`/api/finance/receivables/${id}/`, { method: 'GET', credentials: 'include' });
+                if (response.status === 401) { window.location.href = 'login.html'; return; }
+                const receivable = await response.json();
                 if (receivable) {
                     const form = document.getElementById('mark-as-received-form');
 
@@ -671,9 +660,9 @@
             periodFilter.value = currentMonth;
 
             // --- CÓDIGO DA TOPBAR ---
-            
+
             protectPage('pagamentos')
-            
+
 
             // --- CARREGAMENTO INICIAL DOS DADOS ---
             fetchClients();
@@ -736,11 +725,18 @@
                     bank_account_id: document.getElementById('bank_account_id').value,
                     payment_date: document.getElementById('payment_date').value,
                 };
-                try {
-                    await fetchApi(`/receivables/${receivableId}/mark-as-received/`, { method: 'POST', body: JSON.stringify(data) });
-                    showToast('Conta marcada como recebida!');
-                    closeMarkAsReceivedModal();
-                    fetchReceivables();
+                 try {
+                
+                const response = await fetch(`/api/finance/receivables/${receivableId}/mark-as-received/`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify(data)
+                });
+                if (!response.ok) throw new Error('Falha ao marcar como recebido.');
+                showToast('Conta marcada como recebida!');
+                document.getElementById('mark-as-received-modal').classList.add('hidden');
+                fetchReceivables();
                 } catch (error) {
                     console.error("Erro ao marcar como recebido:", error);
                 }

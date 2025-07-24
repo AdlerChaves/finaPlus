@@ -228,21 +228,16 @@
         <span id="toastMessage"></span>
     </div>
 
-    
+
     <script src="../componentes/auth.js"></script>
     <script src="../componentes/topbar.js"></script>
     <script>
-        const API_URL = 'http://127.0.0.1:8000'; // Ajuste se necessário
 
-        // Variável global para saber qual cliente deletar
         let customerIdToDelete = null;
 
         document.addEventListener('DOMContentLoaded', () => {
 
             protectPage('cadastros')
-        
-
-            // Carrega a lista de clientes da API
             loadCustomers();
 
             // Adiciona os listeners para os botões do modal de exclusão
@@ -255,16 +250,16 @@
         // --- LÓGICA PRINCIPAL DE CARREGAMENTO E RENDERIZAÇÃO ---
 
         async function loadCustomers() {
-            const token = localStorage.getItem('accessToken');
-            if (!token) {
-                window.location.href = '../login.html';
-                return;
-            }
 
             try {
-                const response = await fetch(`${API_URL}/api/cadastros/customers/`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
+                const response = await fetch(`/api/cadastros/customers/`, {
+                    credentials: 'include'
                 });
+
+                if (response.status === 401) {
+                    window.location.href = '../login.html';
+                    return;
+                }
                 if (!response.ok) throw new Error('Falha ao buscar clientes.');
 
                 const customers = await response.json();
@@ -278,7 +273,6 @@
         function renderCustomerList(customers) {
             const tableBody = document.getElementById('customer-table-body');
             const mobileList = document.getElementById('customer-list-mobile');
-            // Pega a referência para os novos elementos do resumo
             const summaryTotal = document.getElementById('summary-total');
             const summaryActive = document.getElementById('summary-active');
             const summaryInactive = document.getElementById('summary-inactive');
@@ -286,7 +280,6 @@
             tableBody.innerHTML = '';
             mobileList.innerHTML = '';
 
-            // --- LÓGICA DE ATUALIZAÇÃO DOS CARDS ---
             const totalCount = customers.length;
             const activeCount = customers.filter(c => c.status === 'active').length;
             const inactiveCount = totalCount - activeCount;
@@ -377,14 +370,14 @@
         async function deleteCustomer() {
             if (!customerIdToDelete) return; // Não faz nada se não houver ID
 
-            const token = localStorage.getItem('accessToken');
+
             let success = false;
             let errorMessage = 'Ocorreu um erro desconhecido.';
 
             try {
-                const response = await fetch(`${API_URL}/api/cadastros/customers/${customerIdToDelete}/`, {
+                const response = await fetch(`/api/cadastros/customers/${customerIdToDelete}/`, {
                     method: 'DELETE',
-                    headers: { 'Authorization': `Bearer ${token}` }
+                    credentials: 'include'
                 });
 
                 // Verifica se a exclusão foi bem-sucedida (código 204)
@@ -419,11 +412,12 @@
             contentDiv.innerHTML = '<p class="text-center text-gray-500">Carregando...</p>';
             modal.classList.remove('hidden');
 
-            const token = localStorage.getItem('accessToken');
             try {
-                const response = await fetch(`${API_URL}/api/cadastros/customers/${customerId}/`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
+                const response = await fetch(`/api/cadastros/customers/${customerId}/`, {
+                    credentials: 'include'
                 });
+                if (response.status === 401) { window.location.href = '../login.html'; return; }
+
                 if (!response.ok) throw new Error('Falha ao carregar detalhes do cliente.');
 
                 const customer = await response.json();

@@ -376,20 +376,18 @@
                 <script src="../componentes/topbar.js"></script>
                 <script>
                     document.addEventListener('DOMContentLoaded', () => {
-
-                        protectPage('cadastros')
+                        protectPage('cadastros');
+                        loadSuppliers();
+                        setupEventListeners();
                     });
                 </script>
 
                 <script>
-                    const API_URL = 'http://127.0.0.1:8000';
 
                     let supplierIdToDelete = null;
                     let allSuppliers = [];
 
                     document.addEventListener('DOMContentLoaded', () => {
-
-                        renderTopbar('cadastros', {});
                         loadSuppliers();
                         setupEventListeners();
                     });
@@ -452,16 +450,15 @@
                     }
 
                     async function loadSuppliers() {
-                        const token = localStorage.getItem('accessToken');
-                        if (!token) {
-                            window.location.href = '../login.html';
-                            return;
-                        }
 
                         try {
-                            const response = await fetch(`${API_URL}/api/cadastros/suppliers/`, {
-                                headers: { 'Authorization': `Bearer ${token}` }
+                            const response = await fetch(`/api/cadastros/suppliers/`, {
+                                credentials: 'include'
                             });
+                            if (response.status === 401) {
+                                window.location.href = '../login.html';
+                                return;
+                            }
                             if (!response.ok) throw new Error('Falha ao carregar fornecedores.');
 
                             const suppliers = await response.json();
@@ -564,12 +561,12 @@
 
                     async function deleteSupplier() {
                         if (!supplierIdToDelete) return;
-                        const token = localStorage.getItem('accessToken');
+
 
                         try {
-                            const response = await fetch(`${API_URL}/api/cadastros/suppliers/${supplierIdToDelete}/`, {
+                            const response = await fetch(`/api/cadastros/suppliers/${supplierIdToDelete}/`, {
                                 method: 'DELETE',
-                                headers: { 'Authorization': `Bearer ${token}` }
+                                credentials: 'include'
                             });
                             if (response.status !== 204) throw new Error('Falha ao excluir fornecedor.');
 

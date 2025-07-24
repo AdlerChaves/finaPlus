@@ -172,14 +172,12 @@
     <script>
 
         // document.addEventListener('DOMContentLoaded', () => {
-        //     const token = localStorage.getItem('accessToken');
+        //     
         //     if (token) {
         //         // Se já existe um token, tenta ir direto para o dashboard
         //         window.location.href = '../index.html';
         //     }
         // });
-        // URL base da sua API Django
-        const API_URL = 'http://127.0.0.1:8000';
 
         // --- DOM ELEMENTS ---
         const loginForm = document.getElementById('login-form');
@@ -210,40 +208,6 @@
             }, 5000);
         }
 
-        async function fetchUserData(token) {
-            try {
-                const response = await fetch(`${API_URL}/api/accounts/me/`, {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-
-                if (!response.ok) {
-                    throw new Error('Não foi possível buscar os dados do usuário.');
-                }
-                const userData = await response.json();
-
-                // Armazena a lista de permissões no localStorage
-                if (userData.permissions_list) {
-                    localStorage.setItem('userPermissions', JSON.stringify(userData.permissions_list));
-                }
-
-                // Você pode armazenar outros dados do usuário se precisar
-                localStorage.setItem('userName', `${userData.first_name} ${userData.last_name}`);
-
-                // Redireciona para o dashboard somente após buscar os dados
-                window.location.href = '../index.html';
-
-            } catch (error) {
-                showError(error.message);
-                // Limpa o token se a chamada falhar para forçar um novo login
-                localStorage.removeItem('accessToken');
-                localStorage.removeItem('refreshToken');
-            }
-        }
-
         function showSuccessToast(message) {
             const toast = document.createElement('div');
             toast.className = 'fixed top-5 right-5 bg-green-500 text-white py-2 px-4 rounded-lg shadow-lg';
@@ -268,8 +232,8 @@
             this.querySelector('svg').classList.toggle('text-gray-700');
         });
 
+
         // --- LÓGICA DE LOGIN ---
-        // --- LÓGICA DE LOGIN ATUALIZADA ---
         loginForm.addEventListener('submit', function (e) {
             e.preventDefault();
             const email = emailInput.value.trim();
@@ -286,27 +250,21 @@
 
             const payload = { username: email, password: password };
 
-            // 1. Primeiro, obtemos o token
-            fetch(`${API_URL}/api/token/`, {
+            // A chamada fetch continua igual, usando o caminho relativo
+            fetch(`/api/accounts/token/`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
             })
                 .then(async response => {
-                    const data = await response.json();
                     if (!response.ok) {
+                        // Se a resposta não for OK, lemos o erro e o exibimos
+                        const data = await response.json();
                         throw new Error(data.detail || 'Credenciais inválidas.');
                     }
-                    return data;
-                })
-                .then(data => {
-                    // Token obtido com sucesso!
-                    const accessToken = data.access;
-                    localStorage.setItem('accessToken', accessToken);
-                    localStorage.setItem('refreshToken', data.refresh);
-
-                    // 2. Agora, usamos o token para buscar os dados do usuário (incluindo permissões)
-                    return fetchUserData(accessToken);
+                    // Se a resposta for OK (200), o backend já enviou os cookies.
+                    // Agora, apenas redirecionamos para o dashboard.
+                    window.location.href = '../index.html'; // Ajustado para o caminho correto
                 })
                 .catch(error => {
                     showError(error.message);
@@ -317,6 +275,7 @@
                     loginButton.disabled = false;
                 });
         });
+
 
         // --- LÓGICA DO MODAL ESQUECI MINHA SENHA ---
         function closeForgotPasswordModal() {
@@ -341,7 +300,7 @@
             }
             forgotPasswordButton.disabled = true;
             forgotPasswordButton.textContent = 'Enviando...';
-            fetch(`${API_URL}/api/accounts/password_reset/`, {
+            fetch(`/api/accounts/password_reset/`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email: email })

@@ -234,47 +234,73 @@
 
 
         // --- LÓGICA DE LOGIN ---
-        loginForm.addEventListener('submit', function (e) {
-            e.preventDefault();
-            const email = emailInput.value.trim();
-            const password = passwordInput.value;
+         loginForm.addEventListener('submit', function (e) {
+        e.preventDefault();
+        const email = emailInput.value.trim();
+        const password = passwordInput.value;
 
-            if (!email || !password) {
-                showError('Por favor, preencha o e-mail e a senha.');
-                return;
+        if (!email || !password) {
+            showError('Por favor, preencha o e-mail e a senha.');
+            return;
+        }
+
+        buttonText.classList.add('hidden');
+        buttonLoading.classList.remove('hidden');
+        loginButton.disabled = true;
+
+        const payload = { username: email, password: password };
+
+        // Passo 1: Autenticar e obter os cookies de sessão
+        fetch(`/api/accounts/token/`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        })
+        .then(async response => {
+            if (!response.ok) {
+                const data = await response.json();
+                throw new Error(data.detail || 'Credenciais inválidas.');
+            }
+            // Se a resposta for OK (200), a autenticação foi bem-sucedida e os cookies foram definidos.
+            // Agora, vamos buscar os dados do usuário.
+            return fetch(`/api/accounts/me/`, {
+                credentials: 'include' // Garante que os cookies de sessão sejam enviados
+            });
+        })
+        .then(async response => {
+            if (!response.ok) {
+                throw new Error('Não foi possível buscar os dados do usuário após o login.');
+            }
+            return response.json();
+        })
+        .then(data => {
+            // --- A CORREÇÃO PRINCIPAL ESTÁ AQUI ---
+            // Passo 2: Salvar os dados necessários no localStorage
+            if (data.permissions_list) {
+                localStorage.setItem('userPermissions', JSON.stringify(data.permissions_list));
+            } else {
+                // Se não vier permissão, salvamos uma lista vazia para evitar erros
+                localStorage.setItem('userPermissions', JSON.stringify([]));
+            }
+            
+            // Salva o nome do usuário para ser usado no dashboard
+            const userName = `${data.first_name} ${data.last_name}`.trim();
+            if (userName) {
+                localStorage.setItem('userName', userName);
             }
 
-            buttonText.classList.add('hidden');
-            buttonLoading.classList.remove('hidden');
-            loginButton.disabled = true;
-
-            const payload = { username: email, password: password };
-
-            // A chamada fetch continua igual, usando o caminho relativo
-            fetch(`/api/accounts/token/`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            })
-                .then(async response => {
-                    if (!response.ok) {
-                        // Se a resposta não for OK, lemos o erro e o exibimos
-                        const data = await response.json();
-                        throw new Error(data.detail || 'Credenciais inválidas.');
-                    }
-                    // Se a resposta for OK (200), o backend já enviou os cookies.
-                    // Agora, apenas redirecionamos para o dashboard.
-                    window.location.href = '../index.html'; // Ajustado para o caminho correto
-                })
-                .catch(error => {
-                    showError(error.message);
-                })
-                .finally(() => {
-                    buttonText.classList.remove('hidden');
-                    buttonLoading.classList.add('hidden');
-                    loginButton.disabled = false;
-                });
+            // Passo 3: Agora, com tudo salvo, redirecionar para o dashboard
+            window.location.href = '../index.html';
+        })
+        .catch(error => {
+            showError(error.message);
+        })
+        .finally(() => {
+            buttonText.classList.remove('hidden');
+            buttonLoading.classList.add('hidden');
+            loginButton.disabled = false;
         });
+    });
 
 
         // --- LÓGICA DO MODAL ESQUECI MINHA SENHA ---

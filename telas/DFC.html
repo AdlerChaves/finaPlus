@@ -6,6 +6,7 @@
     <title>Gestão de Fluxo de Caixa</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="../style.css">
     <style>
         .status-badge {
@@ -29,239 +30,106 @@
         .card-shadow {
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
         }
+        /* Estilo para feedback de carregamento */
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(255, 255, 255, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+        }
     </style>
 </head>
 <body class="bg-gray-50 font-sans">
-    <!-- Header -->
+    <div id="header-container"></div>
 
-    <!-- Main Content -->
     <main class="mt-16 pt-6 pb-20">
         <div class="container mx-auto px-4">
-            <!-- Period Selector -->
             <div class="bg-white rounded-lg shadow-sm p-4 mb-6 flex justify-between items-center">
                 <h2 class="text-lg font-semibold text-gray-800">Demonstração do Fluxo de Caixa</h2>
                 <div class="flex space-x-2">
-                    <select id="periodSelect" class="bg-white border border-gray-300 text-gray-700 py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        <option value="monthly">Mensal</option>
-                        <option value="quarterly">Trimestral</option>
-                        <option value="yearly" selected>Anual</option>
-                    </select>
                     <select id="yearSelect" class="bg-white border border-gray-300 text-gray-700 py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        <option value="2023">2023</option>
-                        <option value="2022">2022</option>
-                        <option value="2021">2021</option>
-                    </select>
-                    <button class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-md flex items-center space-x-2 transition-colors">
+                        </select>
+                    <button id="export-btn" class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-md flex items-center space-x-2 transition-colors">
                         <i class="fas fa-file-pdf"></i>
                         <span>Exportar</span>
                     </button>
                 </div>
             </div>
 
-            <!-- Summary Cards -->
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-                <!-- Saldo Inicial -->
                 <div class="bg-white rounded-lg border border-gray-100 p-4 hover-scale card-shadow">
                     <div class="flex justify-between items-start">
                         <div>
                             <p class="text-sm text-gray-500">Saldo Inicial</p>
-                            <p class="text-2xl font-bold text-gray-800">R$ 25.000,00</p>
+                            <p id="summary-saldo-inicial" class="text-2xl font-bold text-gray-800">R$ 0,00</p>
                         </div>
                         <div class="bg-gray-100 p-2 rounded-lg">
                             <i class="fas fa-wallet text-gray-600"></i>
                         </div>
                     </div>
-                    <p class="text-xs text-gray-500 mt-1">1º Jan 2023</p>
+                    <p id="summary-saldo-inicial-date" class="text-xs text-gray-500 mt-1">--</p>
                 </div>
 
-                <!-- Saldo Final -->
                 <div class="bg-white rounded-lg border border-gray-100 p-4 hover-scale card-shadow">
                     <div class="flex justify-between items-start">
                         <div>
                             <p class="text-sm text-gray-500">Saldo Final</p>
-                            <p class="text-2xl font-bold text-green-600">R$ 42.750,00</p>
+                            <p id="summary-saldo-final" class="text-2xl font-bold text-green-600">R$ 0,00</p>
                         </div>
                         <div class="bg-green-100 p-2 rounded-lg">
                             <i class="fas fa-piggy-bank text-green-600"></i>
                         </div>
                     </div>
-                    <p class="text-xs text-gray-500 mt-1">31º Dez 2023</p>
+                    <p id="summary-saldo-final-date" class="text-xs text-gray-500 mt-1">--</p>
                 </div>
 
-                <!-- Variação de Caixa -->
                 <div class="bg-white rounded-lg border border-gray-100 p-4 hover-scale card-shadow">
                     <div class="flex justify-between items-start">
                         <div>
                             <p class="text-sm text-gray-500">Variação de Caixa</p>
-                            <p class="text-2xl font-bold text-green-600">R$ 17.750,00</p>
+                            <p id="summary-variacao-caixa" class="text-2xl font-bold text-gray-800">R$ 0,00</p>
                         </div>
                         <div class="bg-blue-100 p-2 rounded-lg">
                             <i class="fas fa-chart-line text-blue-600"></i>
                         </div>
                     </div>
-                    <p class="text-xs text-green-600 mt-1">+71% no período</p>
+                    <p id="summary-variacao-percentual" class="text-xs text-gray-500 mt-1">--</p>
                 </div>
 
-                <!-- Fluxo Operacional -->
                 <div class="bg-white rounded-lg border border-gray-100 p-4 hover-scale card-shadow">
                     <div class="flex justify-between items-start">
                         <div>
                             <p class="text-sm text-gray-500">Fluxo Operacional</p>
-                            <p class="text-2xl font-bold text-green-600">R$ 32.400,00</p>
+                            <p id="summary-fluxo-operacional" class="text-2xl font-bold text-green-600">R$ 0,00</p>
                         </div>
                         <div class="bg-purple-100 p-2 rounded-lg">
                             <i class="fas fa-business-time text-purple-600"></i>
                         </div>
                     </div>
-                    <p class="text-xs text-gray-500 mt-1">+28% vs ano anterior</p>
+                    <p class="text-xs text-gray-500 mt-1">Total no período</p>
                 </div>
             </div>
 
-            <!-- DFC Statement -->
             <div class="bg-white rounded-lg shadow-sm p-4 mb-6 overflow-x-auto">
-                <h3 class="text-lg font-semibold mb-4 text-gray-800">Demonstrativo Completo - Método Indireto</h3>
+                <h3 class="text-lg font-semibold mb-4 text-gray-800">Demonstrativo Completo - Método Direto</h3>
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
                         <tr>
                             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Descrição</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">2023</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">2022</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Variação</th>
+                            <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Valor</th>
                         </tr>
                     </thead>
-                    <tbody class="bg-white divide-y divide-gray-200">
-                        <!-- Atividades Operacionais -->
-                        <tr class="bg-blue-50">
-                            <td colspan="4" class="px-6 py-3 whitespace-nowrap font-semibold text-gray-900">
-                                <i class="fas fa-business-time mr-2 text-blue-600"></i> Atividades Operacionais
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="px-6 py-4 whitespace-nowrap pl-10 text-gray-500">Lucro Líquido</td>
-                            <td class="px-6 py-4 whitespace-nowrap">R$ 50.600,00</td>
-                            <td class="px-6 py-4 whitespace-nowrap">R$ 30.100,00</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-green-600 font-medium">+68,1%</td>
-                        </tr>
-                        <tr>
-                            <td class="px-6 py-4 whitespace-nowrap pl-10 text-gray-500">(+) Depreciação e Amortização</td>
-                            <td class="px-6 py-4 whitespace-nowrap">R$ 8.200,00</td>
-                            <td class="px-6 py-4 whitespace-nowrap">R$ 7.500,00</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-green-600 font-medium">+9,3%</td>
-                        </tr>
-                        <tr>
-                            <td class="px-6 py-4 whitespace-nowrap pl-10 text-gray-500">(-) Aumento de Contas a Receber</td>
-                            <td class="px-6 py-4 whitespace-nowrap">R$ 12.400,00</td>
-                            <td class="px-6 py-4 whitespace-nowrap">R$ 8.200,00</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-red-600 font-medium">+51,2%</td>
-                        </tr>
-                        <tr>
-                            <td class="px-6 py-4 whitespace-nowrap pl-10 text-gray-500">(+) Aumento de Contas a Pagar</td>
-                            <td class="px-6 py-4 whitespace-nowrap">R$ 6.500,00</td>
-                            <td class="px-6 py-4 whitespace-nowrap">R$ 4.800,00</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-green-600 font-medium">+35,4%</td>
-                        </tr>
-                        <tr class="font-semibold">
-                            <td class="px-6 py-4 whitespace-nowrap pl-10 text-gray-900">Caixa gerado pelas operações</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-green-600">R$ 32.400,00</td>
-                            <td class="px-6 py-4 whitespace-nowrap">R$ 25.200,00</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-green-600 font-medium">+28,6%</td>
-                        </tr>
-
-                        <!-- Atividades de Investimento -->
-                        <tr class="bg-blue-50">
-                            <td colspan="4" class="px-6 py-3 whitespace-nowrap font-semibold text-gray-900">
-                                <i class="fas fa-hard-hat mr-2 text-blue-600"></i> Atividades de Investimento
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="px-6 py-4 whitespace-nowrap pl-10 text-gray-500">(-) Compra de Equipamentos</td>
-                            <td class="px-6 py-4 whitespace-nowrap">R$ 15.000,00</td>
-                            <td class="px-6 py-4 whitespace-nowrap">R$ 12.000,00</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-red-600 font-medium">+25,0%</td>
-                        </tr>
-                        <tr>
-                            <td class="px-6 py-4 whitespace-nowrap pl-10 text-gray-500">(+) Venda de Ativos</td>
-                            <td class="px-6 py-4 whitespace-nowrap">R$ 5.200,00</td>
-                            <td class="px-6 py-4 whitespace-nowrap">R$ 3.500,00</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-green-600 font-medium">+48,6%</td>
-                        </tr>
-                        <tr>
-                            <td class="px-6 py-4 whitespace-nowrap pl-10 text-gray-500">(-) Aplicações Financeiras</td>
-                            <td class="px-6 py-4 whitespace-nowrap">R$ 8.000,00</td>
-                            <td class="px-6 py-4 whitespace-nowrap">R$ 6.000,00</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-red-600 font-medium">+33,3%</td>
-                        </tr>
-                        <tr class="font-semibold">
-                            <td class="px-6 py-4 whitespace-nowrap pl-10 text-gray-900">Caixa líquido usado em investimentos</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-red-600">R$ 17.800,00</td>
-                            <td class="px-6 py-4 whitespace-nowrap">R$ 14.500,00</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-red-600 font-medium">+22,8%</td>
-                        </tr>
-
-                        <!-- Atividades de Financiamento -->
-                        <tr class="bg-blue-50">
-                            <td colspan="4" class="px-6 py-3 whitespace-nowrap font-semibold text-gray-900">
-                                <i class="fas fa-hand-holding-usd mr-2 text-blue-600"></i> Atividades de Financiamento
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="px-6 py-4 whitespace-nowrap pl-10 text-gray-500">(+) Empréstimos obtidos</td>
-                            <td class="px-6 py-4 whitespace-nowrap">R$ 20.000,00</td>
-                            <td class="px-6 py-4 whitespace-nowrap">R$ 15.000,00</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-green-600 font-medium">+33,3%</td>
-                        </tr>
-                        <tr>
-                            <td class="px-6 py-4 whitespace-nowrap pl-10 text-gray-500">(-) Pagamento de empréstimos</td>
-                            <td class="px-6 py-4 whitespace-nowrap">R$ 12.000,00</td>
-                            <td class="px-6 py-4 whitespace-nowrap">R$ 10.000,00</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-red-600 font-medium">+20,0%</td>
-                        </tr>
-                        <tr>
-                            <td class="px-6 py-4 whitespace-nowrap pl-10 text-gray-500">(+) Aportes de sócios</td>
-                            <td class="px-6 py-4 whitespace-nowrap">R$ 5.000,00</td>
-                            <td class="px-6 py-4 whitespace-nowrap">R$ 8.000,00</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-red-600 font-medium">-37,5%</td>
-                        </tr>
-                        <tr class="font-semibold">
-                            <td class="px-6 py-4 whitespace-nowrap pl-10 text-gray-900">Caixa líquido gerado em financiamentos</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-green-600">R$ 13.000,00</td>
-                            <td class="px-6 py-4 whitespace-nowrap">R$ 13.000,00</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-gray-600 font-medium">0,0%</td>
-                        </tr>
-
-                        <!-- Variação de Caixa -->
-                        <tr class="bg-green-50 font-semibold">
-                            <td class="px-6 py-4 whitespace-nowrap text-gray-900">
-                                <i class="fas fa-exchange-alt mr-2 text-green-600"></i> Variação de Caixa no Período
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-green-600">R$ 27.600,00</td>
-                            <td class="px-6 py-4 whitespace-nowrap">R$ 23.700,00</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-green-600 font-medium">+16,5%</td>
-                        </tr>
-
-                        <!-- Saldo de Caixa -->
-                        <tr class="bg-blue-50">
-                            <td colspan="4" class="px-6 py-3 whitespace-nowrap font-semibold text-gray-900">
-                                <i class="fas fa-piggy-bank mr-2 text-blue-600"></i> Saldo de Caixa
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="px-6 py-4 whitespace-nowrap pl-10 text-gray-500">Saldo Inicial</td>
-                            <td class="px-6 py-4 whitespace-nowrap">R$ 25.000,00</td>
-                            <td class="px-6 py-4 whitespace-nowrap">R$ 20.000,00</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-green-600 font-medium">+25,0%</td>
-                        </tr>
-                        <tr class="font-semibold">
-                            <td class="px-6 py-4 whitespace-nowrap pl-10 text-gray-900">Saldo Final</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-green-600">R$ 42.750,00</td>
-                            <td class="px-6 py-4 whitespace-nowrap">R$ 33.700,00</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-green-600 font-medium">+26,9%</td>
-                        </tr>
-                    </tbody>
+                    <tbody id="dfc-table-body" class="bg-white divide-y divide-gray-200">
+                        </tbody>
                 </table>
             </div>
 
-            <!-- Charts Section -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
                 <div class="bg-white rounded-lg shadow-sm p-4 border border-gray-100">
                     <h3 class="text-gray-800 font-medium mb-4">Composição do Fluxo de Caixa</h3>
@@ -276,107 +144,163 @@
                     </div>
                 </div>
             </div>
-
-            <!-- Detailed Cash Flow -->
-            <div class="bg-white rounded-lg shadow-sm p-4 mb-6">
-                <h3 class="text-lg font-semibold mb-4 text-gray-800">Fluxo de Caixa Detalhado</h3>
-                <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Descrição</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Categoria</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Valor</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipo</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Saldo</th>
-                            </tr>
-                        </thead>
-                        <tbody class="bg-white divide-y divide-gray-200">
-                            <tr>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">01/01/2023</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Saldo Inicial</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">-</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">R$ 25.000,00</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Saldo</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">R$ 25.000,00</td>
-                            </tr>
-                            <tr>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">15/01/2023</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Recebimento de clientes</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Operacional</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-green-600">R$ 12.500,00</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Entrada</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">R$ 37.500,00</td>
-                            </tr>
-                            <tr>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">20/01/2023</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Pagamento de fornecedores</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Operacional</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-red-600">R$ 8.200,00</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Saída</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">R$ 29.300,00</td>
-                            </tr>
-                            <tr>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">25/01/2023</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Compra de equipamentos</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Investimento</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-red-600">R$ 15.000,00</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Saída</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">R$ 14.300,00</td>
-                            </tr>
-                            <tr>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">30/01/2023</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Empréstimo bancário</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Financiamento</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-green-600">R$ 20.000,00</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Entrada</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">R$ 34.300,00</td>
-                            </tr>
-                            <tr>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">31/12/2023</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Saldo Final</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">-</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">R$ 42.750,00</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Saldo</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">R$ 42.750,00</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+            
         </div>
     </main>
-
-    <!-- Floating Action Button -->
-    <button class="fab fixed bottom-6 right-6 w-14 h-14 bg-blue-500 text-white rounded-full flex items-center justify-center focus:outline-none hover:bg-blue-600 transition-colors">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-        </svg>
-    </button>
 
     <script src="../componentes/auth.js"></script>
     <script src="../componentes/topbar.js"></script>
     <script>
-        // Initialize charts when DOM is loaded
-        document.addEventListener('DOMContentLoaded', function() {
+        // Variáveis globais para os gráficos
+        let cashFlowChart;
+        let cashBalanceChart;
+        
+        // Função para formatar moeda
+        const formatCurrency = (value) => {
+            const numValue = parseFloat(value);
+            if (isNaN(numValue)) return "R$ 0,00";
+            return numValue.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        };
+        
+        // Função para atualizar a cor baseada no valor
+        const updateElementColor = (element, value) => {
+            element.classList.remove('text-green-600', 'text-red-600', 'text-gray-800');
+            if (value > 0) {
+                element.classList.add('text-green-600');
+            } else if (value < 0) {
+                element.classList.add('text-red-600');
+            } else {
+                element.classList.add('text-gray-800');
+            }
+        };
 
-            // Cash Flow Composition Chart
+        // Função principal para buscar e popular os dados da DFC
+        const fetchDFCData = async (year) => {
+            
+            // Adicionar feedback de loading (opcional)
+            document.body.style.cursor = 'wait';
+
+            try {
+                const response = await fetch(`/api/finance/charts/dfc/?year=${year}`, {
+                    credentials: 'include'
+                });
+
+                if (!response.ok) {
+                    throw new Error('Falha ao buscar dados da DFC.');
+                }
+
+                const data = await response.json();
+                
+                // 1. Popular os cartões de resumo
+                const summary = data.summary;
+                const saldoInicialEl = document.getElementById('summary-saldo-inicial');
+                const saldoFinalEl = document.getElementById('summary-saldo-final');
+                const variacaoCaixaEl = document.getElementById('summary-variacao-caixa');
+                const fluxoOperacionalEl = document.getElementById('summary-fluxo-operacional');
+
+                saldoInicialEl.textContent = formatCurrency(summary.saldo_inicial);
+                saldoFinalEl.textContent = formatCurrency(summary.saldo_final);
+                variacaoCaixaEl.textContent = formatCurrency(summary.variacao_caixa);
+                fluxoOperacionalEl.textContent = formatCurrency(summary.fluxo_operacional);
+
+                updateElementColor(saldoFinalEl, summary.saldo_final);
+                updateElementColor(variacaoCaixaEl, summary.variacao_caixa);
+                updateElementColor(fluxoOperacionalEl, summary.fluxo_operacional);
+
+                document.getElementById('summary-saldo-inicial-date').textContent = `Em 01/01/${year}`;
+                document.getElementById('summary-saldo-final-date').textContent = `Em 31/12/${year}`;
+                
+                const variacaoPercentualEl = document.getElementById('summary-variacao-percentual');
+                if (summary.saldo_inicial !== 0) {
+                    const percentual = (summary.variacao_caixa / Math.abs(summary.saldo_inicial)) * 100;
+                    variacaoPercentualEl.textContent = `${percentual.toFixed(1)}% no período`;
+                    updateElementColor(variacaoPercentualEl, percentual);
+                } else {
+                    variacaoPercentualEl.textContent = 'Não aplicável';
+                }
+
+                // 2. Popular a tabela do demonstrativo
+                const tableBody = document.getElementById('dfc-table-body');
+                tableBody.innerHTML = ''; // Limpa a tabela
+                const statement = data.statement;
+
+                const addRow = (icon, title, value, isHeader = false, isTotal = false) => {
+                    const row = document.createElement('tr');
+                    if (isHeader) {
+                        row.className = 'bg-blue-50';
+                        row.innerHTML = `<td colspan="2" class="px-6 py-3 whitespace-nowrap font-semibold text-gray-900"><i class="fas ${icon} mr-2 text-blue-600"></i> ${title}</td>`;
+                    } else if(isTotal) {
+                        const valueColor = value >= 0 ? 'text-green-600' : 'text-red-600';
+                        row.className = 'font-semibold';
+                        row.innerHTML = `<td class="px-6 py-4 whitespace-nowrap pl-10 text-gray-900">${title}</td><td class="px-6 py-4 whitespace-nowrap text-right ${valueColor}">${formatCurrency(value)}</td>`;
+                    } else {
+                        const valueColor = value >= 0 ? 'text-green-600' : 'text-red-600';
+                        const sign = value > 0 ? '(+)' : '(-)';
+                        row.innerHTML = `<td class="px-6 py-4 whitespace-nowrap pl-10 text-gray-500">${sign} ${title}</td><td class="px-6 py-4 whitespace-nowrap text-right ${valueColor}">${formatCurrency(Math.abs(value))}</td>`;
+                    }
+                    tableBody.appendChild(row);
+                };
+
+                // Atividades Operacionais
+                addRow('fa-business-time', 'Atividades Operacionais', null, true);
+                addRow('', 'Entradas Operacionais', statement.operacional.entradas);
+                addRow('', 'Saídas Operacionais', -statement.operacional.saidas);
+                addRow('', 'Caixa líquido das operações', statement.operacional.total, false, true);
+                
+                // Atividades de Investimento
+                addRow('fa-hard-hat', 'Atividades de Investimento', null, true);
+                addRow('', 'Entradas de Investimentos', statement.investimento.entradas);
+                addRow('', 'Saídas de Investimentos', -statement.investimento.saidas);
+                addRow('', 'Caixa líquido de investimentos', statement.investimento.total, false, true);
+
+                // Atividades de Financiamento
+                addRow('fa-hand-holding-usd', 'Atividades de Financiamento', null, true);
+                addRow('', 'Entradas de Financiamentos', statement.financiamento.entradas);
+                addRow('', 'Saídas de Financiamentos', -statement.financiamento.saidas);
+                addRow('', 'Caixa líquido de financiamentos', statement.financiamento.total, false, true);
+                
+                // Totalização
+                const variacaoTotalRow = document.createElement('tr');
+                const variacaoColor = summary.variacao_caixa >= 0 ? 'text-green-600' : 'text-red-600';
+                variacaoTotalRow.className = 'bg-green-50 font-semibold';
+                variacaoTotalRow.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap text-gray-900"><i class="fas fa-exchange-alt mr-2 text-green-600"></i> Variação de Caixa no Período</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right ${variacaoColor}">${formatCurrency(summary.variacao_caixa)}</td>
+                `;
+                tableBody.appendChild(variacaoTotalRow);
+
+                // 3. Atualizar os gráficos
+                updateCharts(data.charts);
+
+            } catch (error) {
+                console.error('Erro:', error);
+                alert('Não foi possível carregar os dados da DFC. Tente novamente mais tarde.');
+            } finally {
+                document.body.style.cursor = 'default';
+            }
+        };
+
+        // Função para inicializar ou atualizar os gráficos
+        const updateCharts = (chartsData) => {
+            // Gráfico de Composição do Fluxo
             const cashFlowCtx = document.getElementById('cashFlowChart').getContext('2d');
-            const cashFlowChart = new Chart(cashFlowCtx, {
+            if (cashFlowChart) {
+                cashFlowChart.destroy();
+            }
+            cashFlowChart = new Chart(cashFlowCtx, {
                 type: 'doughnut',
                 data: {
-                    labels: ['Operacional', 'Investimento', 'Financiamento'],
+                    labels: chartsData.composicao_fluxo.labels,
                     datasets: [{
-                        data: [32400, -17800, 13000],
+                        data: chartsData.composicao_fluxo.data,
                         backgroundColor: [
-                            'rgba(59, 130, 246, 0.7)', // blue-500 (Operacional)
-                            'rgba(239, 68, 68, 0.7)',  // red-500 (Investimento)
-                            'rgba(16, 185, 129, 0.7)'  // green-500 (Financiamento)
+                            'rgba(59, 130, 246, 0.7)', // Azul (Operacional)
+                            'rgba(147, 51, 234, 0.7)', // Roxo (Investimento)
+                            'rgba(16, 185, 129, 0.7)'  // Verde (Financiamento)
                         ],
                         borderColor: [
                             'rgba(59, 130, 246, 1)',
-                            'rgba(239, 68, 68, 1)',
+                            'rgba(147, 51, 234, 1)',
                             'rgba(16, 185, 129, 1)'
                         ],
                         borderWidth: 1
@@ -384,33 +308,22 @@
                 },
                 options: {
                     responsive: true,
-                    plugins: {
-                        legend: {
-                            position: 'bottom',
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    const label = context.label || '';
-                                    const value = context.raw;
-                                    const sign = value >= 0 ? '+' : '-';
-                                    return `${label}: ${sign} R$ ${Math.abs(value).toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
-                                }
-                            }
-                        }
-                    }
+                    plugins: { legend: { position: 'bottom' }, tooltip: { callbacks: { label: (c) => `${c.label}: ${formatCurrency(c.raw)}` } } }
                 }
             });
 
-            // Cash Balance Evolution Chart
+            // Gráfico de Evolução do Saldo
             const cashBalanceCtx = document.getElementById('cashBalanceChart').getContext('2d');
-            const cashBalanceChart = new Chart(cashBalanceCtx, {
+            if (cashBalanceChart) {
+                cashBalanceChart.destroy();
+            }
+            cashBalanceChart = new Chart(cashBalanceCtx, {
                 type: 'line',
                 data: {
-                    labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],
+                    labels: chartsData.evolucao_saldo.labels,
                     datasets: [{
                         label: 'Saldo de Caixa',
-                        data: [25000, 34300, 38200, 41500, 38700, 42100, 45300, 40200, 43700, 46500, 49200, 42750],
+                        data: chartsData.evolucao_saldo.data,
                         borderColor: '#10B981',
                         backgroundColor: 'rgba(16, 185, 129, 0.1)',
                         borderWidth: 2,
@@ -420,42 +333,59 @@
                 },
                 options: {
                     responsive: true,
-                    plugins: {
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    return 'Saldo: R$ ' + context.raw.toLocaleString('pt-BR', {minimumFractionDigits: 2});
-                                }
-                            }
-                        }
-                    },
-                    scales: {
-                        y: {
-                            ticks: {
-                                callback: function(value) {
-                                    return 'R$ ' + value.toLocaleString('pt-BR');
-                                }
-                            }
-                        }
-                    }
+                    plugins: { tooltip: { callbacks: { label: (c) => `Saldo: ${formatCurrency(c.raw)}` } } },
+                    scales: { y: { ticks: { callback: (v) => formatCurrency(v) } } }
                 }
             });
+        };
 
-            // Mobile menu toggle
-            const mobileMenuButton = document.getElementById('mobile-menu-button');
-            const mobileMenu = document.getElementById('mobile-menu');
+        // Função para popular o seletor de anos
+        const populateYearSelector = () => {
+            const yearSelect = document.getElementById('yearSelect');
+            const currentYear = new Date().getFullYear();
+            for (let i = 0; i < 5; i++) {
+                const year = currentYear - i;
+                const option = document.createElement('option');
+                option.value = year;
+                option.textContent = year;
+                if (i === 0) {
+                    option.selected = true;
+                }
+                yearSelect.appendChild(option);
+            }
+        };
+
+        // Inicialização quando o DOM estiver carregado
+        document.addEventListener('DOMContentLoaded', function() {
+            // Protege a página
+            protectPage('relatorios');
+
+            // Carrega o header
+            const headerContainer = document.getElementById('header-container');
+            if (headerContainer) {
+                fetch('../componentes/topbar.html')
+                    .then(response => response.text())
+                    .then(data => {
+                        headerContainer.innerHTML = data;
+                        // Chama a função para configurar a topbar, se existir no topbar.js
+                        if (typeof setupTopbar === 'function') {
+                            setupTopbar();
+                        }
+                    });
+            }
+
+            // Popula o seletor de anos
+            populateYearSelector();
             
-            mobileMenuButton.addEventListener('click', function() {
-                mobileMenu.classList.toggle('hidden');
+            // Busca os dados para o ano atual
+            const initialYear = document.getElementById('yearSelect').value;
+            fetchDFCData(initialYear);
+
+            // Adiciona listener para mudança de ano
+            document.getElementById('yearSelect').addEventListener('change', (event) => {
+                fetchDFCData(event.target.value);
             });
         });
     </script>
-    
-        <script>
-            document.addEventListener('DOMContentLoaded', () => {
-                protectPage('relatorios');
-            });
-        </script>
 </body>
-
 </html>

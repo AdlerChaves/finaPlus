@@ -66,14 +66,27 @@
                 <div class="settings-section-content p-4 border-b border-gray-100">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label for="user-name" class="block text-sm font-medium text-gray-700 mb-1">Nome</label>
-                            <input type="text" id="user-name" value="João Silva"
+                            <label for="first-name" class="block text-sm font-medium text-gray-700 mb-1">Nome</label>
+                            <input type="text" id="first-name"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                        <div>
+                            <label for="last-name"
+                                class="block text-sm font-medium text-gray-700 mb-1">Sobrenome</label>
+                            <input type="text" id="last-name"
                                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                         </div>
                         <div>
                             <label for="user-email" class="block text-sm font-medium text-gray-700 mb-1">E-mail</label>
-                            <input type="email" id="user-email" value="joao.silva@email.com" readonly
+                            <input type="email" id="user-email" readonly
                                 class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100 cursor-not-allowed">
+                        </div>
+                        <div>
+                            <label for="user-phone" class="block text-sm font-medium text-gray-700 mb-1">Telefone com
+                                WhatsApp</label>
+                            <input type="tel" id="user-phone"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                placeholder="(11) 98765-4321">
                         </div>
                     </div>
 
@@ -143,7 +156,7 @@
             </div>
 
             <!-- Notifications Section -->
-            <div class="settings-section bg-white rounded-lg shadow-sm border border-gray-100 mb-6 overflow-hidden">
+            <!-- <div class="settings-section bg-white rounded-lg shadow-sm border border-gray-100 mb-6 overflow-hidden">
                 <div
                     class="settings-section-header flex items-center justify-between p-4 cursor-pointer border-b border-gray-100">
                     <div class="flex items-center">
@@ -199,10 +212,10 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </div> -->
 
             <!-- Security Section -->
-            <div class="settings-section bg-white rounded-lg shadow-sm border border-gray-100 mb-6 overflow-hidden">
+            <!-- <div class="settings-section bg-white rounded-lg shadow-sm border border-gray-100 mb-6 overflow-hidden">
                 <div
                     class="settings-section-header flex items-center justify-between p-4 cursor-pointer border-b border-gray-100">
                     <div class="flex items-center">
@@ -233,7 +246,7 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </div> -->
 
             <!-- Data Section -->
             <div class="settings-section bg-white rounded-lg shadow-sm border border-gray-100 mb-6 overflow-hidden">
@@ -249,7 +262,7 @@
                 </div>
                 <div class="settings-section-content p-4">
                     <div class="space-y-4">
-                        <div class="flex items-center justify-between">
+                        <!-- <div class="flex items-center justify-between">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Exportar dados</label>
                                 <p class="text-xs text-gray-500">Baixe um backup de todas as suas informações</p>
@@ -258,7 +271,7 @@
                                 class="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors flex items-center">
                                 <i class="fas fa-file-export mr-2"></i> Exportar
                             </button>
-                        </div>
+                        </div> -->
 
                         <div class="pt-4 border-t border-gray-200">
                             <label class="block text-sm font-medium text-gray-700 mb-1">Excluir conta</label>
@@ -399,8 +412,19 @@
             })
                 .then(response => response.json())
                 .then(data => {
-                    document.getElementById('user-name').value = `${data.first_name} ${data.last_name}`.trim();
-                    document.getElementById('user-email').value = data.email;
+                    document.getElementById('first-name').value = data.first_name || '';
+                    document.getElementById('last-name').value = data.last_name || '';
+                    document.getElementById('user-email').value = data.email || '';
+                    let phoneToDisplay = data.phone || '';
+                    if (phoneToDisplay.startsWith('+55')) {
+                        phoneToDisplay = phoneToDisplay.substring(3);
+                    }
+
+                    const phoneInput = document.getElementById('user-phone');
+                    phoneInput.value = phoneToDisplay;
+
+                    // Aplica a máscara ao valor já sem o +55
+                    IMask(phoneInput, { mask: '(00) 00000-0000' });
 
                     // Preferências do Sistema
                     document.getElementById('theme-toggle').checked = data.theme === 'dark';
@@ -417,9 +441,12 @@
 
         // Salvar alterações
         document.getElementById('save-settings').addEventListener('click', function () {
+            const phoneValue = document.getElementById('user-phone').value.replace(/\D/g, '');
+
             const payload = {
-                first_name: document.getElementById('user-name').value.split(' ')[0],
-                last_name: document.getElementById('user-name').value.split(' ').slice(1).join(' '),
+                first_name: document.getElementById('first-name').value,
+                last_name: document.getElementById('last-name').value,
+                phone: phoneValue ? `+55${phoneValue}` : '', // Envia com código do país
                 theme: document.getElementById('theme-toggle').checked ? 'dark' : 'light',
                 currency: document.getElementById('currency').value,
                 language: document.getElementById('language').value,
@@ -428,12 +455,14 @@
                 notify_bills_reminder: document.getElementById('bills-reminder-toggle').checked
             };
 
-            fetch(`${API_URL}/api/accounts/me/`, {
+            // A correção está na estrutura do fetch abaixo
+            fetch(`/api/accounts/me/`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${getAccessToken()}`
+
                 },
+                credentials: 'include', // Garante que os cookies de autenticação são enviados
                 body: JSON.stringify(payload)
             })
                 .then(response => {
@@ -442,12 +471,16 @@
                         toast.classList.remove('hidden');
                         setTimeout(() => toast.classList.add('hidden'), 3000);
                     } else {
-                        throw new Error('Falha ao salvar configurações.');
+                        // Se houver um erro, tenta mostrar uma mensagem mais detalhada do backend
+                        response.json().then(data => {
+                            console.error('Erro do servidor:', data);
+                            alert('Falha ao salvar. Verifique os dados e tente novamente.');
+                        });
                     }
                 })
                 .catch(error => {
-                    console.error('Erro ao salvar:', error);
-                    alert('Não foi possível salvar as configurações.');
+                    console.error('Erro de rede ou de script:', error);
+                    alert('Não foi possível salvar as configurações. Verifique a sua conexão.');
                 });
         });
 
@@ -583,6 +616,9 @@
                 document.getElementById('language').value = savedLanguage;
             }
         });
+
+
+
     </script>
 
     <script>

@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Relda | Contas a Pagar</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" crossorigin href="../assets/style-B887qhJx.css">
+</head>
+
+<body class="bg-gray-50 font-sans">
+    <main class="mt-16 pt-6 pb-20">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-800">Contas a Pagar</h2>
+                <div class="mt-4 md:mt-0 flex space-x-2">
+                    <button id="add-bill-button"
+                        class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors flex items-center">
+                        <i class="fas fa-plus mr-2"></i>
+                        Nova Conta Boleto
+                    </button>
+                    <button id="add-card-expense-btn"
+                        class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition-colors flex items-center">
+                        <i class="fas fa-credit-card mr-2"></i>
+                        Lançar Despesa Parcelada
+                    </button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                <div class="bg-white rounded-lg shadow-sm p-4 border border-gray-100">
+                    <div class="flex items-center">
+                        <div class="p-3 rounded-full bg-blue-100 text-blue-600 mr-4"><i
+                                class="fas fa-file-invoice-dollar text-lg"></i></div>
+                        <div>
+                            <p class="text-sm text-gray-500">Total Aberto (Mês)</p>
+                            <p id="summary-total-open" class="text-xl font-bold text-gray-800">R$ 0,00</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-lg shadow-sm p-4 border border-gray-100">
+                    <div class="flex items-center">
+                        <div class="p-3 rounded-full bg-green-100 text-green-600 mr-4"><i
+                                class="fas fa-check-circle text-lg"></i></div>
+                        <div>
+                            <p class="text-sm text-gray-500">Total Pago (Mês)</p>
+                            <p id="summary-total-paid" class="text-xl font-bold text-gray-800">R$ 0,00</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-lg shadow-sm p-4 border border-gray-100">
+                    <div class="flex items-center">
+                        <div class="p-3 rounded-full bg-red-100 text-red-600 mr-4"><i
+                                class="fas fa-exclamation-circle text-lg"></i></div>
+                        <div>
+                            <p class="text-sm text-gray-500">Total Vencido</p>
+                            <p id="summary-total-overdue" class="text-xl font-bold text-gray-800">R$ 0,00</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div
+                class="bg-white rounded-lg shadow-sm p-4 border border-gray-100 mb-6 flex items-center justify-between">
+                <h3 class="text-lg font-medium text-gray-800">Filtros</h3>
+                <div class="flex items-center space-x-4">
+                    <button id="prev-month-btn" class="p-2 rounded-full hover:bg-gray-100 transition-colors">
+                        <i class="fas fa-chevron-left text-gray-600"></i>
+                    </button>
+                    <span id="current-month-display" class="text-center font-semibold text-gray-700 w-32">Julho /
+                        2025</span>
+                    <button id="next-month-btn" class="p-2 rounded-full hover:bg-gray-100 transition-colors">
+                        <i class="fas fa-chevron-right text-gray-600"></i>
+                    </button>
+                </div>
+            </div>
+
+
+            <div class="bg-white rounded-lg shadow-sm overflow-hidden border border-gray-100">
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Descrição</th>
+                                <th
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Categoria</th>
+                                <th
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Vencimento</th>
+                                <th
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Valor</th>
+                                <th
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Status</th>
+                                <th
+                                    class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="payables-table-body" class="bg-white divide-y divide-gray-200"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div id="bill-modal" class="fixed inset-0 overflow-y-auto z-50 hidden">
+        <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            <div
+                class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">Nova Conta a Pagar</h3>
+                    <form id="bill-form" class="mt-4 space-y-4">
+                        <input type="hidden" id="bill-status">
+                        <input type="hidden" id="bill-id">
+                        <div>
+                            <label for="bill-description" class="block text-sm font-medium text-gray-700">Descrição
+                                *</label>
+                            <input type="text" id="bill-description" required
+                                class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3">
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label for="bill-amount" class="block text-sm font-medium text-gray-700">Valor *</label>
+                                <input type="number" id="bill-amount" step="0.01" required
+                                    class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3"
+                                    placeholder="0.00">
+                            </div>
+                            <div>
+                                <label for="bill-due-date" class="block text-sm font-medium text-gray-700">Vencimento
+                                    *</label>
+                                <input type="date" id="bill-due-date" required
+                                    class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3">
+                            </div>
+                        </div>
+                        <div>
+                            <label for="bill-category" class="block text-sm font-medium text-gray-700">Categoria</label>
+                            <select id="bill-category"
+                                class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3">
+                                <option value="">Carregando categorias...</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                    <button type="submit" form="bill-form" id="save-bill"
+                        class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 sm:ml-3 sm:w-auto sm:text-sm">
+                        Salvar
+                    </button>
+                    <button type="button" id="cancel-modal"
+                        class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 sm:mt-0 sm:w-auto sm:text-sm">
+                        Cancelar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="delete-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg p-6 max-w-sm w-full mx-4">
+            <h3 class="text-lg font-medium text-gray-900">Confirmar Exclusão</h3>
+            <p class="mt-2 text-sm text-gray-500">Tem certeza que deseja excluir esta conta? Esta ação não pode ser
+                desfeita.</p>
+            <div class="mt-4 flex justify-end space-x-3">
+                <button id="cancel-delete-btn" type="button"
+                    class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300">Cancelar</button>
+                <button id="confirm-delete-btn" type="button"
+                    class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700">Excluir</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast-notification" class="hidden fixed bottom-5 right-5 ...">
+        <span id="toast-message"></span>
+    </div>
+    <div id="card-expense-modal-container"></div>
+
+    <div id="toast-notification" class="hidden ...">
+        <span id="toast-message"></span>
+    </div>
+
+    <script src="../componentes/auth.js"></script>
+    <script src="../componentes/topbar.js"></script>
+    <script>
+
+        document.addEventListener('DOMContentLoaded', () => {
+            protectPage('pagamentos')
+            setupPage();
+            renderMonthlyBills();
+        });
+
+
+        let billIdToModify = null;
+        let currentMonth = new Date();
+
+        const prevMonthBtn = document.getElementById('prev-month-btn');
+        const nextMonthBtn = document.getElementById('next-month-btn');
+        const currentMonthDisplay = document.getElementById('current-month-display');
+
+        function updateMonthDisplay() {
+            const monthName = currentMonth.toLocaleString('pt-BR', { month: 'long' });
+            const year = currentMonth.getFullYear();
+            currentMonthDisplay.textContent = `${monthName.charAt(0).toUpperCase() + monthName.slice(1)} / ${year}`;
+        }
+
+        prevMonthBtn.addEventListener('click', () => {
+            currentMonth.setMonth(currentMonth.getMonth() - 1);
+            renderMonthlyBills();
+        });
+
+        nextMonthBtn.addEventListener('click', () => {
+            currentMonth.setMonth(currentMonth.getMonth() + 1);
+            renderMonthlyBills();
+        });
+
+
+        function markAsPaid(id) {
+            const row = document.querySelector(`button[onclick="markAsPaid(${id})"]`).closest('tr');
+            const amountText = row.cells[3].textContent;
+            const amountValue = amountText.replace('R$', '').replace(/\./g, '').replace(',', '.').trim();
+            openMarkAsPaidModal(id, amountValue);
+        }
+
+        async function openMarkAsPaidModal(billId, billAmount) {
+
+            const modal = document.getElementById('mark-as-paid-modal');
+            const accountSelect = document.getElementById('payment-account');
+
+            try {
+                const response = await fetch(`/api/finance/bank-accounts/?is_active=true`, { credentials: 'include' });
+           
+                const accounts = await response.json();
+                accountSelect.innerHTML = '<option value="">Selecione a conta de origem</option>';
+                accounts.forEach(acc => {
+                    accountSelect.innerHTML += `<option value="${acc.id}">${acc.name} (${formatMoney(acc.initial_balance)})</option>`;
+                });
+            } catch (error) { console.error(error); }
+
+            document.getElementById('payable-id-input').value = billId;
+            document.getElementById('payment-amount').value = parseFloat(billAmount).toFixed(2);
+            document.getElementById('payment-date').valueAsDate = new Date();
+
+            modal.classList.remove('hidden');
+        }
+
+        async function confirmPayment(event) {
+            event.preventDefault();
+
+            const payableId = document.getElementById('payable-id-input').value;
+
+            const payload = {
+                bank_account_id: document.getElementById('payment-account').value,
+                amount: document.getElementById('payment-amount').value,
+                payment_date: document.getElementById('payment-date').value
+            };
+
+            if (!payload.bank_account_id) {
+                alert("Por favor, selecione a conta de origem do pagamento.");
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/finance/payables/${payableId}/mark_as_paid/`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json'},
+                    credentials: 'include',
+                    body: JSON.stringify(payload)
+                });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error || 'Erro ao processar pagamento.');
+
+                showToast(data.success);
+                document.getElementById('mark-as-paid-modal').classList.add('hidden');
+                renderMonthlyBills();
+            } catch (error) {
+                showToast(error.message, 'error');
+            }
+        }
+
+        function setupEventListeners() {
+            document.getElementById('add-bill-button').addEventListener('click', openAddModal);
+            document.getElementById('cancel-modal').addEventListener('click', closeModal);
+            document.getElementById('bill-form').addEventListener('submit', savePayable);
+            document.getElementById('confirm-delete-btn').addEventListener('click', deletePayable);
+            document.getElementById('cancel-delete-btn').addEventListener('click', closeDeleteModal);
+            document.getElementById('add-card-expense-btn').addEventListener('click', openCardExpenseModal);
+        }
+        async function loadDynamicModals() {
+            try {
+                const [cardRes, paidRes] = await Promise.all([
+                    fetch('../componentes/modalGastoCartao.html'),
+                    fetch('../componentes/modalMarcarPago.html')
+                ]);
+                const cardHtml = await cardRes.text();
+                const paidHtml = await paidRes.text();
+
+                document.getElementById('card-expense-modal-container').innerHTML = cardHtml;
+                document.body.insertAdjacentHTML('beforeend', paidHtml);
+
+                document.getElementById('add-card-expense-btn').addEventListener('click', openCardExpenseModal);
+                document.getElementById('cancelCardExpenseBtn').addEventListener('click', closeCardExpenseModal);
+                document.getElementById('cardExpenseForm').addEventListener('submit', saveCardExpense);
+                document.getElementById('mark-as-paid-form').addEventListener('submit', confirmPayment);
+                document.getElementById('cancel-payment-btn').addEventListener('click', () => document.getElementById('mark-as-paid-modal').classList.add('hidden'));
+
+            } catch (error) { console.error("Falha ao carregar componentes:", error); }
+        }
+
+        function setupPage() {
+            setupEventListeners();
+            loadDynamicModals();
+        }
+
+        const formatMoney = (value) => parseFloat(value).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        const formatDate = (dateString) => { const [y, m, d] = dateString.split('-'); return `${d}/${m}/${y}`; };
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast-notification');
+            const toastMessage = document.getElementById('toast-message');
+
+            if (!toast || !toastMessage) {
+                console.error("Elementos do Toast não encontrados no DOM.");
+                return;
+            }
+
+            toastMessage.textContent = message;
+            const bgColor = type === 'success' ? 'bg-green-500' : 'bg-red-500';
+            toast.className = `fixed bottom-4 right-4 text-white px-4 py-2 rounded-lg shadow-lg toast ${bgColor}`;
+
+            setTimeout(() => {
+                toast.className = 'hidden';
+            }, 3000);
+        }
+
+        // --- FUNÇÃO PARA RENDERIZAR A TABELA UNIFICADA ---
+        function renderUnifiedTable(items) {
+            const payablesTableBody = document.getElementById('payables-table-body');
+            payablesTableBody.innerHTML = '';
+
+            if (items.length === 0) {
+                payablesTableBody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-gray-500">Nenhuma conta para este mês.</td></tr>`;
+                return;
+            }
+
+            items.forEach(item => {
+                const row = document.createElement('tr');
+                let statusClass = '';
+                let statusText = '';
+
+                // --- LÓGICA DE STATUS UNIFICADA ---
+                switch (item.status) {
+                    case 'pago':
+                        statusClass = 'bg-green-100 text-green-800';
+                        statusText = 'Pago';
+                        row.classList.add('bg-green-50'); // Fundo verde claro para a linha
+                        break;
+                    case 'vencido':
+                        statusClass = 'bg-red-100 text-red-800';
+                        statusText = 'Vencido';
+                        row.classList.add('bg-red-50'); // Fundo vermelho claro para a linha
+                        break;
+                    default: // 'pendente'
+                        statusClass = 'bg-yellow-100 text-yellow-800';
+                        statusText = 'Pendente';
+                        break;
+                }
+
+                if (item.type === 'card') {
+                    const dueDate = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), item.due_day);
+                    row.innerHTML = `
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                            <i class="fas fa-credit-card text-indigo-500 mr-2"></i>
+                            Fatura ${item.card_name}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Fatura de Cartão</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold">${formatDate(dueDate.toISOString().split('T')[0])}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-indigo-600">${formatMoney(item.total_amount)}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                             <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${statusClass}">${statusText}</span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                            <button onclick="viewCardStatement(${item.card_id})" class="text-indigo-600 hover:text-indigo-900 transition-colors" title="Ver Detalhes da Fatura">
+                                <i class="fas fa-eye"></i> Ver Detalhes
+                            </button>
+                        </td>
+                    `;
+                } else { // é 'manual'
+                    row.innerHTML = `
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${item.description}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${item.category_name || 'N/A'}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm ${item.status === 'vencido' ? 'text-red-600 font-bold' : 'text-gray-500'}">${formatDate(item.due_date)}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold">${formatMoney(item.amount)}</td>
+                        <td class="px-6 py-4 whitespace-nowrap"><span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${statusClass}">${statusText}</span></td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                            ${item.status !== 'pago' ? `<button onclick="markAsPaid(${item.id})" class="text-green-600 hover:text-green-800 mr-3" title="Marcar como Pago"><i class="fas fa-check-circle"></i></button>` : ''}
+                            <button onclick="openEditModal(${item.id})" class="text-blue-600 hover:text-blue-800 mr-3" title="Editar"><i class="fas fa-edit"></i></button>
+                            <button onclick="openDeleteModal(${item.id})" class="text-red-500 hover:text-red-700" title="Excluir"><i class="fas fa-trash-alt"></i></button>
+                        </td>
+                    `;
+                }
+                payablesTableBody.appendChild(row);
+            });
+        }
+
+
+        // --- NOVA FUNÇÃO PARA EXIBIR A FATURA (SIMULADO) ---
+        function viewCardStatement(cardId) {
+            const year = currentMonth.getFullYear();
+            const month = currentMonth.getMonth() + 1;
+
+            // Redireciona para a tela de detalhes da fatura, passando os dados via URL
+            window.location.href = `detalheFatura.html?card_id=${cardId}&month=${month}&year=${year}`;
+        }
+
+        async function renderMonthlyBills() {
+        updateMonthDisplay();
+        const year = currentMonth.getFullYear();
+        const month = currentMonth.getMonth() + 1;
+        const url = `/api/finance/monthly-bills/?month=${month}&year=${year}`;
+
+        try {
+            
+            const response = await fetch(url, { credentials: 'include' });
+            if (response.status === 401) { window.location.href = 'login.html'; return; }
+            if (!response.ok) throw new Error('Falha ao buscar as contas do mês.');
+            
+            const data = await response.json();
+            const manualItems = data.manual_bills.map(bill => ({ ...bill, type: 'manual' }));
+            const cardItems = data.card_bills.map(bill => ({ ...bill, type: 'card' }));
+            let allItems = [...manualItems, ...cardItems];
+            allItems.sort((a, b) => {
+                const dateA = a.type === 'card' ? new Date(year, month - 1, a.due_day) : new Date(a.due_date);
+                const dateB = b.type === 'card' ? new Date(year, month - 1, b.due_day) : new Date(b.due_date);
+                return dateA - dateB;
+            });
+            renderUnifiedTable(allItems);
+            updateSummaryCards(allItems);
+        } catch (error) {
+            showToast(error.message, 'error');
+        }
+    }
+
+        function updateSummaryCards(items) {
+            let totalOpen = 0, totalPaid = 0, totalOverdue = 0;
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            items.forEach(item => {
+                const amount = parseFloat(item.amount || item.total_amount);
+
+                if (item.status === 'pago') {
+                    totalPaid += amount;
+                } else { // Se não está pago, está aberto
+                    totalOpen += amount;
+                    // Se estiver aberto E vencido, soma também no total vencido
+                    if (item.status === 'vencido') {
+                        totalOverdue += amount;
+                    }
+                }
+            });
+
+            document.getElementById('summary-total-open').textContent = formatMoney(totalOpen);
+            document.getElementById('summary-total-paid').textContent = formatMoney(totalPaid);
+            document.getElementById('summary-total-overdue').textContent = formatMoney(totalOverdue);
+        }
+
+        async function populateCategoriesDropdown() {
+            const categorySelect = document.getElementById('bill-category');
+            try {
+                const response = await fetch(`/api/finance/categories/?type=saida`);
+                if (!response.ok) throw new Error('Falha ao carregar categorias.');
+                const categories = await response.json();
+                categorySelect.innerHTML = '<option value="">Selecione uma Categoria</option>';
+                categories.forEach(cat => {
+                    categorySelect.innerHTML += `<option value="${cat.id}">${cat.name}</option>`;
+                });
+            } catch (error) {
+                categorySelect.innerHTML = '<option value="">Erro ao carregar</option>';
+                showToast(error.message, 'error');
+            }
+        }
+
+        async function openAddModal() {
+            const billForm = document.getElementById('bill-form');
+            billForm.reset();
+            document.getElementById('modal-title').textContent = 'Nova Conta a Pagar';
+            document.getElementById('bill-id').value = '';
+
+            await populateCategoriesDropdown();
+            document.getElementById('bill-modal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('bill-modal').classList.add('hidden');
+        }
+
+        async function savePayable(event) {
+            event.preventDefault();
+
+            const id = document.getElementById('bill-id').value;
+
+            // --- LÓGICA DO PAYLOAD CORRIGIDA ---
+            const payload = {
+                description: document.getElementById('bill-description').value,
+                amount: document.getElementById('bill-amount').value,
+                due_date: document.getElementById('bill-due-date').value,
+                category: document.getElementById('bill-category').value || null,
+                // Agora, ele pega o status do campo oculto, ou usa 'pendente' se for uma conta nova
+                status: document.getElementById('bill-status').value || 'pendente'
+            };
+
+            if (!payload.description || !payload.amount || !payload.due_date) {
+                showToast('Descrição, Valor e Data de Vencimento são obrigatórios.', 'error');
+                return;
+            }
+
+             const url = id ? `/api/finance/payables/${id}/` : `/api/finance/payables/`;
+            const method = id ? 'PUT' : 'POST';
+
+            const saveButton = document.getElementById('save-bill');
+            saveButton.disabled = true;
+            saveButton.textContent = 'Salvando...';
+
+            try {
+                const response = await fetch(url, {
+                    method: method,
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify(payload)
+                });
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(`Erro ao salvar: ${JSON.stringify(errorData)}`);
+                }
+                showToast(id ? 'Conta atualizada com sucesso!' : 'Conta criada com sucesso!');
+                closeModal();
+                renderMonthlyBills();
+            } catch (error) {
+                showToast(error.message, 'error');
+            } finally {
+                saveButton.disabled = false;
+                saveButton.textContent = 'Salvar';
+            }
+        }
+
+        async function openEditModal(id) {
+        document.getElementById('bill-id').value = id;
+        await populateCategoriesDropdown();
+        try {
+            const response = await fetch(`/api/finance/payables/${id}/`, { credentials: 'include' });
+            if (response.status === 401) { window.location.href = 'login.html'; return; }
+            if (!response.ok) throw new Error('Falha ao buscar dados da conta.');
+            const bill = await response.json();
+                document.getElementById('modal-title').textContent = 'Editar Conta a Pagar';
+                document.getElementById('bill-description').value = bill.description;
+                document.getElementById('bill-amount').value = bill.amount;
+                document.getElementById('bill-due-date').value = bill.due_date;
+                document.getElementById('bill-category').value = bill.category || '';
+
+                // --- LINHA NOVA ADICIONADA AQUI ---
+                // Guarda o status atual da conta no campo oculto
+                document.getElementById('bill-status').value = bill.status;
+
+                document.getElementById('bill-modal').classList.remove('hidden');
+            } catch (error) {
+                showToast(error.message, 'error');
+            }
+        }
+
+        function openDeleteModal(id) {
+            billIdToModify = id;
+            document.getElementById('delete-modal').classList.remove('hidden');
+        }
+
+        function closeDeleteModal() {
+            billIdToModify = null;
+            document.getElementById('delete-modal').classList.add('hidden');
+        }
+
+        async function deletePayable() {
+        if (!billIdToModify) return;
+        try {
+            const response = await fetch(`/api/finance/payables/${billIdToModify}/`, {
+                method: 'DELETE',
+                credentials: 'include' // CORRIGIDO
+            });
+                if (response.status !== 204) {
+                    throw new Error('Erro ao excluir a conta.');
+                }
+                showToast('Conta excluída com sucesso!');
+                closeDeleteModal();
+                renderMonthlyBills();
+            } catch (error) {
+                showToast(error.message, 'error');
+            }
+        }
+
+        async function openCardExpenseModal() {
+        const cardSelect = document.getElementById('card-expense-card');
+        const categorySelect = document.getElementById('card-expense-category');
+        try {
+            const [cardsRes, catRes] = await Promise.all([
+                fetch(`/api/finance/credit-cards/?is_active=true`, { credentials: 'include' }), // CORRIGIDO
+                fetch(`/api/finance/categories/?type=saida`, { credentials: 'include' }) // CORRIGIDO
+            ]);
+                const cards = await cardsRes.json();
+                const categories = await catRes.json();
+                cardSelect.innerHTML = '<option value="">Selecione um cartão</option>';
+                cards.forEach(c => { cardSelect.innerHTML += `<option value="${c.id}">${c.name} (final ${c.last_digits})</option>`; });
+                categorySelect.innerHTML = '<option value="">Selecione uma categoria</option>';
+                categories.forEach(c => { categorySelect.innerHTML += `<option value="${c.id}">${c.name}</option>`; });
+                document.getElementById('cardExpenseModal').classList.remove('hidden');
+            } catch (error) {
+                console.error(error);
+                showToast('Erro ao carregar dados para o formulário.', 'error');
+            }
+        }
+
+        function closeCardExpenseModal() {
+            document.getElementById('cardExpenseModal').classList.add('hidden');
+        }
+
+        async function saveCardExpense(event) {
+            event.preventDefault();
+
+            const saveButton = document.getElementById('saveCardExpenseBtn');
+            const payload = {
+                description: document.getElementById('card-expense-description').value,
+                amount: document.getElementById('card-expense-amount').value,
+                installments: document.getElementById('card-expense-installments').value,
+                credit_card_id: document.getElementById('card-expense-card').value,
+                category_id: document.getElementById('card-expense-category').value,
+                transaction_date: document.getElementById('card-expense-date').value,
+            };
+
+            if (!payload.description || !payload.amount || !payload.credit_card_id || !payload.category_id || !payload.transaction_date) {
+                showToast("Por favor, preencha todos os campos obrigatórios.", "error");
+                return;
+            }
+            saveButton.disabled = true;
+            saveButton.textContent = 'Criando...';
+
+            try {
+            const response = await fetch(`/api/finance/card-expense/`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include', 
+                body: JSON.stringify(payload)
+            });
+                const data = await response.json();
+                if (!response.ok) {
+                    throw new Error(data.error || 'Ocorreu um erro ao registrar a despesa.');
+                }
+                showToast(data.success || 'Despesa registrada com sucesso!');
+                document.getElementById('cardExpenseForm').reset(); // Limpa os campos do formulário
+
+                closeCardExpenseModal();
+                renderMonthlyBills();
+            } catch (error) {
+                showToast(error.message, 'error');
+            } finally {
+                saveButton.disabled = false;
+                saveButton.textContent = 'Criar Parcelas';
+            }
+        }
+    </script>
+</body>
+
+</html>
+

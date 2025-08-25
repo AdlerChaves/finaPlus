@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configurações | Relda</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+
+    </style>
+  <link rel="stylesheet" crossorigin href="../assets/style-B887qhJx.css">
+</head>
+
+<body class="bg-gray-50 font-sans">
+    <!-- Header -->
+
+    <!-- Main Content -->
+    <main class="mt-16 pt-6 pb-20">
+        <div class="container mx-auto px-4">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-2xl font-bold text-gray-800">Configurações</h2>
+                <button id="save-settings"
+                    class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors flex items-center">
+                    <i class="fas fa-save mr-2"></i> Salvar alterações
+                </button>
+            </div>
+
+            <!-- Toast Notification (hidden by default) -->
+            <div id="toast-notification"
+                class="hidden toast fixed top-20 right-4 bg-green-500 text-white px-4 py-2 rounded-md shadow-lg z-50">
+                <div class="flex items-center">
+                    <i class="fas fa-check-circle mr-2"></i>
+                    <span>Configurações salvas com sucesso!</span>
+                </div>
+            </div>
+
+            <!-- User Account Section -->
+            <div class="settings-section bg-white rounded-lg shadow-sm border border-gray-100 mb-6 overflow-hidden">
+                <div
+                    class="settings-section-header flex items-center justify-between p-4 cursor-pointer border-b border-gray-100">
+                    <div class="flex items-center">
+                        <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3">
+                            <i class="fas fa-user text-blue-500"></i>
+                        </div>
+                        <h3 class="text-lg font-medium text-gray-800">Conta do Usuário</h3>
+                    </div>
+                    <i class="fas fa-chevron-down text-gray-400 transition-transform duration-300"></i>
+                </div>
+                <div class="settings-section-content p-4 border-b border-gray-100">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="first-name" class="block text-sm font-medium text-gray-700 mb-1">Nome</label>
+                            <input type="text" id="first-name"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                        <div>
+                            <label for="last-name"
+                                class="block text-sm font-medium text-gray-700 mb-1">Sobrenome</label>
+                            <input type="text" id="last-name"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                        <div>
+                            <label for="user-email" class="block text-sm font-medium text-gray-700 mb-1">E-mail</label>
+                            <input type="email" id="user-email" readonly
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100 cursor-not-allowed">
+                        </div>
+                        <div>
+                            <label for="user-phone" class="block text-sm font-medium text-gray-700 mb-1">Telefone com
+                                WhatsApp</label>
+                            <input type="tel" id="user-phone"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                placeholder="(11) 98765-4321">
+                        </div>
+                    </div>
+
+                    <div class="mt-6 flex flex-wrap gap-3">
+                        <button id="change-password"
+                            class="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors flex items-center">
+                            <i class="fas fa-key mr-2"></i> Alterar senha
+                        </button>
+                        <button id="logout"
+                            class="px-4 py-2 bg-red-50 text-red-600 rounded-md hover:bg-red-100 transition-colors flex items-center">
+                            <i class="fas fa-sign-out-alt mr-2"></i> Encerrar sessão
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- System Preferences Section -->
+            <div class="settings-section bg-white rounded-lg shadow-sm border border-gray-100 mb-6 overflow-hidden">
+                <div
+                    class="settings-section-header flex items-center justify-between p-4 cursor-pointer border-b border-gray-100">
+                    <div class="flex items-center">
+                        <div class="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center mr-3">
+                            <i class="fas fa-cog text-purple-500"></i>
+                        </div>
+                        <h3 class="text-lg font-medium text-gray-800">Preferências do Sistema</h3>
+                    </div>
+                    <i class="fas fa-chevron-down text-gray-400 transition-transform duration-300"></i>
+                </div>
+                <div class="settings-section-content p-4 border-b border-gray-100">
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Tema</label>
+                                <p class="text-xs text-gray-500">Escolha entre tema claro ou escuro</p>
+                            </div>
+                            <div class="relative inline-block w-10 mr-2 align-middle select-none">
+                                <input type="checkbox" id="theme-toggle"
+                                    class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer" />
+                                <label for="theme-toggle"
+                                    class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer"></label>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label for="currency" class="block text-sm font-medium text-gray-700 mb-1">Moeda
+                                padrão</label>
+                            <select id="currency"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                <option value="BRL">Real Brasileiro (R$)</option>
+                                <option value="USD">Dólar Americano ($)</option>
+                                <option value="EUR">Euro (€)</option>
+                                <option value="GBP">Libra Esterlina (£)</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label for="language" class="block text-sm font-medium text-gray-700 mb-1">Idioma</label>
+                            <select id="language"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                <option value="pt-BR">Português (Brasil)</option>
+                                <option value="en-US">Inglês (EUA)</option>
+                                <option value="es-ES">Espanhol</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Notifications Section -->
+            <!-- <div class="settings-section bg-white rounded-lg shadow-sm border border-gray-100 mb-6 overflow-hidden">
+                <div
+                    class="settings-section-header flex items-center justify-between p-4 cursor-pointer border-b border-gray-100">
+                    <div class="flex items-center">
+                        <div class="w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center mr-3">
+                            <i class="fas fa-bell text-yellow-500"></i>
+                        </div>
+                        <h3 class="text-lg font-medium text-gray-800">Notificações</h3>
+                    </div>
+                    <i class="fas fa-chevron-down text-gray-400 transition-transform duration-300"></i>
+                </div>
+                <div class="settings-section-content p-4 border-b border-gray-100">
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Notificações de metas
+                                    semanais</label>
+                                <p class="text-xs text-gray-500">Receba alertas sobre seu progresso semanal</p>
+                            </div>
+                            <div class="relative inline-block w-10 mr-2 align-middle select-none">
+                                <input type="checkbox" id="weekly-goals-toggle" checked
+                                    class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer" />
+                                <label for="weekly-goals-toggle"
+                                    class="toggle-label block overflow-hidden h-6 rounded-full bg-blue-500 cursor-pointer"></label>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Notificações de grandes
+                                    transações</label>
+                                <p class="text-xs text-gray-500">Alertas para entradas/saídas acima de R$ 1.000,00</p>
+                            </div>
+                            <div class="relative inline-block w-10 mr-2 align-middle select-none">
+                                <input type="checkbox" id="large-transactions-toggle" checked
+                                    class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer" />
+                                <label for="large-transactions-toggle"
+                                    class="toggle-label block overflow-hidden h-6 rounded-full bg-blue-500 cursor-pointer"></label>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Lembrete de contas a
+                                    pagar</label>
+                                <p class="text-xs text-gray-500">Notificações 3 dias antes do vencimento</p>
+                            </div>
+                            <div class="relative inline-block w-10 mr-2 align-middle select-none">
+                                <input type="checkbox" id="bills-reminder-toggle" checked
+                                    class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer" />
+                                <label for="bills-reminder-toggle"
+                                    class="toggle-label block overflow-hidden h-6 rounded-full bg-blue-500 cursor-pointer"></label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div> -->
+
+            <!-- Security Section -->
+            <!-- <div class="settings-section bg-white rounded-lg shadow-sm border border-gray-100 mb-6 overflow-hidden">
+                <div
+                    class="settings-section-header flex items-center justify-between p-4 cursor-pointer border-b border-gray-100">
+                    <div class="flex items-center">
+                        <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mr-3">
+                            <i class="fas fa-lock text-green-500"></i>
+                        </div>
+                        <h3 class="text-lg font-medium text-gray-800">Segurança</h3>
+                    </div>
+                    <i class="fas fa-chevron-down text-gray-400 transition-transform duration-300"></i>
+                </div>
+                <div class="settings-section-content p-4 border-b border-gray-100">
+                    <div class="space-y-6">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Verificação em duas
+                                    etapas</label>
+                                <p class="text-xs text-gray-500">Adicione uma camada extra de segurança à sua conta</p>
+                            </div>
+                            <button id="enable-2fa"
+                                class="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors flex items-center">
+                                <i class="fas fa-shield-alt mr-2"></i> Ativar
+                            </button>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Último login</label>
+                            <p class="text-sm text-gray-600">15/06/2023 às 14:30 - IP: 192.168.1.100 (São Paulo, BR)</p>
+                        </div>
+                    </div>
+                </div>
+            </div> -->
+
+            <!-- Data Section -->
+            <div class="settings-section bg-white rounded-lg shadow-sm border border-gray-100 mb-6 overflow-hidden">
+                <div
+                    class="settings-section-header flex items-center justify-between p-4 cursor-pointer border-b border-gray-100">
+                    <div class="flex items-center">
+                        <div class="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center mr-3">
+                            <i class="fas fa-database text-red-500"></i>
+                        </div>
+                        <h3 class="text-lg font-medium text-gray-800">Dados</h3>
+                    </div>
+                    <i class="fas fa-chevron-down text-gray-400 transition-transform duration-300"></i>
+                </div>
+                <div class="settings-section-content p-4">
+                    <div class="space-y-4">
+                        <!-- <div class="flex items-center justify-between">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Exportar dados</label>
+                                <p class="text-xs text-gray-500">Baixe um backup de todas as suas informações</p>
+                            </div>
+                            <button id="export-data"
+                                class="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors flex items-center">
+                                <i class="fas fa-file-export mr-2"></i> Exportar
+                            </button>
+                        </div> -->
+
+                        <div class="pt-4 border-t border-gray-200">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Excluir conta</label>
+                            <p class="text-xs text-gray-500 mb-3">Esta ação é irreversível. Todos os seus dados serão
+                                permanentemente removidos.</p>
+                            <button id="delete-account"
+                                class="px-4 py-2 bg-red-50 text-red-600 rounded-md hover:bg-red-100 transition-colors flex items-center">
+                                <i class="fas fa-trash-alt mr-2"></i> Excluir minha conta
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Delete Account Modal -->
+    <div id="delete-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4 fade-in">
+            <div class="flex items-start">
+                <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100">
+                    <i class="fas fa-exclamation-triangle text-red-600"></i>
+                </div>
+                <div class="ml-4">
+                    <h3 class="text-lg font-medium text-gray-900">Tem certeza que deseja excluir sua conta?</h3>
+                    <div class="mt-2">
+                        <p class="text-sm text-gray-500">Esta ação não pode ser desfeita. Todos os seus dados serão
+                            permanentemente removidos do nosso sistema.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-5 flex justify-end space-x-3">
+                <button id="cancel-delete" type="button"
+                    class="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200">
+                    Cancelar
+                </button>
+                <button id="confirm-delete" type="button"
+                    class="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600">
+                    Sim, excluir conta
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Change Password Modal -->
+    <div id="password-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4 fade-in">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-medium text-gray-900">Alterar senha</h3>
+                <button id="close-password-modal" class="text-gray-400 hover:text-gray-500">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="space-y-4">
+                <div>
+                    <label for="current-password" class="block text-sm font-medium text-gray-700 mb-1">Senha
+                        atual</label>
+                    <div class="relative">
+                        <input type="password" id="current-password"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        <button type="button"
+                            class="absolute right-3 top-2 text-gray-400 hover:text-gray-500 toggle-password">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+                <div>
+                    <label for="new-password" class="block text-sm font-medium text-gray-700 mb-1">Nova senha</label>
+                    <div class="relative">
+                        <input type="password" id="new-password"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        <button type="button"
+                            class="absolute right-3 top-2 text-gray-400 hover:text-gray-500 toggle-password">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-1">Mínimo de 8 caracteres, incluindo letras e números</p>
+                </div>
+                <div>
+                    <label for="confirm-password" class="block text-sm font-medium text-gray-700 mb-1">Confirmar nova
+                        senha</label>
+                    <div class="relative">
+                        <input type="password" id="confirm-password"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        <button type="button"
+                            class="absolute right-3 top-2 text-gray-400 hover:text-gray-500 toggle-password">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-6 flex justify-end">
+                <button id="update-password" class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600">
+                    Atualizar senha
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2FA Modal -->
+    <div id="twofa-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4 fade-in">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-medium text-gray-900">Verificação em Duas Etapas</h3>
+                <button id="close-twofa-modal" class="text-gray-400 hover:text-gray-500">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="text-center">
+                <div class="mx-auto w-48 h-48 bg-gray-100 rounded flex items-center justify-center mb-4">
+                    <i class="fas fa-qrcode text-4xl text-gray-400"></i>
+                </div>
+                <p class="text-sm text-gray-600 mb-4">Escaneie o QR code acima com seu aplicativo autenticador (Google
+                    Authenticator, Authy, etc.)</p>
+                <div class="mb-4">
+                    <label for="twofa-code" class="block text-sm font-medium text-gray-700 mb-1">Código de
+                        verificação</label>
+                    <input type="text" id="twofa-code"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-center tracking-widest"
+                        maxlength="6" placeholder="000000">
+                </div>
+                <button id="enable-twofa" class="w-full px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600">
+                    Ativar verificação em duas etapas
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <script src="../componentes/auth.js"></script>
+    <script src="../componentes/topbar.js"></script>
+    <script>
+        // Função para buscar os dados do usuário e popular a página
+        function loadUserSettings() {
+            fetch(`/api/accounts/me/`, {
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+            })
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('first-name').value = data.first_name || '';
+                    document.getElementById('last-name').value = data.last_name || '';
+                    document.getElementById('user-email').value = data.email || '';
+                    let phoneToDisplay = data.phone || '';
+                    if (phoneToDisplay.startsWith('+55')) {
+                        phoneToDisplay = phoneToDisplay.substring(3);
+                    }
+
+                    const phoneInput = document.getElementById('user-phone');
+                    phoneInput.value = phoneToDisplay;
+
+                    // Aplica a máscara ao valor já sem o +55
+                    IMask(phoneInput, { mask: '(00) 00000-0000' });
+
+                    // Preferências do Sistema
+                    document.getElementById('theme-toggle').checked = data.theme === 'dark';
+                    document.getElementById('currency').value = data.currency;
+                    document.getElementById('language').value = data.language;
+
+                    // Notificações
+                    document.getElementById('weekly-goals-toggle').checked = data.notify_weekly_goals;
+                    document.getElementById('large-transactions-toggle').checked = data.notify_large_transactions;
+                    document.getElementById('bills-reminder-toggle').checked = data.notify_bills_reminder;
+                })
+                .catch(error => console.error('Erro ao carregar configurações:', error));
+        }
+
+        // Salvar alterações
+        document.getElementById('save-settings').addEventListener('click', function () {
+            const phoneValue = document.getElementById('user-phone').value.replace(/\D/g, '');
+
+            const payload = {
+                first_name: document.getElementById('first-name').value,
+                last_name: document.getElementById('last-name').value,
+                phone: phoneValue ? `+55${phoneValue}` : '', // Envia com código do país
+                theme: document.getElementById('theme-toggle').checked ? 'dark' : 'light',
+                currency: document.getElementById('currency').value,
+                language: document.getElementById('language').value,
+                notify_weekly_goals: document.getElementById('weekly-goals-toggle').checked,
+                notify_large_transactions: document.getElementById('large-transactions-toggle').checked,
+                notify_bills_reminder: document.getElementById('bills-reminder-toggle').checked
+            };
+
+            // A correção está na estrutura do fetch abaixo
+            fetch(`/api/accounts/me/`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+
+                },
+                credentials: 'include', // Garante que os cookies de autenticação são enviados
+                body: JSON.stringify(payload)
+            })
+                .then(response => {
+                    if (response.ok) {
+                        const toast = document.getElementById('toast-notification');
+                        toast.classList.remove('hidden');
+                        setTimeout(() => toast.classList.add('hidden'), 3000);
+                    } else {
+                        // Se houver um erro, tenta mostrar uma mensagem mais detalhada do backend
+                        response.json().then(data => {
+                            console.error('Erro do servidor:', data);
+                            alert('Falha ao salvar. Verifique os dados e tente novamente.');
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro de rede ou de script:', error);
+                    alert('Não foi possível salvar as configurações. Verifique a sua conexão.');
+                });
+        });
+
+        // Atualizar senha
+        document.getElementById('update-password').addEventListener('click', function () {
+            const payload = {
+                current_password: document.getElementById('current-password').value,
+                new_password: document.getElementById('new-password').value
+            };
+
+            if (payload.new_password !== document.getElementById('confirm-password').value) {
+                alert('A nova senha e a confirmação não coincidem!');
+                return;
+            }
+
+            fetch(`/api/accounts/change-password/`, {
+                method: 'PUT', // ou PATCH dependendo da sua view
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${getAccessToken()}`
+                },
+                body: JSON.stringify(payload)
+            })
+                .then(async response => {
+                    if (response.ok) {
+                        alert('Senha alterada com sucesso!');
+                        document.getElementById('password-modal').classList.add('hidden');
+                    } else {
+                        const errorData = await response.json();
+                        const errorMessage = Object.values(errorData).join('\n');
+                        throw new Error(errorMessage);
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro ao alterar senha:', error);
+                    alert(`Erro: ${error.message}`);
+                });
+        });
+
+        // Excluir conta
+        document.getElementById('confirm-delete').addEventListener('click', function () {
+            fetch(`/api/accounts/delete-account/`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${getAccessToken()}`
+                }
+            })
+                .then(response => {
+                    if (response.ok) {
+                        alert('Conta excluída com sucesso!');
+                        // Limpa os dados e redireciona
+                        localStorage.clear();
+                        window.location.href = "./login.html";
+                    } else {
+                        throw new Error('Falha ao excluir a conta.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro ao excluir conta:', error);
+                    alert('Não foi possível excluir a conta. Tente novamente.');
+                });
+        });
+
+        // 2FA modal
+        document.getElementById('enable-2fa').addEventListener('click', function () {
+            document.getElementById('twofa-modal').classList.remove('hidden');
+        });
+
+        document.getElementById('close-twofa-modal').addEventListener('click', function () {
+            document.getElementById('twofa-modal').classList.add('hidden');
+        });
+
+        document.getElementById('enable-twofa').addEventListener('click', function () {
+            const code = document.getElementById('twofa-code').value;
+
+            if (!code || code.length !== 6) {
+                alert('Por favor, insira um código de 6 dígitos válido');
+                return;
+            }
+
+            alert('Verificação em duas etapas ativada com sucesso (simulação)');
+            document.getElementById('twofa-modal').classList.add('hidden');
+            document.getElementById('enable-2fa').innerHTML = '<i class="fas fa-shield-alt mr-2"></i> Configurado';
+            document.getElementById('enable-2fa').classList.remove('bg-gray-100', 'text-gray-700');
+            document.getElementById('enable-2fa').classList.add('bg-green-100', 'text-green-700');
+        });
+
+        // Export data
+        document.getElementById('export-data').addEventListener('click', function () {
+            alert('Dados exportados com sucesso (simulação)');
+        });
+
+        // --- LÓGICA DE LOGOUT ATUALIZADA ---
+        document.getElementById('logout').addEventListener('click', function () {
+            if (confirm('Tem certeza que deseja sair da sua conta?')) {
+                // Faz uma chamada POST para a nova view de logout
+                fetch('/api/accounts/logout/', { method: 'POST' })
+                    .then(response => {
+                        if (response.ok) {
+                            // Limpa qualquer dado que ainda possa existir no localStorage (boa prática)
+                            localStorage.clear();
+                            // Redireciona para a página de login
+                            window.location.href = "./login.html";
+                        } else {
+                            throw new Error('Falha ao fazer logout.');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Erro no logout:', error);
+                        alert('Não foi possível fazer logout. Tente novamente.');
+                    });
+            }
+        });
+
+
+
+        // Load saved preferences
+        document.addEventListener('DOMContentLoaded', function () {
+            const savedTheme = localStorage.getItem('financaplus-theme');
+            const savedCurrency = localStorage.getItem('financaplus-currency');
+            const savedLanguage = localStorage.getItem('financaplus-language');
+
+            if (savedTheme === 'dark') {
+                document.getElementById('theme-toggle').checked = true;
+                document.body.classList.add('bg-gray-900', 'text-white');
+            }
+
+            if (savedCurrency) {
+                document.getElementById('currency').value = savedCurrency;
+            }
+
+            if (savedLanguage) {
+                document.getElementById('language').value = savedLanguage;
+            }
+        });
+
+
+
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            protectPage('configuracoes');
+            loadUserSettings();
+        });
+    </script>
+</body>
+
+</html>

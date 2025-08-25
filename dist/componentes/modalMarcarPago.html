@@ -1,0 +1,37 @@
+<div id="mark-as-paid-modal" class="fixed inset-0 overflow-y-auto z-50 hidden">
+    <div class="flex items-center justify-center min-h-screen">
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75"></div>
+        <div class="bg-white rounded-lg shadow-xl transform transition-all sm:max-w-lg sm:w-full">
+            <div class="bg-white px-4 pt-5 pb-4 sm:p-6">
+                <h3 class="text-lg leading-6 font-medium text-gray-900">Marcar Conta como Paga</h3>
+                <form id="mark-as-paid-form" class="mt-4 space-y-4">
+                    <input type="hidden" id="payable-id-input">
+                    <div>
+                        <label for="payment-account" class="block text-sm font-medium text-gray-700">Pagar com a conta *</label>
+                        <select id="payment-account" required class="mt-1 block w-full border border-gray-300 rounded-md py-2 px-3">
+                            <option value="">Carregando contas...</option>
+                        </select>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label for="payment-amount" class="block text-sm font-medium text-gray-700">Valor Pago *</label>
+                            <input type="number" id="payment-amount" step="0.01" required class="mt-1 block w-full border border-gray-300 rounded-md py-2 px-3">
+                        </div>
+                        <div>
+                            <label for="payment-date" class="block text-sm font-medium text-gray-700">Data do Pagamento *</label>
+                            <input type="date" id="payment-date" required class="mt-1 block w-full border border-gray-300 rounded-md py-2 px-3">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse">
+                <button type="submit" form="mark-as-paid-form" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-green-600 text-base font-medium text-white hover:bg-green-700 sm:ml-3 sm:w-auto sm:text-sm">
+                    Confirmar Pagamento
+                </button>
+                <button type="button" id="cancel-payment-btn" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white sm:mt-0 sm:w-auto sm:text-sm">
+                    Cancelar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

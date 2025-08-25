@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="pt-BR"> payload
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="../componentes/theme.js" defer></script>
+    <title>Relda | Saídas Financeiras</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" crossorigin href="../assets/style-B887qhJx.css">
+</head>
+
+<body class="bg-gray-50 font-sans">
+    <main class="mt-16 pt-6 pb-20">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-800">Saídas Financeiras</h2>
+                <div class="mt-4 md:mt-0">
+                    <button id="add-expense-header-btn"
+                        class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors flex items-center">
+                        <i class="fas fa-plus mr-2"></i>
+                        Nova Saída
+                    </button>
+
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-sm p-4 border border-gray-100 mb-6">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h3 class="text-gray-700 font-medium">Total de Saídas</h3>
+                        <p class="text-xs text-gray-500">Período selecionado</p>
+                    </div>
+                    <p id="total-expenses-summary" class="text-2xl font-bold text-red-600">R$ 0,00</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                <div class="bg-white rounded-xl shadow-sm p-4">
+                    <h2 class="text-lg font-semibold mb-4 text-gray-700">Despesas por Categoria</h2>
+                    <div class="chart-container" style="position: relative; height:300px">
+                        <canvas id="expenseChart"></canvas>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl shadow-sm p-4">
+                    <h2 id="chart-by-account-title" class="text-lg font-semibold mb-4 text-gray-700">Despesas por Conta
+                    </h2>
+                    <div class="chart-container" style="position: relative; height:300px">
+                        <canvas id="statusChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-sm overflow-hidden border border-gray-100">
+                <div class="flex justify-between items-center p-4">
+                    <h3 class="text-gray-800 font-medium">Lista de Saídas</h3>
+                </div>
+
+                <div class="hidden md:block overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Descrição</th>
+                                <th
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Valor</th>
+                                <th
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Categoria</th>
+                                <th
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Data</th>
+                                <th
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Conta</th>
+                                <th
+                                    class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="expensesTableBody" class="bg-white divide-y divide-gray-200">
+                        </tbody>
+                    </table>
+                </div>
+
+                <div id="expenses-list-mobile" class="md:hidden">
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <button id="addExpenseBtn"
+        class="fab fixed bottom-6 right-6 w-14 h-14 bg-blue-500 text-white rounded-full flex items-center justify-center focus:outline-none shadow-lg">
+        <i class="fas fa-plus"></i>
+    </button>
+
+    <div id="expenseModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg shadow-sm w-full max-w-md mx-4">
+            <div class="flex justify-between items-center border-b p-4">
+                <h3 id="modal-title" class="text-gray-800 font-medium">Adicionar Saída</h3>
+                <button id="closeModal" class="text-gray-500 hover:text-gray-700">&times;</button>
+            </div>
+            <form id="expenseForm" class="p-4 space-y-4">
+                <input type="hidden" id="transaction-id">
+                <div>
+                    <label for="expense-description"
+                        class="block text-sm font-medium text-gray-700 mb-1">Descrição</label>
+                    <input type="text" id="expense-description" class="w-full p-2 border border-gray-300 rounded-md"
+                        required>
+                </div>
+                <div>
+                    <label for="expense-amount" class="block text-sm font-medium text-gray-700 mb-1">Valor (R$)</label>
+                    <input type="number" id="expense-amount" step="0.01"
+                        class="w-full p-2 border border-gray-300 rounded-md" required>
+                </div>
+                <div>
+                    <label for="expense-category" class="block text-sm font-medium text-gray-700 mb-1">Categoria</label>
+                    <select id="expense-category" class="w-full p-2 border border-gray-300 rounded-md" required>
+                        <option value="">Carregando...</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="expense-account" class="block text-sm font-medium text-gray-700 mb-1">Conta de
+                        Origem</label>
+                    <select id="expense-account" class="w-full p-2 border border-gray-300 rounded-md" required>
+                        <option value="">Carregando...</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="expense-date" class="block text-sm font-medium text-gray-700 mb-1">Data</label>
+                    <input type="date" id="expense-date" class="w-full p-2 border border-gray-300 rounded-md" required>
+                </div>
+                <div>
+                    <label for="expense-notes" class="block text-sm font-medium text-gray-700 mb-1">Observações</label>
+                    <textarea id="expense-notes" rows="2"
+                        class="w-full p-2 border border-gray-300 rounded-md"></textarea>
+                </div>
+                <div class="flex justify-end space-x-3 pt-4">
+                    <button type="button" id="cancelButton"
+                        class="px-4 py-2 border rounded-md text-gray-700 hover:bg-gray-50 text-sm">Cancelar</button>
+                    <button type="submit"
+                        class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 text-sm">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="delete-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg p-6 max-w-sm w-full mx-4">
+            <h3 class="text-lg font-medium text-gray-900">Confirmar Exclusão</h3>
+            <p class="mt-2 text-sm text-gray-500">Tem certeza que deseja excluir esta despesa? Esta ação não pode ser
+                desfeita.</p>
+            <div class="mt-4 flex justify-end space-x-3">
+                <button id="cancel-delete-btn" type="button"
+                    class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300">Cancelar</button>
+                <button id="confirm-delete-btn" type="button"
+                    class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700">Excluir</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast-notification"
+        class="hidden fixed bottom-5 right-5 px-5 py-3 rounded-lg shadow-lg text-white transition-opacity duration-300">
+        <span id="toast-message"></span>
+    </div>
+
+    <script src="../componentes/auth.js"></script>
+    <script src="../componentes/topbar.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            protectPage('movimentacoes');
+            renderExpenses();
+        });
+
+        // --- DOM ELEMENTS ---
+        const expenseModal = document.getElementById('expenseModal');
+        const deleteModal = document.getElementById('delete-modal');
+        const addExpenseHeaderBtn = document.getElementById('add-expense-header-btn');
+        const addExpenseFabBtn = document.getElementById('addExpenseBtn');
+        const expenseForm = document.getElementById('expenseForm');
+        const expensesTableBody = document.getElementById('expensesTableBody');
+        const categorySelect = document.getElementById('expense-category');
+        const accountSelect = document.getElementById('expense-account');
+        const toastNotification = document.getElementById('toast-notification');
+        const toastMessage = document.getElementById('toast-message');
+        const totalExpensesEl = document.getElementById('totalExpenses');
+        const totalExpensesSummary = document.getElementById('total-expenses-summary');
+
+        let transactionIdToDelete = null;
+        let expenseChart = null;
+        let statusChart = null;
+
+        // --- FUNÇÕES DE UTILIDADE E FEEDBACK ---
+        const formatMoney = (value) => parseFloat(value).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        const formatDate = (dateString) => { const [y, m, d] = dateString.split('-'); return `${d}/${m}/${y}`; };
+
+        function showToast(message, type = 'success') {
+            const bgColor = type === 'success' ? 'bg-green-500' : 'bg-red-600';
+            toastNotification.className = `fixed bottom-5 right-5 px-5 py-3 rounded-lg shadow-lg text-white ${bgColor}`;
+            toastMessage.textContent = message;
+            toastNotification.classList.remove('hidden');
+            setTimeout(() => { toastNotification.classList.add('hidden'); }, 3000);
+        }
+
+        // --- FUNÇÕES DE GRÁFICOS ---
+        function updateCharts(expenses) {
+            const categoriesData = expenses.reduce((acc, expense) => {
+                const categoryName = expense.category_name || 'Sem Categoria';
+                acc[categoryName] = (acc[categoryName] || 0) + parseFloat(expense.amount);
+                return acc;
+            }, {});
+            const accountsData = expenses.reduce((acc, expense) => {
+                const accountName = expense.bank_account_name || 'Conta Deletada';
+                acc[accountName] = (acc[accountName] || 0) + parseFloat(expense.amount);
+                return acc;
+            }, {});
+
+            if (expenseChart) expenseChart.destroy();
+            if (statusChart) statusChart.destroy();
+
+            const ctxExpense = document.getElementById('expenseChart').getContext('2d');
+            expenseChart = new Chart(ctxExpense, {
+                type: 'doughnut',
+                data: { labels: Object.keys(categoriesData), datasets: [{ data: Object.values(categoriesData), backgroundColor: ['#3B82F6', '#EF4444', '#10B981', '#F59E0B', '#6366F1'] }] },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+
+            const ctxStatus = document.getElementById('statusChart').getContext('2d');
+            statusChart = new Chart(ctxStatus, {
+                type: 'bar',
+                data: { labels: Object.keys(accountsData), datasets: [{ label: 'Total Gasto', data: Object.values(accountsData), backgroundColor: '#8B5CF6' }] },
+                options: { responsive: true, maintainAspectRatio: false, indexAxis: 'y' }
+            });
+        }
+
+        // --- FUNÇÕES DA API E RENDERIZAÇÃO ---
+        async function populateDropdowns(t) {
+            try {
+                // --- A CORREÇÃO ESTÁ NA URL DESTA REQUISIÇÃO ---
+                const [catRes, accRes] = await Promise.all([
+                    // Adicionamos ?type=saida para filtrar apenas as categorias de despesa
+                    fetch(`/api/finance/categories/?type=saida`, { credentials: 'include' }),
+                    fetch(`/api/finance/bank-accounts/`, { credentials: 'include' })
+                ]);
+
+                if (catRes.status === 401 || accRes.status === 401) {
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                if (!catRes.ok || !accRes.ok) {
+                    throw new Error('Falha ao carregar dados para o formulário.');
+                }
+
+                const categories = await catRes.json();
+                const accounts = await accRes.json();
+
+                categorySelect.innerHTML = '<option value="">Selecione a Categoria</option>';
+                categories.forEach(c => {
+                    categorySelect.innerHTML += `<option value="${c.id}">${c.name}</option>`;
+                });
+
+                accountSelect.innerHTML = '<option value="">Selecione a Conta</option>';
+                // Filtramos para mostrar apenas contas ativas no dropdown
+                accounts.filter(a => a.is_active).forEach(a => {
+                    accountSelect.innerHTML += `<option value="${a.id}">${a.name}</option>`;
+                });
+
+            } catch (error) {
+                console.error('Erro ao popular dropdowns:', error);
+                showToast(error.message, 'error'); // Mostra um feedback de erro
+            }
+        }
+
+        async function renderExpenses() {
+
+            await populateDropdowns();
+
+            try {
+                // ADICIONADO: 'credentials: 'include''
+                const response = await fetch(`/api/finance/transactions/?type=saida`, { credentials: 'include' });
+
+                if (response.status === 401) {
+                    window.location.href = 'login.html';
+                    return;
+                }
+                if (!response.ok) throw new Error('Falha ao buscar despesas.');
+
+                const expenses = await response.json();
+                // ... (resto da sua lógica de renderização é mantida) ...
+                const expensesListMobile = document.getElementById('expenses-list-mobile');
+                const expensesTableBody = document.getElementById('expensesTableBody');
+                expensesTableBody.innerHTML = '';
+                expensesListMobile.innerHTML = '';
+
+                if (expenses.length === 0) {
+                    const emptyMessageTable = `<tr><td colspan="6" class="text-center py-4 text-gray-500">Nenhuma despesa registrada.</td></tr>`;
+                    expensesTableBody.innerHTML = emptyMessageTable;
+                    expensesListMobile.innerHTML = `<p class="text-center py-4 text-gray-500">Nenhuma despesa registrada.</p>`;
+                    totalExpensesSummary.textContent = formatMoney(0);
+                    updateCharts([]);
+                    return;
+                }
+
+                const totalValue = expenses.reduce((sum, exp) => sum + parseFloat(exp.amount), 0);
+                totalExpensesSummary.textContent = formatMoney(totalValue);
+
+                expenses.forEach(expense => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${expense.description}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-red-600 font-semibold">${formatMoney(expense.amount)}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${expense.category_name || 'N/A'}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${formatDate(expense.transaction_date)}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${expense.bank_account_name || 'N/A'}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <button onclick="openEditModal(${expense.id})" class="text-blue-600 hover:text-blue-800 mr-3"><i class="fas fa-edit"></i></button>
+                        <button onclick="openDeleteModal(${expense.id})" class="text-red-500 hover:text-red-700"><i class="fas fa-trash-alt"></i></button>
+                    </td>
+                `;
+                    expensesTableBody.appendChild(row);
+
+                    const card = document.createElement('div');
+                    card.className = 'p-4 border-b border-gray-200';
+                    card.innerHTML = `
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="font-semibold text-gray-800">${expense.description}</p>
+                            <p class="text-sm text-gray-500">${expense.category_name || 'N/A'}</p>
+                            <p class="text-xs text-gray-400 mt-1">${formatDate(expense.transaction_date)}</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="font-bold text-red-600">${formatMoney(expense.amount)}</p>
+                            <div class="mt-2">
+                                <button onclick="openEditModal(${expense.id})" class="text-blue-600 hover:text-blue-800 mr-2"><i class="fas fa-edit"></i></button>
+                                <button onclick="openDeleteModal(${expense.id})" class="text-red-500 hover:text-red-700"><i class="fas fa-trash-alt"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                    expensesListMobile.appendChild(card);
+                });
+
+                updateCharts(expenses);
+            } catch (error) { showToast(error.message, 'error'); }
+        }
+
+        // --- LÓGICA DO MODAL E CRUD ---
+        function openAddModal() {
+            expenseForm.reset();
+            document.getElementById('modal-title').textContent = 'Adicionar Nova Saída';
+            document.getElementById('transaction-id').value = '';
+            expenseModal.classList.remove('hidden');
+        }
+
+        async function openEditModal(id) {
+
+            const response = await fetch(`/api/finance/transactions/${id}/`, { credentials: 'include' });
+            if (response.status === 401) { window.location.href = 'login.html'; return; }
+            const expense = await response.json();
+            document.getElementById('modal-title').textContent = 'Editar Saída';
+            document.getElementById('transaction-id').value = expense.id;
+            document.getElementById('expense-description').value = expense.description;
+            document.getElementById('expense-amount').value = expense.amount;
+            document.getElementById('expense-date').value = expense.transaction_date;
+            document.getElementById('expense-category').value = expense.category;
+            document.getElementById('expense-account').value = expense.bank_account;
+            document.getElementById('expense-notes').value = expense.notes;
+            expenseModal.classList.remove('hidden');
+        }
+
+        function closeModal() { expenseModal.classList.add('hidden'); }
+
+        async function saveTransaction(event) {
+        event.preventDefault();
+        const id = document.getElementById('transaction-id').value;
+        const payload = {
+            description: document.getElementById('expense-description').value,
+            amount: document.getElementById('expense-amount').value,
+            transaction_date: document.getElementById('expense-date').value,
+            category: document.getElementById('expense-category').value,
+            bank_account: document.getElementById('expense-account').value,
+            notes: document.getElementById('expense-notes').value,
+            type: 'saida'
+        };
+        const url = id ? `/api/finance/transactions/${id}/` : `/api/finance/transactions/`;
+        const method = id ? 'PUT' : 'POST';
+        try {
+            
+            const response = await fetch(url, {
+                method: method,
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include', 
+                body: JSON.stringify(payload)
+            });
+            if (!response.ok) throw new Error('Erro ao salvar a despesa.');
+            showToast(id ? 'Saída atualizada com sucesso!' : 'Saída adicionada com sucesso!');
+            closeModal();
+            renderExpenses();
+        } catch (error) { showToast(error.message, 'error'); }
+    }
+
+        function openDeleteModal(id) {
+            transactionIdToDelete = id;
+            deleteModal.classList.remove('hidden');
+        }
+
+        function closeDeleteModal() {
+            transactionIdToDelete = null;
+            deleteModal.classList.add('hidden');
+        }
+
+        async function deleteTransaction() {
+        if (!transactionIdToDelete) return;
+        try {
+            
+            const response = await fetch(`/api/finance/transactions/${transactionIdToDelete}/`, {
+                method: 'DELETE',
+                credentials: 'include'
+            });
+            if (response.status !== 204) throw new Error('Erro ao excluir a despesa.');
+            showToast('Despesa excluída com sucesso!');
+            closeDeleteModal();
+            renderExpenses();
+        } catch (error) { showToast(error.message, 'error'); }
+    }
+
+        // --- EVENT LISTENERS ---
+        document.addEventListener('DOMContentLoaded', renderExpenses);
+        addExpenseHeaderBtn.addEventListener('click', openAddModal);
+        addExpenseFabBtn.addEventListener('click', openAddModal);
+        expenseForm.addEventListener('submit', saveTransaction);
+        document.getElementById('closeModal').addEventListener('click', closeModal);
+        document.getElementById('cancelButton').addEventListener('click', closeModal);
+        document.getElementById('confirm-delete-btn').addEventListener('click', deleteTransaction);
+        document.getElementById('cancel-delete-btn').addEventListener('click', closeDeleteModal);
+    </script>
+
+</body>
+
+</html>

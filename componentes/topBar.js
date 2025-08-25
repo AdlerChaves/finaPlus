@@ -3,7 +3,7 @@
  * @param {string} activeMenu - O identificador do menu que deve aparecer como ativo. Ex: 'dashboard', 'movimentacoes', 'relatorios'.
  * @param {object} permissions - Um objeto que define quais seções o usuário pode ver.
  */
-function renderTopbar(activeMenu, permissions) {
+export function renderTopbar(activeMenu, permissions) {
     // Determina o prefixo do caminho para as páginas baseado na localização atual.
     const isRoot = window.location.pathname.endsWith('/') || window.location.pathname.endsWith('index.html');
     const pathPrefix = isRoot ? 'telas/' : '';
@@ -103,9 +103,9 @@ function renderTopbar(activeMenu, permissions) {
         <div class="container mx-auto px-4 py-3 flex justify-between items-center">
             <div class="flex items-center space-x-2">
                 <div class="w-8 h-8 bg-blue-500 rounded-md flex items-center justify-center">
-                    <span class="text-white font-bold">FP</span>
+                    <span class="text-white font-bold">RD</span>
                 </div>
-                <h1 class="text-xl font-semibold text-gray-800">FinançaPlus</h1>
+                <h1 class="text-xl font-semibold text-gray-800">Relda</h1>
             </div>
             <nav class="hidden md:flex space-x-1 items-center">${desktopNavHTML}</nav>
             <button id="mobile-menu-button" class="md:hidden text-gray-600 focus:outline-none">

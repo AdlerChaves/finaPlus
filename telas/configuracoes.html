@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Configurações | FinançaPlus</title>
+    <title>Configurações | Relda</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="../style.css">
     <script>
@@ -496,7 +496,7 @@
                 return;
             }
 
-            fetch(`${API_URL}/api/accounts/change-password/`, {
+            fetch(`/api/accounts/change-password/`, {
                 method: 'PUT', // ou PATCH dependendo da sua view
                 headers: {
                     'Content-Type': 'application/json',
@@ -522,7 +522,7 @@
 
         // Excluir conta
         document.getElementById('confirm-delete').addEventListener('click', function () {
-            fetch(`${API_URL}/api/accounts/delete-account/`, {
+            fetch(`/api/accounts/delete-account/`, {
                 method: 'DELETE',
                 headers: {
                     'Authorization': `Bearer ${getAccessToken()}`

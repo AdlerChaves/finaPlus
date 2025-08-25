@@ -1,0 +1,53 @@
+<div id="card-statement-modal" class="fixed inset-0 overflow-y-auto z-50 hidden">
+    <div class="flex items-center justify-center min-h-screen">
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75"></div>
+        <div class="bg-white rounded-lg shadow-xl transform transition-all sm:max-w-2xl sm:w-full">
+            <div class="bg-white px-4 pt-5 pb-4 sm:p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <div class="flex items-center">
+                        <div
+                            class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-indigo-100 sm:mx-0 sm:h-10 sm:w-10">
+                            <i class="fas fa-receipt text-indigo-600"></i>
+                        </div>
+                        <div class="ml-4">
+                            <h3 class="text-lg leading-6 font-medium text-gray-900" id="statement-modal-title">
+                                Fatura do Cartão
+                            </h3>
+                            <p class="text-sm text-gray-500" id="statement-modal-subtitle">Detalhes da fatura</p>
+                        </div>
+                    </div>
+                    <button id="close-statement-modal" class="text-gray-400 hover:text-gray-500">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+
+                <div class="bg-gray-50 p-4 rounded-lg mb-4 flex justify-between items-center">
+                    <div>
+                        <p class="text-sm text-gray-600">Total da Fatura</p>
+                        <p class="text-2xl font-bold text-indigo-600" id="statement-total-amount">R$ 0,00</p>
+                    </div>
+                    <button id="pay-statement-btn"
+                        class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg flex items-center">
+                        <i class="fas fa-check-circle mr-2"></i> Marcar como Paga
+                    </button>
+                </div>
+
+
+                <div class="max-h-80 overflow-y-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-100 sticky top-0">
+                            <tr>
+                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Data</th>
+                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Descrição
+                                </th>
+                                <th class="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase">Valor</th>
+                            </tr>
+                        </thead>
+                        <tbody id="statement-transactions-body" class="bg-white divide-y divide-gray-200">
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

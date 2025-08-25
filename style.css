@@ -1,3 +1,47 @@
+        /* 1. Cores do Tema Claro (Padrão) */
+        :root {
+            --background-primary: #F9FAFB;
+            /* bg-gray-50 */
+            --background-secondary: #FFFFFF;
+            /* bg-white */
+            --text-primary: #1F2937;
+            /* text-gray-800 */
+            --text-secondary: #6B7280;
+            /* text-gray-500 */
+            --border-color: #E5E7EB;
+            /* border-gray-200 */
+            --primary-color: #3B82F6;
+            /* bg-blue-500 */
+            --primary-hover: #2563EB;
+            /* bg-blue-600 */
+        }
+
+        /* 2. Cores do Tema Escuro */
+        [data-theme='dark'] {
+            --background-primary: #111827;
+            /* bg-gray-900 */
+            --background-secondary: #1F2937;
+            /* bg-gray-800 */
+            --text-primary: #F9FAFB;
+            /* text-gray-50 */
+            --text-secondary: #9CA3AF;
+            /* text-gray-400 */
+            --border-color: #374151;
+            /* border-gray-700 */
+            --primary-color: #3B82F6;
+            /* bg-blue-500 */
+            --primary-hover: #60A5FA;
+            /* bg-blue-400 */
+        }
+
+        /* 3. Aplicar as variáveis aos elementos principais */
+        body {
+            background-color: var(--background-primary);
+            color: var(--text-primary);
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+
         /* Custom styles for the floating action button */
         .fab {
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2),
@@ -71,35 +115,59 @@
             }
         }
 
-                .settings-section {
+        .settings-section {
             transition: all 0.3s ease;
         }
+
         .settings-section-header:hover {
             background-color: #f8fafc;
         }
+
         .toggle-checkbox:checked {
             @apply right-0 border-blue-500;
             right: 0;
             border-color: #3b82f6;
         }
-        .toggle-checkbox:checked + .toggle-label {
+
+        .toggle-checkbox:checked+.toggle-label {
             @apply bg-blue-500;
             background-color: #3b82f6;
         }
+
         .fade-in {
             animation: fadeIn 0.3s ease-in-out;
         }
+
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
+
         .toast {
             animation: slideIn 0.3s ease-in-out, fadeOut 0.5s ease-in-out 2.5s forwards;
         }
+
         @keyframes slideIn {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
         }
+
         @keyframes fadeOut {
-            to { opacity: 0; }
+            to {
+                opacity: 0;
+            }
         }

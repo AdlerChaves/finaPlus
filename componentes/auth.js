@@ -1,9 +1,11 @@
+import { renderTopbar } from "./topbar";
+
 /**
  * Verifica se o usuário tem permissão para acessar uma página, baseado nas
  * permissões salvas no localStorage. Redireciona para o login se não tiver.
  * @param {string} requiredPermission - A chave de permissão necessária para a página.
  */
-function protectPage(requiredPermission) {
+export  function protectPage(requiredPermission) {
     
     const permissionsString = localStorage.getItem('userPermissions');
 

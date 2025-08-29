@@ -1,20 +1,31 @@
-import { protectPage } from './componentes/auth.js';  
+import { protectPage } from './src/componentes/auth';  
 
 const apiUrl = import.meta.env.VITE_API_URL;
 
 let barChart = null;
 let lineChart = null;
-// --- PONTO DE PARTIDA DA EXECUÇÃO ---
-// Adicionamos um listener que espera a página inteira carregar antes de executar qualquer código.
-document.addEventListener('DOMContentLoaded', function () {
-    protectPage('dashboard'); // Função do auth.js para verificar se o usuário está logado.
-    setupMobileMenu(); // Função para configurar o menu mobile.
-    displayUserInfo();
-    loadDashboardData(); // Função principal que busca os dados da .
-    loadChartData();
-    loadCashFlowChartData();
 
-    console.log("Itens no localStorage:", localStorage);
+
+document.addEventListener('DOMContentLoaded', async function () { // MUDANÇA 1: Adicionado "async" aqui
+    try {
+        // MUDANÇA 2: "await" garante que o código só continue DEPOIS que a autenticação for confirmada.
+        // Se o usuário não estiver logado, protectPage irá redirecioná-lo e o código abaixo nunca será executado.
+        await protectPage('dashboard');
+
+        // Se chegamos aqui, o usuário está 100% autenticado.
+        console.log("Autenticação confirmada. Carregando a página...");
+
+        // Agora podemos executar o restante das funções com segurança.
+        setupMobileMenu();
+        displayUserInfo(); // Esta função agora funcionará, pois protectPage já salvou o 'userName'
+        loadDashboardData();
+        loadChartData();
+        loadCashFlowChartData();
+
+    } catch (error) {
+        // O próprio protectPage já lida com o redirecionamento, mas é uma boa prática ter um catch.
+        console.error("Ocorreu um erro durante a inicialização da página:", error);
+    }
 });
 
 
@@ -22,12 +33,10 @@ document.addEventListener('DOMContentLoaded', function () {
 function displayUserInfo() {
     const userName = localStorage.getItem('userName');
     if (userName) {
-        // Atualiza o nome no corpo da página
         const nameSpan = document.getElementById('user-name-display');
         if (nameSpan) {
             nameSpan.textContent = userName;
         }
-
     }
 }
 
@@ -178,7 +187,7 @@ async function loadDashboardData() {
 
         if (response.status === 401) {
             console.error("Não autorizado (401). Redirecionando para login.");
-            window.location.href = '../telas/login.html';
+            window.location.href = './src/pages/login/login.html';
             return;
         }
 

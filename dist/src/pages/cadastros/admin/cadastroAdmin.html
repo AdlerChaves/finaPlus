@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="../componentes/theme.js" defer></script>
+    <title>Criar Conta - Administrador | Relda</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    <script src="https://unpkg.com/imask"></script>
+    <style>
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+
+        .input-focus:focus {
+            border-color: #3B82F6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+
+        .password-strength {
+            height: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .password-strength.weak {
+            background-color: #EF4444;
+            width: 25%;
+        }
+
+        .password-strength.fair {
+            background-color: #F59E0B;
+            width: 50%;
+        }
+
+        .password-strength.good {
+            background-color: #3B82F6;
+            width: 75%;
+        }
+
+        .password-strength.strong {
+            background-color: #10B981;
+            width: 100%;
+        }
+    </style>
+  <script type="module" crossorigin src="../../../../assets/cadastroAdmin-B39Ylx8-.js"></script>
+  <link rel="modulepreload" crossorigin href="../../../../assets/modulepreload-polyfill-B5Qt9EMX.js">
+</head>
+
+<body class="bg-gray-50 font-['Inter'] min-h-screen flex items-center justify-center p-4">
+    <!-- Main Container -->
+    <div class="w-full max-w-3xl fade-in">
+        <!-- Logo & Welcome -->
+        <div class="text-center mb-8">
+            <div class="flex justify-center items-center space-x-2 mb-4">
+                <div class="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center">
+                    <span class="text-white font-bold text-xl">RD</span>
+                </div>
+                <h1 class="text-2xl font-bold text-gray-800">Relda</h1>
+            </div>
+            <p class="text-gray-600">Crie sua conta e comece a gerenciar suas finanças de forma inteligente.</p>
+        </div>
+
+        <!-- Registration Card -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
+            <h2 class="text-xl font-semibold text-gray-800 mb-6">Criar Conta - Administrador</h2>
+
+            <!-- Progress Steps -->
+            <div class="mb-8">
+                <div class="flex items-center">
+                    <div class="flex items-center text-blue-600 relative">
+                        <div
+                            class="rounded-full transition duration-500 ease-in-out h-8 w-8 py-1 border-2 border-blue-600 flex items-center justify-center">
+                            <span class="font-bold">1</span>
+                        </div>
+                        <div class="absolute top-0 -ml-10 text-center mt-10 w-32 text-xs font-medium text-blue-600">
+                            Informações da Empresa</div>
+                    </div>
+                    <div class="flex-auto border-t-2 transition duration-500 ease-in-out border-blue-600"></div>
+                    <div class="flex items-center text-gray-500 relative">
+                        <div
+                            class="rounded-full transition duration-500 ease-in-out h-8 w-8 py-1 border-2 border-gray-300 flex items-center justify-center">
+                            <span class="font-bold">2</span>
+                        </div>
+                        <div class="absolute top-0 -ml-10 text-center mt-10 w-32 text-xs font-medium text-gray-500">
+                            Dados do Administrador</div>
+                    </div>
+                    <div class="flex-auto border-t-2 transition duration-500 ease-in-out border-gray-300"></div>
+                    <div class="flex items-center text-gray-500 relative">
+                        <div
+                            class="rounded-full transition duration-500 ease-in-out h-8 w-8 py-1 border-2 border-gray-300 flex items-center justify-center">
+                            <span class="font-bold">3</span>
+                        </div>
+                        <div class="absolute top-0 -ml-10 text-center mt-10 w-32 text-xs font-medium text-gray-500">
+                            Confirmação</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Error Message -->
+            <div id="error-message" class="hidden bg-red-50 border-l-4 border-red-500 text-red-700 p-4 mb-4 rounded">
+                <p id="error-text"></p>
+            </div>
+
+            <!-- Success Message -->
+            <div id="success-message"
+                class="hidden bg-green-50 border-l-4 border-green-500 text-green-700 p-4 mb-4 rounded">
+                <p id="success-text"></p>
+            </div>
+
+            <!-- Registration Form -->
+            <form id="registration-form" class="space-y-6">
+                <!-- Company Information Section -->
+                <div id="company-section">
+                    <h3 class="text-lg font-medium text-gray-800 mb-4 flex items-center">
+                        <span class="bg-blue-100 text-blue-800 p-2 rounded-full mr-2">🏢</span>
+                        Informações da Empresa
+                    </h3>
+
+                    <!-- Company Name -->
+                    <div>
+                        <label for="company-name" class="block text-sm font-medium text-gray-700 mb-1">Nome da Empresa
+                            *</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <span class="text-gray-500">🏢</span>
+                            </div>
+                            <input type="text" id="company-name" name="company-name" required
+                                placeholder="Ex: Minha Empresa Ltda"
+                                class="input-focus pl-10 w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none transition duration-200">
+                        </div>
+                    </div>
+
+                    <!-- CNPJ -->
+                    <div>
+                        <label for="cnpj" class="block text-sm font-medium text-gray-700 mb-1">CNPJ</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <span class="text-gray-500">🔢</span>
+                            </div>
+                            <input type="text" id="cnpj" name="cnpj" placeholder="00.000.000/0000-00"
+                                class="input-focus pl-10 w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none transition duration-200">
+                        </div>
+                        <p class="mt-1 text-xs text-gray-500">Formato: 00.000.000/0000-00</p>
+                    </div>
+
+                    <!-- Business Area -->
+                    <div>
+                        <label for="business-area" class="block text-sm font-medium text-gray-700 mb-1">Área de
+                            Atuação</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <span class="text-gray-500">📊</span>
+                            </div>
+                            <select id="business-area" name="business-area"
+                                class="input-focus pl-10 w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none transition duration-200 appearance-none">
+                                <option value="">Selecione uma opção</option>
+                                <option value="comercio">Comércio</option>
+                                <option value="servicos">Serviços</option>
+                                <option value="industria">Indústria</option>
+                                <option value="tecnologia">Tecnologia</option>
+                                <option value="saude">Saúde</option>
+                                <option value="educacao">Educação</option>
+                                <option value="outros">Outros</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="pt-4">
+                        <button type="button" id="next-to-admin"
+                            class="w-full flex justify-center py-2 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-200">
+                            Próximo
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Admin Information Section (Hidden Initially) -->
+                <div id="admin-section" class="hidden">
+                    <h3 class="text-lg font-medium text-gray-800 mb-4 flex items-center">
+                        <span class="bg-blue-100 text-blue-800 p-2 rounded-full mr-2">👤</span>
+                        Dados do Administrador
+                    </h3>
+
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="first-name" class="block text-sm font-medium text-gray-700 mb-1">Nome *</label>
+                            <input type="text" id="first-name" name="first-name" required placeholder="Ex: João"
+                                class="input-focus w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none transition duration-200">
+                        </div>
+                        <div>
+                            <label for="last-name" class="block text-sm font-medium text-gray-700 mb-1">Sobrenome
+                                *</label>
+                            <input type="text" id="last-name" name="last-name" required placeholder="Ex: da Silva"
+                                class="input-focus w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none transition duration-200">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="phone" class="block text-sm font-medium text-gray-700 mb-1">Telefone com
+                            WhatsApp</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <span class="text-gray-500">📱</span>
+                            </div>
+                            <input type="tel" id="phone" name="phone" placeholder="(11) 98765-4321"
+                                class="input-focus pl-10 w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none transition duration-200">
+                        </div>
+                        <p class="mt-1 text-xs text-gray-500">Usado para lembretes de contas a pagar.</p>
+                    </div>
+
+                    <!-- Email -->
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-gray-700 mb-1">E-mail *</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <span class="text-gray-500">✉️</span>
+                            </div>
+                            <input type="email" id="email" name="email" required placeholder="exemplo@empresa.com"
+                                autocomplete="username"
+                                class="input-focus pl-10 w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none transition duration-200">
+                        </div>
+                        <p class="mt-1 text-xs text-gray-500">Este será seu login no sistema</p>
+                    </div>
+
+                    <!-- Password -->
+                    <div>
+                        <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Senha *</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <span class="text-gray-500">🔒</span>
+                            </div>
+                            <input type="password" id="password" name="password" required minlength="8"
+                                placeholder="••••••••" autocomplete="new-password"
+                                class="input-focus pl-10 w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none transition duration-200">
+                            <button type="button" id="toggle-password"
+                                class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-gray-700">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="mt-1 flex items-center space-x-2">
+                            <div id="password-strength" class="password-strength weak rounded-full"></div>
+                            <span id="password-strength-text" class="text-xs text-gray-500">Senha fraca</span>
+                        </div>
+                        <p class="mt-1 text-xs text-gray-500">Mínimo 8 caracteres, incluindo letras e números</p>
+                    </div>
+
+                    <!-- Confirm Password -->
+                    <div>
+                        <label for="confirm-password" class="block text-sm font-medium text-gray-700 mb-1">Confirmar
+                            Senha *</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <span class="text-gray-500">🔒</span>
+                            </div>
+                            <input type="password" id="confirm-password" name="confirm-password" required minlength="8"
+                                placeholder="••••••••" autocomplete="new-password"
+                                class="input-focus pl-10 w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none transition duration-200">
+                            <button type="button" id="toggle-confirm-password"
+                                class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-gray-700">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                </svg>
+                            </button>
+                        </div>
+                        <p id="password-match" class="mt-1 text-xs text-gray-500 hidden">✔ As senhas coincidem</p>
+                        <p id="password-mismatch" class="mt-1 text-xs text-red-500 hidden">✖ As senhas não coincidem</p>
+                    </div>
+
+                    <!-- Terms Checkbox -->
+                    <div class="flex items-start">
+                        <div class="flex items-center h-5">
+                            <input id="terms" name="terms" type="checkbox" required
+                                class="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300 rounded">
+                        </div>
+                        <div class="ml-3 text-sm">
+                            <label for="terms" class="font-medium text-gray-700">Eu li e concordo com os</label>
+                            <a href="#" class="text-blue-600 hover:text-blue-500"> Termos de Uso</a> e
+                            <a href="#" class="text-blue-600 hover:text-blue-500"> Política de Privacidade</a> *
+                        </div>
+                    </div>
+
+                    <div class="pt-4 flex space-x-3">
+                        <button type="button" id="back-to-company"
+                            class="w-1/2 flex justify-center py-2 px-4 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-200">
+                            Voltar
+                        </button>
+                        <button type="submit" id="register-button"
+                            class="w-1/2 flex justify-center py-2 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-200">
+                            <span id="button-text">Criar conta</span>
+                            <span id="button-loading" class="hidden">
+                                <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                                    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
+                                        stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor"
+                                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                                    </path>
+                                </svg>
+                            </span>
+                        </button>
+                    </div>
+                </div>
+            </form>
+
+            <!-- Login Link -->
+            <div class="mt-6 text-center text-sm">
+                <p class="text-gray-600">Já tem uma conta?
+                    <a href="login.html" class="font-medium text-blue-600 hover:text-blue-500">Faça login</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div id="success-modal"
+        class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-lg shadow-xl max-w-md w-full p-6 fade-in">
+            <div class="text-center">
+                <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100">
+                    <svg class="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                </div>
+                <h3 class="text-lg font-medium text-gray-900 mt-3">Conta criada com sucesso!</h3>
+                <div class="mt-2">
+                    <p class="text-sm text-gray-500">Sua conta de administrador foi criada. Você será redirecionado para
+                        a página de login em <span id="countdown">5</span> segundos.</p>
+                </div>
+                <div class="mt-4">
+                    <a href="login.html"
+                        class="inline-flex justify-center px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        Ir para login agora
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

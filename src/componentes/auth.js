@@ -1,107 +1,81 @@
-import { renderTopbar } from "./topbar/topBar.js";
-
 const apiUrl = import.meta.env.VITE_API_URL;
 
 /**
- * Verifica a autenticação do usuário fazendo uma requisição para o endpoint /me/.
- * Se bem-sucedido, retorna os dados do usuário.
- * Se falhar, redireciona para a página de login.
- * @returns {Promise<object|null>} Uma promessa que resolve com os dados do usuário ou nula se ocorrer um erro.
+ * Busca os dados do usuário logado no endpoint /api/accounts/me/,
+ * armazena no localStorage e retorna os dados.
+ * @returns {Promise<object|null>} Os dados do usuário ou null se a requisição falhar.
  */
-async function verifyAuthentication() {
+async function fetchAndStoreUserData() {
     try {
         const response = await fetch(`${apiUrl}/api/accounts/me/`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
             },
-            // ESSENCIAL: Garante que os cookies HttpOnly sejam enviados com a requisição
-            credentials: 'include',
+            credentials: 'include' 
         });
 
         if (response.ok) {
             const userData = await response.json();
-            // Retorna os dados do usuário para serem usados na página
+            localStorage.setItem('userData', JSON.stringify(userData));
             return userData;
         } else {
-            // Se a resposta for 401, 403, ou qualquer outro erro, o usuário não está autenticado
-            throw new Error('Usuário não autenticado.');
+            localStorage.removeItem('userData');
+            return null;
         }
-
     } catch (error) {
-        console.error("Falha na verificação de autenticação:", error.message);
-        // Limpa qualquer dado antigo que possa ter ficado no localStorage
-        localStorage.clear();
-        // Redireciona para o login
-        window.location.href = '/src/pages/login/login.html'; // Ajuste o caminho se necessário
+        console.error('Erro ao buscar dados do usuário:', error);
+        localStorage.removeItem('userData');
         return null;
     }
 }
 
-
 /**
- * Controla a renderização de elementos da UI com base nas permissões do usuário.
- * Esta função deve ser chamada APÓS a autenticação ser verificada.
- * @param {string} requiredPermission - A permissão necessária para a página atual.
- * @param {Array<string>} userPermissionsArray - A lista de permissões do usuário vinda do backend.
+ * Protege uma página, verificando se o usuário está logado e se tem a permissão necessária.
+ * @param {string} [requiredPermission] - A permissão necessária para acessar a página.
  */
-function managePageAccess(requiredPermission, userPermissionsArray = []) {
-    // A lógica de mapeamento de permissões que você já tinha
-    const permissionsLookup = {};
-    userPermissionsArray.forEach(p => {
-        if (typeof p === 'string') {
-            permissionsLookup[p.toLowerCase()] = true;
-        }
-    });
+export async function protectPage(requiredPermission) {
+    let userData = JSON.parse(localStorage.getItem('userData'));
 
-    const permissionMap = {
-        'dashboard': ['dashboard'],
-        'pagamentos': ['contas a pagar', 'contas a receber', 'pagamentos', 'contas-a-receber'],
-        'movimentacoes': ['entradas', 'saidas'],
-        'relatorios': ['dre', 'dfc'],
-        'cadastros': ['clientes', 'fornecedores', 'usuarios', 'categorias'],
-        'contas': ['contas bancarias', 'contas'],
-        'configuracoes': ['configuracoes']
-    };
-
-    for (const key in permissionMap) {
-        if (permissionMap[key].some(p => permissionsLookup[p])) {
-            permissionsLookup[key] = true;
-        }
+    // Se os dados não estiverem no localStorage, busca do servidor.
+    // Isso é crucial na primeira vez que o usuário carrega a página após o login.
+    if (!userData) {
+        userData = await fetchAndStoreUserData();
     }
 
-    // A verificação de acesso agora controla apenas o conteúdo da página, não o redirecionamento
-    const userRole = localStorage.getItem('userRole'); // Você pode obter isso dos dados do usuário se vier da API
-    if (userRole !== 'admin' && requiredPermission && !permissionsLookup[requiredPermission.toLowerCase()]) {
-        console.warn(`Acesso negado para conteúdo. Permissão necessária: '${requiredPermission}'`);
-        alert("Você não tem permissão para acessar esta página.");
-        window.location.href = '/index.html'; // Redireciona para o dashboard
+    // Se, mesmo após a tentativa de busca, não houver dados, o usuário não está logado.
+    if (!userData) {
+        window.location.href = '/src/pages/login/login.html'; // Redireciona para o login
         return;
     }
 
-    // Se tudo estiver OK, renderiza os componentes da página, como o Topbar
-    renderTopbar(requiredPermission, permissionsLookup);
+    // Agora, com os dados do usuário garantidamente carregados, verificamos a permissão.
+    if (requiredPermission && (!userData.permissions_list || !userData.permissions_list.includes(requiredPermission))) {
+        // O usuário não tem a permissão necessária.
+        console.warn(`Acesso negado. Permissão necessária: ${requiredPermission}`);
+        // Redireciona para a página inicial (ou uma página de "acesso negado").
+        window.location.href = '/index.html';
+        return;
+    }
+
+    // Se o usuário está logado e tem a permissão, preenchemos o nome dele na página.
+    // Isso confirma visualmente que os dados foram carregados.
+    const userNameElement = document.getElementById('user-name'); // Supondo que você tenha um elemento com este ID no seu HTML
+    if (userNameElement) {
+        userNameElement.textContent = `${userData.first_name} ${userData.last_name}`;
+    }
 }
 
-
 /**
- * Função principal para proteger uma página.
- * Primeiro verifica a autenticação e depois gerencia o acesso ao conteúdo.
- * @param {string} requiredPermission - A permissão necessária para a página atual (opcional).
+ * Realiza o logout do usuário, limpando os cookies no backend e os dados no localStorage.
  */
-export async function protectPage(requiredPermission) {
-    const userData = await verifyAuthentication();
-
-    if (userData) {
-        // Se a autenticação for bem-sucedida, userData conterá os dados do usuário
-        // Agora podemos usar as permissões para gerenciar o acesso ao conteúdo da página
-        const permissions = userData.permissions_list || [];
-        managePageAccess(requiredPermission, permissions);
-
-        // Opcional: Salve dados não sensíveis no localStorage para acesso rápido na UI
-        const userName = `${userData.first_name} ${userData.last_name}`.trim();
-        if (userName) {
-            localStorage.setItem('userName', userName);
-        }
-    }
+export function logout() {
+    // Faz a chamada para o backend apagar os cookies httpOnly
+    fetch(`${apiUrl}/api/accounts/logout/`, { method: 'POST' })
+        .then(() => {
+            // Limpa os dados do localStorage e redireciona para o login
+            localStorage.removeItem('userData');
+            window.location.href = '/src/pages/login/login.html';
+        })
+        .catch(error => console.error('Erro ao fazer logout:', error));
 }

@@ -1,4 +1,5 @@
-import { protectPage } from './src/componentes/auth';  
+import { protectPage } from './src/componentes/auth';
+import { renderTopbar } from './src/componentes/topBar/topBar';
 
 const apiUrl = import.meta.env.VITE_API_URL;
 
@@ -12,12 +13,15 @@ document.addEventListener('DOMContentLoaded', async function () { // MUDANÇA 1:
         // Se o usuário não estiver logado, protectPage irá redirecioná-lo e o código abaixo nunca será executado.
         await protectPage('dashboard');
 
-        // Se chegamos aqui, o usuário está 100% autenticado.
-        console.log("Autenticação confirmada. Carregando a página...");
+        const userData = JSON.parse(localStorage.getItem('userData'));
 
-        // Agora podemos executar o restante das funções com segurança.
+        if (userData) {
+            // 3. Renderiza a topbar, passando as permissões
+            renderTopbar('dashboard', userData.permissions_list);
+        }
+
         setupMobileMenu();
-        displayUserInfo(); // Esta função agora funcionará, pois protectPage já salvou o 'userName'
+        displayUserInfo(); 
         loadDashboardData();
         loadChartData();
         loadCashFlowChartData();

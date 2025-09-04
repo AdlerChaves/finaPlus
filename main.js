@@ -7,27 +7,34 @@ let barChart = null;
 let lineChart = null;
 
 
-document.addEventListener('DOMContentLoaded', async function () { // MUDANÇA 1: Adicionado "async" aqui
+document.addEventListener('DOMContentLoaded', async function () {
     try {
-        // MUDANÇA 2: "await" garante que o código só continue DEPOIS que a autenticação for confirmada.
-        // Se o usuário não estiver logado, protectPage irá redirecioná-lo e o código abaixo nunca será executado.
+        // 1. Garante que o usuário está autenticado para a página 'dashboard'
+        // Se não estiver, o usuário será redirecionado e o resto do script não executa.
         await protectPage('dashboard');
 
+        // 2. Busca os dados do usuário que foram salvos no login
         const userData = JSON.parse(localStorage.getItem('userData'));
 
-        if (userData) {
-            // 3. Renderiza a topbar, passando as permissões
-            renderTopbar('dashboard', userData.permissions_list);
+        // 3. Renderiza a topbar, passando as permissões do usuário real
+        if (userData && userData.permissions_list) {
+            // A função renderTopbar agora é assíncrona, então usamos await
+            await renderTopbar('dashboard', userData.permissions_list);
+        } else {
+             // Lógica de fallback caso não encontre as permissões
+             console.error("Não foi possível encontrar as permissões do usuário.");
+             // Você poderia, por exemplo, renderizar uma topbar vazia ou com um erro.
         }
 
-        setupMobileMenu();
-        displayUserInfo(); 
+        // 4. Continua carregando o restante do conteúdo do dashboard
+        // A função setupMobileMenu() não é mais necessária aqui, pois `renderTopbar` já cuida disso.
+        displayUserInfo();
         loadDashboardData();
         loadChartData();
         loadCashFlowChartData();
 
     } catch (error) {
-        // O próprio protectPage já lida com o redirecionamento, mas é uma boa prática ter um catch.
+        // O protectPage já lida com o redirecionamento em caso de falha de autenticação.
         console.error("Ocorreu um erro durante a inicialização da página:", error);
     }
 });

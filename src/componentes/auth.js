@@ -45,7 +45,7 @@ export async function protectPage(requiredPermission) {
 
     // Se, mesmo após a tentativa de busca, não houver dados, o usuário não está logado.
     if (!userData) {
-        window.location.href = '/src/pages/login/login.html'; // Redireciona para o login
+        window.location.href = '/login.html';
         return;
     }
 

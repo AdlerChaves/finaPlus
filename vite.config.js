@@ -2,9 +2,7 @@ import { resolve } from 'path';
 import { defineConfig } from 'vite';
 
 export default defineConfig({
-  
   base: './',
-
   build: {
     rollupOptions: {
       input: {
@@ -15,7 +13,7 @@ export default defineConfig({
         login: resolve(__dirname, 'src/pages/login/login.html'),
         cadastroAdmin: resolve(__dirname, 'src/pages/cadastros/admin/cadastroAdmin.html'),
         passwordReset: resolve(__dirname, 'src/pages/resetPassword/password_reset_confirm.html'),
-        
+
         // Telas Principais da Aplicação
         clientes: resolve(__dirname, 'src/pages/clientes/clientes.html'),
         contas: resolve(__dirname, 'src/pages/banking/contas/contas.html'),
@@ -39,8 +37,11 @@ export default defineConfig({
         modalFaturaCartao: resolve(__dirname, 'src/componentes/modalFaturaCartao/modalFaturaCartao.html'),
         modalGastoCartao: resolve(__dirname, 'src/componentes/modalGastoCartao/modalGastoCartao.html'),
         modalMarcarPago: resolve(__dirname, 'src/componentes/modalMarcarPago/modalMarcarPago.html'),
-        
-
+      },
+      output: {
+        entryFileNames: 'assets/[name]-[hash].js',
+        chunkFileNames: 'assets/[name]-[hash].js',
+        assetFileNames: 'assets/[name]-[hash].[ext]',
       },
     },
   },

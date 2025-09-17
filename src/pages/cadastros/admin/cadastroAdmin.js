@@ -210,7 +210,7 @@ registrationForm.addEventListener('submit', async function (e) {
             countdownElement.textContent = countdown;
             if (countdown <= 0) {
                 clearInterval(countdownInterval);
-                window.location.href = './login.html';
+                window.location.href = '../../login/login.html';
             }
         }, 1000);
 

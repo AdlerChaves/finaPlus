@@ -1,24 +1,18 @@
 const apiUrl = import.meta.env.VITE_API_URL;
 
-/**
- * Busca os dados do usuário logado no endpoint /api/accounts/me/,
- * armazena no localStorage e retorna os dados.
- * @returns {Promise<object|null>} Os dados do usuário ou null se a requisição falhar.
- */
-async function fetchAndStoreUserData() {
+// Função para buscar os dados do usuário com autenticação
+export async function fetchWithAuth() {
     try {
         const response = await fetch(`${apiUrl}/api/accounts/me/`, {
             method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            credentials: 'include' 
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
         });
 
         if (response.ok) {
-            const userData = await response.json();
-            localStorage.setItem('userData', JSON.stringify(userData));
-            return userData;
+            const data = await response.json();
+            localStorage.setItem('userData', JSON.stringify(data));
+            return data;
         } else {
             localStorage.removeItem('userData');
             return null;
@@ -30,52 +24,31 @@ async function fetchAndStoreUserData() {
     }
 }
 
-/**
- * Protege uma página, verificando se o usuário está logado e se tem a permissão necessária.
- * @param {string} [requiredPermission] - A permissão necessária para acessar a página.
- */
+// Função para proteger a página
 export async function protectPage(requiredPermission) {
     let userData = JSON.parse(localStorage.getItem('userData'));
 
-    // Se os dados não estiverem no localStorage, busca do servidor.
-    // Isso é crucial na primeira vez que o usuário carrega a página após o login.
     if (!userData) {
-        userData = await fetchAndStoreUserData();
+        userData = await fetchWithAuth();
     }
 
-    // Se, mesmo após a tentativa de busca, não houver dados, o usuário não está logado.
+    // --- CORREÇÃO PRINCIPAL AQUI ---
     if (!userData) {
-        window.location.href = '/login.html';
-        return;
+        // Redireciona para o caminho completo da página de login
+        window.location.href = '/src/pages/login/login.html';
+        return; 
     }
 
-    // Agora, com os dados do usuário garantidamente carregados, verificamos a permissão.
-    if (requiredPermission && (!userData.permissions_list || !userData.permissions_list.includes(requiredPermission))) {
-        // O usuário não tem a permissão necessária.
+    if (!userData.permissions_list || !userData.permissions_list.includes(requiredPermission)) {
         console.warn(`Acesso negado. Permissão necessária: ${requiredPermission}`);
-        // Redireciona para a página inicial (ou uma página de "acesso negado").
-        window.location.href = '/index.html';
+        // Redireciona para a página inicial em caso de falta de permissão
+        window.location.href = '/index.html'; 
         return;
     }
 
-    // Se o usuário está logado e tem a permissão, preenchemos o nome dele na página.
-    // Isso confirma visualmente que os dados foram carregados.
-    const userNameElement = document.getElementById('user-name'); // Supondo que você tenha um elemento com este ID no seu HTML
+    // Se o usuário está autenticado e tem permissão, atualiza o nome no display se existir
+    const userNameElement = document.getElementById('user-name');
     if (userNameElement) {
         userNameElement.textContent = `${userData.first_name} ${userData.last_name}`;
     }
-}
-
-/**
- * Realiza o logout do usuário, limpando os cookies no backend e os dados no localStorage.
- */
-export function logout() {
-    // Faz a chamada para o backend apagar os cookies httpOnly
-    fetch(`${apiUrl}/api/accounts/logout/`, { method: 'POST' })
-        .then(() => {
-            // Limpa os dados do localStorage e redireciona para o login
-            localStorage.removeItem('userData');
-            window.location.href = '/src/pages/login/login.html';
-        })
-        .catch(error => console.error('Erro ao fazer logout:', error));
 }

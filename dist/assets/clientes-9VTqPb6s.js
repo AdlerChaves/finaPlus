@@ -1,0 +1,38 @@
+import"./modulepreload-polyfill-B5Qt9EMX.js";import{p as $,r as w}from"./topBar-DJwU6RwO.js";const p="https://www.relda.com.br",E=JSON.parse(localStorage.getItem("userData"));let r=null;document.addEventListener("DOMContentLoaded",()=>{$("cadastros"),w("cadastros",E.permissions_list),y(),document.getElementById("confirm-delete-btn").addEventListener("click",L),document.getElementById("cancel-delete-btn").addEventListener("click",f),document.getElementById("close-details-modal-btn").addEventListener("click",M)});async function y(){try{const e=await fetch(`${p}/api/cadastros/customers/`,{credentials:"include"});if(e.status===401){window.location.href="../login.html";return}if(!e.ok)throw new Error("Falha ao buscar clientes.");const n=await e.json();C(n)}catch(e){m(e.message,"error")}}function C(e){const n=document.getElementById("customer-table-body"),s=document.getElementById("customer-list-mobile"),d=document.getElementById("summary-total"),a=document.getElementById("summary-active"),c=document.getElementById("summary-inactive");n.innerHTML="",s.innerHTML="";const o=e.length,u=e.filter(t=>t.status==="active").length,v=o-u;if(d.textContent=o,a.textContent=u,c.textContent=v,e.length===0){const t='<tr><td colspan="6" class="text-center py-4 text-gray-500">Nenhum cliente cadastrado.</td></tr>';n.innerHTML=t,s.innerHTML='<p class="text-center py-4 text-gray-500">Nenhum cliente cadastrado.</p>';return}e.forEach(t=>{const x=t.status==="active"?"bg-green-100 text-green-800":"bg-gray-100 text-gray-800",h=(t.name.split(" ").map(b=>b[0]).join("")||"C").substring(0,2).toUpperCase(),i=document.createElement("tr");i.className="clickable-card hover:bg-gray-50",i.onclick=()=>g(t.id),i.innerHTML=`
+                    <td class="px-6 py-4 whitespace-nowrap"><div class="flex items-center"><div class="flex-shrink-0 h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-500 font-semibold">${h}</div><div class="ml-4"><div class="text-sm font-medium text-gray-900">${t.name}</div><div class="text-sm text-gray-500">${t.customer_type==="PF"?"Pessoa Física":"Pessoa Jurídica"}</div></div></div></td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${t.document}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${t.phone}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${t.email}</td>
+                    <td class="px-6 py-4 whitespace-nowrap"><span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${x}">${t.status==="active"?"Ativo":"Inativo"}</span></td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <button onclick="event.stopPropagation(); editCustomer(${t.id})" class="text-blue-500 hover:text-blue-700 mr-3"><i class="fas fa-edit"></i></button>
+                        <button onclick="event.stopPropagation(); confirmDeleteCustomer(${t.id})" class="text-red-500 hover:text-red-700"><i class="fas fa-trash"></i></button>
+                    </td>
+                `,n.appendChild(i);const l=document.createElement("div");l.className="p-4 clickable-card hover:bg-gray-50",l.onclick=()=>g(t.id),l.innerHTML=`
+                    <div class="flex items-start">
+                        <div class="flex-1">
+                            <div class="flex justify-between">
+                                <div><p class="text-sm font-medium text-gray-900">${t.name}</p><p class="text-xs text-gray-500">${t.document}</p></div>
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${x}">${t.status==="active"?"Ativo":"Inativo"}</span>
+                            </div>
+                            <div class="mt-2 flex justify-end space-x-2">
+                                <button onclick="event.stopPropagation(); editCustomer(${t.id})" class="text-blue-500 text-sm"><i class="fas fa-edit"></i></button>
+                                <button onclick="event.stopPropagation(); confirmDeleteCustomer(${t.id})" class="text-red-500 text-sm"><i class="fas fa-trash"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                `,s.appendChild(l)})}function m(e,n="success"){const s=document.getElementById("toast"),d=document.getElementById("toastMessage");s.className=`fixed bottom-4 right-4 bg-${n==="success"?"green":"red"}-500 text-white px-4 py-2 rounded-lg shadow-lg`,d.textContent=e,s.classList.remove("hidden"),setTimeout(()=>{s.classList.add("hidden")},3e3)}function f(){r=null,document.getElementById("deleteModal").classList.add("hidden")}async function L(){if(!r)return;let e=!1,n="Ocorreu um erro desconhecido.";try{const s=await fetch(`${p}/api/cadastros/customers/${r}/`,{method:"DELETE",credentials:"include"});if(s.status===204)e=!0;else{const d=await s.json().catch(()=>null);n=(d==null?void 0:d.detail)||`Erro ${s.status}: Falha ao excluir o cliente.`}}catch{n="Erro de conexão. Não foi possível contatar o servidor."}f(),e?(m("Cliente excluído com sucesso!","success"),y()):m(n,"error")}async function g(e){const n=document.getElementById("detailsModal"),s=document.getElementById("details-modal-content");s.innerHTML='<p class="text-center text-gray-500">Carregando...</p>',n.classList.remove("hidden");try{const d=await fetch(`${p}/api/cadastros/customers/${e}/`,{credentials:"include"});if(d.status===401){window.location.href="../login.html";return}if(!d.ok)throw new Error("Falha ao carregar detalhes do cliente.");const a=await d.json();let c='<p class="text-sm text-gray-500">Endereço não cadastrado.</p>';if(a.address){const o=a.address;c=`
+                        <p>${o.street}, ${o.number} ${o.complement?`- ${o.complement}`:""}</p>
+                        <p>${o.neighborhood} - ${o.city}/${o.state}</p>
+                        <p>CEP: ${o.cep}</p>
+                    `}s.innerHTML=`
+                    <dl class="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-6">
+                        <div class="sm:col-span-1"><dt class="text-sm font-medium text-gray-500">Nome/Razão Social</dt><dd class="mt-1 text-sm text-gray-900">${a.name}</dd></div>
+                        <div class="sm:col-span-1"><dt class="text-sm font-medium text-gray-500">${a.customer_type==="PF"?"CPF":"CNPJ"}</dt><dd class="mt-1 text-sm text-gray-900">${a.document}</dd></div>
+                        <div class="sm:col-span-1"><dt class="text-sm font-medium text-gray-500">E-mail</dt><dd class="mt-1 text-sm text-gray-900">${a.email}</dd></div>
+                        <div class="sm:col-span-1"><dt class="text-sm font-medium text-gray-500">Telefone</dt><dd class="mt-1 text-sm text-gray-900">${a.phone}</dd></div>
+                        ${a.customer_type==="PF"&&a.birth_date?`<div class="sm:col-span-1"><dt class="text-sm font-medium text-gray-500">Data de Nascimento</dt><dd class="mt-1 text-sm text-gray-900">${new Date(a.birth_date).toLocaleDateString("pt-BR",{timeZone:"UTC"})}</dd></div>`:""}
+                        <div class="sm:col-span-2"><dt class="text-sm font-medium text-gray-500">Endereço</dt><dd class="mt-1 text-sm text-gray-900">${c}</dd></div>
+                        ${a.notes?`<div class="sm:col-span-2"><dt class="text-sm font-medium text-gray-500">Observações</dt><dd class="mt-1 text-sm text-gray-900 whitespace-pre-wrap">${a.notes}</dd></div>`:""}
+                    </dl>
+                `}catch(d){s.innerHTML=`<p class="text-center text-red-500">${d.message}</p>`}}function M(){document.getElementById("detailsModal").classList.add("hidden")}

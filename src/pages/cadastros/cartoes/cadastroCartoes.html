@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="../componentes/theme.js" defer></script>
+
     <title>Relda | Cartões de Crédito</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -186,344 +186,92 @@
         </div>
     </div>
 
-    <script src="../componentes/auth.js"></script>
-    <script src="../componentes/topbar.js"></script>
-    <script>
-        // --- INÍCIO DO SCRIPT UNIFICADO E CORRIGIDO ---
-
-        const formatMoney = (value) => {
-            const numberValue = parseFloat(value);
-            if (isNaN(numberValue)) return "R$ 0,00";
-            return numberValue.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-        };
-
-        // Função principal que é chamada quando a página carrega
-        document.addEventListener('DOMContentLoaded', () => {
-
-            protectPage('contas');
-            loadAndSetupModal();
-            renderCreditCards();
-        });
-
-        // Esta nova função irá carregar o HTML do modal E configurar os seus eventos
-        async function loadAndSetupModal() {
-            try {
-                const response = await fetch('../componentes/modalCartaoCredito.html');
-                const modalHtml = await response.text();
-                document.body.insertAdjacentHTML('beforeend', modalHtml);
-
-                document.getElementById('openModalBtn').addEventListener('click', openAddModal);
-                document.getElementById('cancelBtn').addEventListener('click', closeModal);
-                document.getElementById('creditCardForm').addEventListener('submit', saveCard);
-                document.getElementById('confirm-delete-btn').addEventListener('click', deleteCard);
-                document.getElementById('cancel-delete-btn').addEventListener('click', closeDeleteModal);
-
-
-            } catch (error) {
-                console.error("Falha ao carregar o componente do modal:", error);
-            }
-        }
-
-        // Função para renderizar os cartões na tabela
-        async function renderCreditCards() {
-
-            const cardsTableBody = document.getElementById('cards-table-body');
-            const activeCardsCountEl = document.getElementById('active-cards-count');
-            const totalLimitEl = document.getElementById('total-limit');
-            const nextDueDateEl = document.getElementById('next-due-date');
-
-            try {
-                const response = await fetch(`/api/finance/credit-cards/`, {
-                    credentials: 'include'
-                });
-
-                if (response.status === 401) {
-                    window.location.href = '../login.html';
-                    return;
-                }
-
-                if (!response.ok) {
-                    throw new Error('Falha ao buscar os cartões de crédito. Tente fazer login novamente.');
-                }
-
-                const cards = await response.json();
-
-                // 3. Limpa qualquer conteúdo antigo da tabela
-                cardsTableBody.innerHTML = '';
-
-                // 4. Se não houver cartões, exibe uma mensagem amigável e zera os resumos
-                if (cards.length === 0) {
-                    cardsTableBody.innerHTML = `<tr><td colspan="7" class="text-center py-4 text-gray-500">Nenhum cartão cadastrado.</td></tr>`;
-                    activeCardsCountEl.textContent = 0;
-                    totalLimitEl.textContent = formatMoney(0);
-                    nextDueDateEl.textContent = '-';
-                    return;
-                }
-
-                // 5. Calcula os totais para os cards de resumo
-                let activeCount = 0;
-                let totalLimit = 0;
-                cards.forEach(card => {
-                    if (card.is_active) {
-                        activeCount++;
-                        totalLimit += parseFloat(card.credit_limit);
-                    }
-                });
-
-                // Atualiza os cards de resumo no topo da página
-                activeCardsCountEl.textContent = activeCount;
-                totalLimitEl.textContent = formatMoney(totalLimit);
-                const nextDueCard = cards.filter(c => c.is_active).sort((a, b) => a.due_day - b.due_day).find(c => c.due_day >= new Date().getDate()) || cards.find(c => c.is_active);
-                if (nextDueCard) nextDueDateEl.textContent = `Dia ${nextDueCard.due_day}`;
-
-                // 6. Cria uma linha na tabela para cada cartão retornado pela API
-                cards.forEach(card => {
-                    const row = document.createElement('tr');
-                    // Adicionamos o botão de Editar com o onclick correto
-                    row.innerHTML = `
-        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${card.name}</td>
-        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${card.brand}</td>
-        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">**** ${card.last_digits}</td>
-        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${formatMoney(card.credit_limit)}</td>
-        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Todo dia ${card.due_day}</td>
-        <td class="px-6 py-4 whitespace-nowrap">
-            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${card.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
-                ${card.is_active ? 'Ativo' : 'Inativo'}
-            </span>
-        </td>
-        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-            <button onclick="openEditModal(${card.id})" class="text-blue-600 hover:text-blue-800 mr-3">
-                <i class="fas fa-edit"></i>
-            </button>
-              <button onclick="openDeleteModal(${card.id})" class="text-red-500 hover:text-red-700">
-            <i class="fas fa-trash-alt"></i>
-        </button>
-            </td>
-    `;
-                    cardsTableBody.appendChild(row);
-                });
-
-            } catch (error) {
-                console.error('Erro ao renderizar cartões:', error);
-                alert(error.message); // Usando alert simples para o erro
-            }
-        }
-
-        // Função para abrir o modal para Adicionar
-        function openAddModal() {
-            const form = document.getElementById('creditCardForm');
-            if (form) {
-                form.reset();
-                document.getElementById('modalTitle').textContent = 'Cadastrar Cartão';
-
-                cardIdToModify = null;
-
-                const cardIdInput = document.getElementById('cardId');
-                if (cardIdInput) cardIdInput.value = '';
-
-                populateAccountsDropdown();
-
-                document.getElementById('creditCardModal').classList.remove('hidden');
-            }
-        }
-        async function openEditModal(id) {
-            cardIdToModify = id;
-
-            try {
-                const response = await fetch(`/api/finance/credit-cards/${id}/`, {
-                    credentials: 'include'
-                });
-                if (response.status === 401) { window.location.href = '../login.html'; return; }
-                if (!response.ok) throw new Error('Não foi possível carregar os dados do cartão.');
-
-                const card = await response.json();
-
-                await populateAccountsDropdown();
-
-                const modal = document.getElementById('creditCardModal');
-                document.getElementById('modalTitle').textContent = 'Editar Cartão de Crédito';
-                document.getElementById('cardId').value = card.id;
-                document.getElementById('cardName').value = card.name;
-                document.getElementById('cardBrand').value = card.brand;
-                document.getElementById('lastDigits').value = card.last_digits;
-                document.getElementById('creditLimit').value = parseFloat(card.credit_limit).toFixed(2).replace('.', ',');
-                document.getElementById('closingDay').value = card.closing_day;
-                document.getElementById('dueDay').value = card.due_day;
-                document.getElementById('associatedAccount').value = card.associated_account;
-                document.getElementById('cardStatus').checked = card.is_active;
-
-                // 4. Abre o modal
-                modal.classList.remove('hidden');
-
-            } catch (error) {
-                alert(error.message); // Usando alert simples para feedback
-            }
-        }
-
-        // Função para salvar (ainda vazia, será o Passo 2)
-        async function saveCard(event) {
-            event.preventDefault();
-
-
-            const id = cardIdToModify; // Pega o ID (pode ser nulo ou um número)
-
-            const payload = {
-                name: document.getElementById('cardName').value,
-                brand: document.getElementById('cardBrand').value,
-                last_digits: document.getElementById('lastDigits').value,
-                credit_limit: document.getElementById('creditLimit').value.replace(/\./g, '').replace(',', '.'),
-                closing_day: document.getElementById('closingDay').value,
-                due_day: document.getElementById('dueDay').value,
-                associated_account: document.getElementById('associatedAccount').value,
-                is_active: document.getElementById('cardStatus').checked
-            };
-
-            const url = id ? `/api/finance/credit-cards/${id}/` : `/api/finance/credit-cards/`;
-            const method = id ? 'PUT' : 'POST';
-
-            const saveButton = document.querySelector('button[type="submit"][form="creditCardForm"]');
-            saveButton.disabled = true;
-            saveButton.textContent = 'Salvando...';
-
-            try {
-                const response = await fetch(url, {
-                    method: method,
-                    headers: { 'Content-Type': 'application/json' },
-                    credentials: 'include',
-                    body: JSON.stringify(payload)
-                });
-
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    let errorMsg = "Erro ao salvar: ";
-                    for (const field in errorData) {
-                        const message = Array.isArray(errorData[field]) ? errorData[field].join(', ') : errorData[field];
-                        errorMsg += `${field}: ${message} `;
-                    }
-                    throw new Error(errorMsg);
-                }
-
-                alert(id ? 'Cartão atualizado com sucesso!' : 'Cartão criado com sucesso!');
-                closeModal();
-                renderCreditCards();
-
-            } catch (error) {
-                alert(error.message);
-            } finally {
-                saveButton.disabled = false;
-                saveButton.textContent = 'Salvar';
-            }
-        }
-
-        async function deleteCard() {
-            if (!cardIdToModify) return;
-
-            try {
-                const response = await fetch(`/api/finance/credit-cards/${cardIdToModify}/`, {
-                    method: 'DELETE',
-                    credentials: 'include'
-                });
-
-                if (response.status !== 204) { // 204 No Content é a resposta de sucesso para DELETE
-                    throw new Error('Erro ao excluir o cartão.');
-                }
-
-                alert('Cartão excluído com sucesso!');
-                closeDeleteModal();
-                renderCreditCards(); // Atualiza a lista na tela
-            } catch (error) {
-                alert(error.message);
-            }
-        }
-
-        function closeModal() {
-            const modal = document.getElementById('creditCardModal');
-            if (modal) modal.classList.add('hidden');
-        }
-
-        function openDeleteModal(id) {
-            cardIdToModify = id; // Guarda o ID do cartão a ser deletado
-            document.getElementById('delete-modal').classList.remove('hidden');
-        }
-
-        function closeDeleteModal() {
-            cardIdToModify = null; // Limpa o ID
-            document.getElementById('delete-modal').classList.add('hidden');
-        }
-
-        function openDeleteModal(id) {
-            cardIdToModify = id; // Guarda o ID do cartão a ser deletado
-            document.getElementById('delete-modal').classList.remove('hidden');
-        }
-
-        function closeDeleteModal() {
-            cardIdToModify = null; // Limpa o ID
-            document.getElementById('delete-modal').classList.add('hidden');
-        }
-
-        async function deleteCard() {
-            if (!cardIdToModify) return;
-
-            try {
-                const response = await fetch(`/api/finance/credit-cards/${cardIdToModify}/`, {
-                    method: 'DELETE',
-                    credentials: 'include'
-                });
-
-                if (response.status !== 204) throw new Error('Erro ao excluir o cartão.');
-
-                alert('Cartão excluído com sucesso!');
-                closeDeleteModal();
-                renderCreditCards(); 
-            } catch (error) {
-                alert(error.message);
-            }
-        }
-
-
-        async function populateAccountsDropdown() {
-            // Encontra o elemento <select> dentro do modal
-            const associatedAccountSelect = document.getElementById('associatedAccount');
-            if (!associatedAccountSelect) return; // Segurança caso o modal não tenha carregado
-
-            try {
-                const response = await fetch(`/api/finance/bank-accounts/`, {
-                    credentials: 'include'
-                });
-                if (response.status === 401) { window.location.href = '../login.html'; return; }
-                if (!response.ok) throw new Error('Falha ao carregar contas.');
-
-                const accounts = await response.json();
-
-                // 2. Limpa as opções existentes (exceto a primeira "Selecione")
-                associatedAccountSelect.innerHTML = '<option value="">Selecione uma conta</option>';
-
-                // 3. Adiciona uma nova <option> para cada conta ATIVA
-                accounts
-                    .filter(account => account.is_active) // Filtra para pegar apenas contas ativas
-                    .forEach(account => {
-                        const option = document.createElement('option');
-                        option.value = account.id; // O valor será o ID da conta
-                        option.textContent = account.name; // O texto será o nome da conta
-                        associatedAccountSelect.appendChild(option);
-                    });
-
-            } catch (error) {
-                console.error("Erro ao popular contas:", error);
-                associatedAccountSelect.innerHTML = '<option value="">Erro ao carregar contas</option>';
-            }
-        }
-
-
-
-        // Seleciona os botões do modal de exclusão
-        const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
-        const cancelDeleteBtn = document.getElementById('cancel-delete-btn');
-
-        // Conecta os cliques às suas respectivas funções
-        confirmDeleteBtn.addEventListener('click', deleteCard);
-        cancelDeleteBtn.addEventListener('click', closeDeleteModal);
-    </script>
+    <div id="creditCardModal" class="modal fixed inset-0 z-50 overflow-y-auto hidden">
+        <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+                <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+            </div>
+
+            <div
+                class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <div class="sm:flex sm:items-start">
+                        <div
+                            class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-blue-100 sm:mx-0 sm:h-10 sm:w-10">
+                            <i class="fas fa-credit-card text-blue-600"></i>
+                        </div>
+                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+                            <h3 class="text-lg leading-6 font-medium text-gray-900" id="modalTitle">
+                                Cadastrar Cartão de Crédito
+                            </h3>
+                            <form id="creditCardForm" class="mt-4 space-y-4">
+                                <input type="hidden" id="cardId">
+                                <div><label for="cardName" class="block text-sm font-medium text-gray-700">Nome do
+                                        Cartão *</label><input type="text" id="cardName" required
+                                        class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                                        placeholder="Ex: Cartão Santander PJ"></div>
+                                <div><label for="cardBrand" class="block text-sm font-medium text-gray-700">Bandeira
+                                        *</label><select id="cardBrand" required
+                                        class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                                        <option value="">Selecione</option>
+                                        <option value="Visa">Visa</option>
+                                        <option value="MasterCard">MasterCard</option>
+                                        <option value="Elo">Elo</option>
+                                        <option value="American Express">Amex</option>
+                                        <option value="Hipercard">Hipercard</option>
+                                        <option value="Diners Club">Diners</option>
+                                        <option value="Outra">Outra</option>
+                                    </select></div>
+                                <div><label for="lastDigits" class="block text-sm font-medium text-gray-700">Últimos 4
+                                        dígitos *</label><input type="text" id="lastDigits" maxlength="4" required
+                                        class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                                        placeholder="1234"></div>
+                                <div><label for="creditLimit" class="block text-sm font-medium text-gray-700">Limite
+                                        Total *</label>
+                                    <div class="mt-1 relative rounded-md shadow-sm">
+                                        <div
+                                            class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                            <span class="text-gray-500 sm:text-sm">R$</span></div><input type="text"
+                                            id="creditLimit" required
+                                            class="focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 pr-12 py-2 border-gray-300 rounded-md sm:text-sm"
+                                            placeholder="0,00">
+                                    </div>
+                                </div>
+                                <div><label for="closingDay" class="block text-sm font-medium text-gray-700">Dia de
+                                        Fechamento *</label><input type="number" id="closingDay" min="1" max="31"
+                                        required
+                                        class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                                </div>
+                                <div><label for="dueDay" class="block text-sm font-medium text-gray-700">Dia de
+                                        Vencimento *</label><input type="number" id="dueDay" min="1" max="31" required
+                                        class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                                </div>
+                                <div><label for="associatedAccount"
+                                        class="block text-sm font-medium text-gray-700">Conta Associada *</label><select
+                                        id="associatedAccount" required
+                                        class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                                        <option value="">Carregando...</option>
+                                    </select></div>
+                                <div><label class="block text-sm font-medium text-gray-700">Status</label>
+                                    <div class="mt-2"><input type="checkbox" id="cardStatus" checked
+                                            class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                                        <label for="cardStatus" class="ml-2 text-sm text-gray-900">Ativo</label></div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                    <button type="submit" form="creditCardForm"
+                        class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">Salvar</button>
+                    <button type="button" id="cancelBtn"
+                        class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:w-auto sm:text-sm">Cancelar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="./cadastroCartoes.js"></script>
 
 </body>
 

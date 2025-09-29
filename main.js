@@ -56,7 +56,7 @@ function displayUserInfo() {
 async function loadChartData() {
 
     try {
-        const response = await fetch(`${apiUrl}/finance/charts/income-expense/`, {
+        const response = await fetch(`${apiUrl}/api/finance/charts/income-expense/`, {
             credentials: 'include'
         });
         if (!response.ok) throw new Error('Falha ao buscar dados do gráfico.');

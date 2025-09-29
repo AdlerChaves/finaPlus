@@ -1,4 +1,5 @@
- // --- Funções Helper (sem alterações) ---
+const apiUrl = import.meta.env.VITE_API_URL; 
+
         function getQueryParams() {
             const urlParams = new URLSearchParams(window.location.search);
             return {
@@ -142,7 +143,7 @@
                 
                 alert('Fatura paga com sucesso!');
                 closePayModal();
-                loadBillDetails(); // Recarrega os dados da página
+                loadBillDetails();
             } catch (error) {
                 alert(`Erro: ${error.message}`);
             }
@@ -152,7 +153,6 @@
         // --- Event Listeners ---
         document.addEventListener('DOMContentLoaded', () => {
             loadBillDetails();
-            protectPage('pagamentos')
             document.getElementById('mark-as-paid-btn').addEventListener('click', openPayModal);
             document.getElementById('cancel-payment-btn').addEventListener('click', closePayModal);
             document.getElementById('payment-form').addEventListener('submit', confirmPayment);

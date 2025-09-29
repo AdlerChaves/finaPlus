@@ -108,6 +108,10 @@ function setupEventListeners() {
     document.getElementById('confirm-delete-btn').addEventListener('click', deletePayable);
     document.getElementById('cancel-delete-btn').addEventListener('click', closeDeleteModal);
     document.getElementById('add-card-expense-btn').addEventListener('click', openCardExpenseModal);
+
+    const markAsPaidModal = document.getElementById('mark-as-paid-modal');
+    document.getElementById('mark-as-paid-form').addEventListener('submit', confirmPayment);
+    document.getElementById('cancel-payment-btn').addEventListener('click', () => markAsPaidModal.classList.add('hidden'));
 }
 async function loadDynamicModals() {
     try {
@@ -229,7 +233,7 @@ function viewCardStatement(cardId) {
     const month = currentMonth.getMonth() + 1;
 
     // Redireciona para a tela de detalhes da fatura, passando os dados via URL
-    window.location.href = `detalheFatura.html?card_id=${cardId}&month=${month}&year=${year}`;
+    window.location.href = `/src/pages/banking/detalheFatura/detalheFatura.html?card_id=${cardId}&month=${month}&year=${year}`;
 }
 
 async function renderMonthlyBills() {
@@ -488,6 +492,3 @@ window.markAsPaid = markAsPaid;
 window.openEditModal = openEditModal;
 window.openDeleteModal = openDeleteModal;
 window.viewCardStatement = viewCardStatement;
-
-
-saveCardExpense

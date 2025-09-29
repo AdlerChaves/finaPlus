@@ -1,5 +1,7 @@
 import { resolve } from 'path';
+import path from 'path'
 import { defineConfig } from 'vite';
+import fs from 'fs';
 
 export default defineConfig({
   
@@ -35,6 +37,12 @@ export default defineConfig({
 
        
       },
+    },
+  },
+  server: {
+    https: {
+      key: fs.readFileSync(path.resolve(__dirname, 'localhost-key.pem')),
+      cert: fs.readFileSync(path.resolve(__dirname, 'localhost.pem')),
     },
   },
 });

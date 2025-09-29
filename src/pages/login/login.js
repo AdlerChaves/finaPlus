@@ -69,7 +69,7 @@ loginForm.addEventListener('submit', function (e) {
     buttonLoading.classList.remove('hidden');
     loginButton.disabled = true;
 
-    const payload = { username: email, password: password };
+    const payload = { email: email, password: password };
 
     fetch(`${apiUrl}/api/accounts/token/`, {
         method: 'POST',
@@ -84,7 +84,7 @@ loginForm.addEventListener('submit', function (e) {
             throw new Error(data.detail || 'Credenciais inválidas.');
         }
         
-        window.location.href = '../../../index.html'; 
+        window.location.href = '/index.html'; 
     })
     .catch(error => {
         showError(error.message);
@@ -95,6 +95,21 @@ loginForm.addEventListener('submit', function (e) {
         loginButton.disabled = false;
     });
 });
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
 
 
 // --- LÓGICA DO MODAL ESQUECI MINHA SENHA ---

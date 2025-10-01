@@ -69,7 +69,7 @@ loginForm.addEventListener('submit', function (e) {
     buttonLoading.classList.remove('hidden');
     loginButton.disabled = true;
 
-    const payload = { email: email, password: password };
+    const payload = { username: email, password: password };
 
     fetch(`${apiUrl}/api/accounts/token/`, {
         method: 'POST',
